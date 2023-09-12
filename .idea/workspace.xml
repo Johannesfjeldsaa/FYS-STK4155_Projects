@@ -10,6 +10,13 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Jupyter Notebook" />
+      </list>
+    </option>
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 4
 }</component>
@@ -44,6 +51,7 @@
       <workItem from="1694435330312" duration="419000" />
       <workItem from="1694436734882" duration="687000" />
       <workItem from="1694499263346" duration="519000" />
+      <workItem from="1694504019446" duration="47000" />
     </task>
     <servers />
   </component>
