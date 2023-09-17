@@ -13,16 +13,20 @@ def FrankeFunction(x,y):
     return term1 + term2 + term3 + term4
 
 if __name__ == '__main__':
-    
+
+### Example plotting the Franke function in a 3D projection ###
+
+
     fig = plt.figure()
-    ax = fig.gca(projection='3d')
-            
-            # Make data.
+    ax = fig.add_subplot(111, projection='3d')
+
+    # Make data.
     x = np.arange(0, 1, 0.05)
     y = np.arange(0, 1, 0.05)
     x, y = np.meshgrid(x,y)
-    
-    
+
+
+
     z = FrankeFunction(x, y)
     # Plot the surface.
     surf = ax.plot_surface(x, y, z, cmap=cm.coolwarm,
@@ -30,8 +34,9 @@ if __name__ == '__main__':
     # Customize the z axis.
     ax.set_zlim(-0.10, 1.40)
     ax.zaxis.set_major_locator(LinearLocator(10))
-    ax.zaxis.set_major_formatter(FormatStrFormatter(’%.02f’))
-            # Add a color bar which maps values to colors.
+    ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
+
+    # Add a color bar which maps values to colors.
     fig.colorbar(surf, shrink=0.5, aspect=5)
     plt.show()
     
