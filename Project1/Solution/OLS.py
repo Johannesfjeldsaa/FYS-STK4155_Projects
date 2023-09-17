@@ -2,26 +2,29 @@
 
 import numpy as np
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import PolynomialFeatures
 
 ### 1D OLS ###
 
-class OLS():
-    def __init__(self, x, y, z=None):
-        if z is not None:
-            X = np.column_stack((x.ravel(), y.ravel()))
-            self.X = np.column_stack((np.ones(X.shape[0]), X))
-            self.y = z.ravel()
+class OLS:
+    def __init__(self, poly_degree, x, y, z=None):
+        poly = PolynomialFeatures(degree=poly_degree)
+
+        if z is None:
+            self.X = poly.fit_transform(x.reshape(-1, 1))
+            self.y = y
         else:
-            self.X = np.column_stack(np.column_stack((np.ones(X.shape[0]), x.ravel())))
-            self.y = y.ravel()
+            self.X = poly.fit_transform(np.c_[x, y])
+            self.y = z
 
         self.splitted = False
         self.scaled = False
         self.scaling_methode = None
 
+
     def check_vectors_same_length(self, a, b):
         """
-        Check if two variables are vectors (1D arrays) and have the same length.
+        Check if two vectors (1D arrays) and have the same length.
 
         Parameters:
         a (array-like): The first variable to check.
@@ -33,15 +36,11 @@ class OLS():
         Returns:
         None
         """
-        # Convert the inputs to NumPy arrays (if they are not already)
-        a = np.asarray(a)
-        b = np.asarray(b)
-
         # Check if both variables are 1D arrays and have the same length
-        if a.ndim == 1 and b.ndim == 1 and len(a) == len(b):
-            return
+        if len(a) != len(b):
+            raise ValueError(f'input must be same length, not {len(a)} and {len(b)}')
         else:
-            raise ValueError("Input variables must be 1D arrays of the same length.")
+            return True
 
 
     def split_data(self, test_size):
@@ -58,9 +57,10 @@ class OLS():
         (self.X_train,
          self.X_test,
          self.y_train,
-         self.y_train) = train_test_split(self.X, self.y,
+         self.y_test) = train_test_split(self.X, self.y,
                                           test_size=test_size)  # Splits data based on test_size
 
+        return self.X_train, self.X_test, self.y_train, self.y_test
 
     def standard_scaling(self):
         if self.splitted is not True:
@@ -78,39 +78,39 @@ class OLS():
 
 
 
-    def train_by_OLS(self, train_on_scaled=None):
+
+    def train_by_OLS(self, train_on_scaled):
         if self.splitted is not True:
             raise ArithmeticError('Split data before performing model training')
 
-        if train_on_scaled is None or True:
+        if train_on_scaled is True:
             if self.scaled is True:
-                if self.scaling_methode == 'Standardscaling':
-                    beta = (np.linalg.inv(self.X_train_scaled.T @ self.X_train_scaled) @
-                            self.X_train_scaled.T @ self.y_train_scaled)
+                if self.scaling_methode == 'StandardScaling':
+                    U, S, VT = np.linalg.svd(self.X_train, full_matrices=False)
+                    # Solve for beta using SVD
+                    self.beta = VT.T @ np.linalg.pinv(np.diag(S)) @ U.T @ self.y_train
             else:
-                raise ValueError('Parse train_on_scaled=False in order to train on unscaled data. '
-                                 'Else perform scaling and repeat command')
+                raise ValueError(f'Parse train_on_scaled=False in order to train on unscaled data. You parsed {train_on_scaled}.')
 
         elif train_on_scaled is False:
-            beta = (np.linalg.inv(self.X_train.T @ self.X_train) @
-                    self.X_train.T @ self.y_train)
+            U, S, VT = np.linalg.svd(self.X_train, full_matrices=False)
+            # Solve for beta using SVD
+            self.beta = VT.T @ np.linalg.pinv(np.diag(S)) @ U.T @ self.y_train
 
         else:
             raise ValueError(f'parameter train_on_scaled takes bolean True or False not {train_on_scaled}')
 
-        self.beta = beta
+        return self.beta
 
-        return beta
-
-    def predict_traing(self):
+    def predict_training(self):
         self.y_pred_train = self.X_train @ self.beta
 
         return self.y_pred_train
 
     def predict_test(self):
         if self.scaled is True:
-            if self.scaling_methode == 'Standardscaling':
-                self.y_pred_test = (self.X_test @ self.beta) + self.y_train_mean
+            if self.scaling_methode == 'StandardScaling':
+                self.y_pred_test = (self.X_test @ self.beta) + self.y_train_mean #something funcy with the scaling!!!
         else:
             self.y_pred_test = (self.X_test @ self.beta)
 
