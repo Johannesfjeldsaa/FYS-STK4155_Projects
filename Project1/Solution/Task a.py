@@ -5,7 +5,7 @@ plt.style.use('Solarize_Light2')
 
 
 from Franke_function import FrankeFunction
-from OLS import OLS
+from LinRegression import LinRegression
 from setup import save_fig, data_path
 
 if __name__ == '__main__':
@@ -14,24 +14,26 @@ if __name__ == '__main__':
 
     x = np.arange(0, 1, 0.05)
     y = np.arange(0, 1, 0.05)
-    x, y = np.meshgrid(x, y)
+    x_mesh, y_mesh = np.meshgrid(x, y, indexing='ij')
 
-    z = FrankeFunction(x, y)
+    z = FrankeFunction(x_mesh, y_mesh)
 
 
-    OLS_regression = OLS(5, x, y, z)
-
+    OLS_regression = LinRegression(5, x, y, z)
+    print(np.shape(OLS_regression.X))
+    print(np.shape(OLS_regression.y))
 
     OLS_regression.split_data(4/5)
+
     print(f'Split performed: {OLS_regression.splitted}')
 
 
-    OLS_regression.standard_scaling()
+    OLS_regression.scale()
     print(f'Scaling performed: {OLS_regression.scaled}\n'
-          f'Scaling methode: {OLS_regression.scaling_methode}')
+          f'Scaling methode: {OLS_regression.scaling_method}')
 
 
-    OLS_regression.train_by_OLS(train_on_scaled=True)
+    OLS_regression.train_model(train_on_scaled=True)
     print(f'The optimal parametres are: {OLS_regression.beta}')
 
     OLS_regression.predict_training()
