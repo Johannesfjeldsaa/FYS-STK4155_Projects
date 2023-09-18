@@ -108,12 +108,33 @@
       <workItem from="1694764323345" duration="1289000" />
       <workItem from="1694972592154" duration="9252000" />
       <workItem from="1694981928781" duration="2714000" />
-      <workItem from="1695028577138" duration="9972000" />
+      <workItem from="1695028577138" duration="10424000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Project1/Solution/LinRegression.py</url>
+          <line>162</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Project1/Solution/LinRegression.py</url>
+          <line>163</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Project1/Solution/LinRegression.py</url>
+          <line>161</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$Task_a.coverage" NAME="Task a Coverage Results" MODIFIED="1695054579161" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
