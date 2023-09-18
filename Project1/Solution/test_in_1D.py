@@ -1,13 +1,9 @@
-import os
+from OLS import OLS
 
 import numpy as np
-
 import matplotlib.pyplot as plt
 plt.style.use('Solarize_Light2')
 
-from sklearn.model_selection import train_test_split
-import sklearn.linear_model as skl
-from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 
 np.random.seed(200)
 n = 100
@@ -17,22 +13,14 @@ y = np.exp(-x ** 2) + 1.5 * np.exp(-(x - 2) ** 2) + np.random.normal(0, 0.1, x.s
 
 
 # Plotting to get an idea of what we are dealing with.
-fig, ax = plt.subplots(figsize=[8,6])
+fig, ax = plt.subplots(figsize=[8, 6])
 
 ax.scatter(x, y,
-            color='blue',
-            label='Random data')
-
-# Legg til en legend nederst sentrert i en separat boks
-legend = ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.2), #lokasjon
-                   fancybox=True, shadow=True) # utseende for boksen
-legend.get_frame().set_facecolor('white') #uteseende for boksenplt.show()
+           color='blue',
+           label='Random data')
 
 plt.show()
 
-
-
-from OLS import OLS
 
 ols = OLS(5, x, y)
 
@@ -46,7 +34,7 @@ print(f'Split performed: {ols.splitted}')
 beta = ols.train_by_OLS(train_on_scaled=False)
 
 
-y_tilde = ols.predict_traing()
+y_tilde = ols.predict_training()
 y_pred = ols.predict_test()
 
 (print(f'y_train: {np.shape(ols.y_train)}'))
@@ -60,22 +48,21 @@ print(f'Mean squared error training: {ols.MSE(ols.y_train, ols.y_pred_train):.4f
 print(f'Mean squared error test: {ols.MSE(ols.y_test, ols.y_pred_test):.4f}')
 
 
-
-
 # Plotting to get an idea of what we are dealing with.
-fig, ax = plt.subplots(figsize=[8,6])
+fig, ax = plt.subplots(figsize=[8, 6])
 
 ax.scatter(x, y,
-            color='blue',
-            label='Random data')
+           color='blue',
+           label='Random data')
 
-ax.scatter(ols.X_test[:,1], ols.y_pred_test,
+
+sorted_indices = np.argsort(ols.X_test[:, 1])  # Get the indices that would sort ols.X_test[:, 1] in ascending order
+sorted_x_test = ols.X_test[:, 1][sorted_indices]  # Sort ols.X_test[:, 1] in ascending order
+sorted_y_pred_test = ols.y_pred_test[sorted_indices]  # Apply the same sorting to ols.y_pred_test
+
+ax.plot(sorted_x_test, sorted_y_pred_test,
            color='red',
            label='predicted data')
 
-# Legg til en legend nederst sentrert i en separat boks
-legend = ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.2), #lokasjon
-                   fancybox=True, shadow=True) # utseende for boksen
-legend.get_frame().set_facecolor('white') #uteseende for boksenplt.show()
 
 plt.show()

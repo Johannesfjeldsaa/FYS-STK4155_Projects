@@ -21,16 +21,18 @@ if __name__ == '__main__':
 
     OLS_regression = OLS(5, x, y, z)
 
+
     OLS_regression.split_data(4/5)
     print(f'Split performed: {OLS_regression.splitted}')
 
-    OLS_regression.standard_scaling()
 
+    OLS_regression.standard_scaling()
     print(f'Scaling performed: {OLS_regression.scaled}\n'
           f'Scaling methode: {OLS_regression.scaling_methode}')
 
 
     OLS_regression.train_by_OLS(train_on_scaled=True)
+    print(f'The optimal parametres are: {OLS_regression.beta}')
 
     OLS_regression.predict_training()
 
@@ -38,7 +40,7 @@ if __name__ == '__main__':
 
     print(OLS_regression.y_test[0])
     print(OLS_regression.y_pred_test[0])
-    print(OLS_regression.y_train_mean)
+    print(OLS_regression.y_scaler)
 
 
     # The mean squared error
@@ -48,8 +50,17 @@ if __name__ == '__main__':
     print(f'R^2 training: {OLS_regression.R_squared(OLS_regression.y_train, OLS_regression.y_pred_train):.4f}')
     print(f'R^2 squared error test: {OLS_regression.R_squared(OLS_regression.y_test, OLS_regression.y_pred_test):.4f}')
 
-    z = FrankeFunction(x, y)
+
     # Plot the surface.
+
+    from mpl_toolkits.mplot3d import Axes3D
+    import matplotlib.pyplot as plt
+    from matplotlib import cm
+    from matplotlib.ticker import LinearLocator, FormatStrFormatter
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
     surf = ax.plot_surface(x, y, z, cmap=cm.coolwarm,
                            linewidth=0, antialiased=False)
 

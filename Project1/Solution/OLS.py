@@ -69,12 +69,12 @@ class OLS:
         self.scaled = True
         self.scaling_methode = 'StandardScaling'
 
-        self.y_train_mean = np.mean(self.y_train)
-        self.y_train_scaled = self.y_train - self.y_train_mean
+        self.y_scaler = np.mean(self.y_train)
+        self.y_train_scaled = self.y_train - self.y_scaler
 
-        self.X_train_mean = np.mean(self.X_train, axis=0)
-        self.X_train_scaled = self.X_train - self.X_train_mean
-        self.X_test_scaled = self.X_test - self.X_train_mean  # Use mean from training data
+        self.X_scaler = np.mean(self.X_train, axis=0)
+        self.X_train_scaled = self.X_train - self.X_scaler
+        self.X_test_scaled = self.X_test - self.X_scaler  # Use mean from training data
 
 
 
@@ -86,9 +86,9 @@ class OLS:
         if train_on_scaled is True:
             if self.scaled is True:
                 if self.scaling_methode == 'StandardScaling':
-                    U, S, VT = np.linalg.svd(self.X_train, full_matrices=False)
+                    U, S, VT = np.linalg.svd(self.X_train_scaled, full_matrices=False)
                     # Solve for beta using SVD
-                    self.beta = VT.T @ np.linalg.pinv(np.diag(S)) @ U.T @ self.y_train
+                    self.beta = VT.T @ np.linalg.pinv(np.diag(S)) @ U.T @ self.y_train_scaled
             else:
                 raise ValueError(f'Parse train_on_scaled=False in order to train on unscaled data. You parsed {train_on_scaled}.')
 
@@ -103,14 +103,16 @@ class OLS:
         return self.beta
 
     def predict_training(self):
-        self.y_pred_train = self.X_train @ self.beta
+        if self.scaled is True:
+            self.y_pred_train = self.X_train_scaled @ self.beta
+        else:
+            self.y_pred_train = self.X_train @ self.beta
 
         return self.y_pred_train
 
     def predict_test(self):
         if self.scaled is True:
-            if self.scaling_methode == 'StandardScaling':
-                self.y_pred_test = (self.X_test @ self.beta) + self.y_train_mean #something funcy with the scaling!!!
+            self.y_pred_test = (self.X_test_scaled @ self.beta)
         else:
             self.y_pred_test = (self.X_test @ self.beta)
 
