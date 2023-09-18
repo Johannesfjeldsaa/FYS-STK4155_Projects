@@ -39,6 +39,9 @@ degree = 5
 x = np.linspace(-3, 3, n).reshape(-1, 1)  # 1 column with n rows
 y = np.exp(-x**2) + 1.5 * np.exp(-(x-2)**2) + np.random.normal(0, 0.1, x.shape) #add noise later, make sure its in the normal dist
 
+plt.scatter(x,y)
+plt.show()
+
 # Making a function to calculate MSE for different complexities.
 
 def MSE_R2_score_ols_analysis(polynomial_degree,x,y):
@@ -136,12 +139,12 @@ y = np.arange(0, 1, 0.05) #+ np.random.normal(0, 0.1) #random stochastic noise
 xv, yv = np.meshgrid(x,y, indexing='ij')  # prøvde å få den indeksert til matrise behandling
 z = FrankeFunction(xv, yv)
 
-def franke_MSE_R2_score_ols_analysis(polynomial_degree,z):
+def franke_MSE_R2_score_ols_analysis(polynomial_degree,xv, yv, z):
     X_list = []
     for polynomial in range(polynomial_degree+1):
         if polynomial != 0:
             poly = PolynomialFeatures(degree=polynomial, include_bias=False) # leave out intercept
-            X_list.append(poly.fit_transform(z[:,0][:, np.newaxis]))
+            X_list.append(poly.fit_transform(xv,y=yv))
 
     #Perform OLS analysis on the different design matrices with different polynomial degrees
 
@@ -150,7 +153,10 @@ def franke_MSE_R2_score_ols_analysis(polynomial_degree,z):
     beta_parameters = []
 
     for design_matrix in X_list:
-        X_train, X_test, y_train, y_test = train_test_split(design_matrix, z[0,:], test_size=0.25)
+
+        print(design_matrix.shape)
+        print(z.shape)
+        X_train, X_test, y_train, y_test = train_test_split(design_matrix, z, test_size=0.25)
 
         # Centering the data
         X_train_mean = np.mean(X_train, axis=0)
@@ -170,7 +176,7 @@ def franke_MSE_R2_score_ols_analysis(polynomial_degree,z):
     return MSE_ols, R2_ols, beta_parameters
 
 
-franke_MSE_ols, franke_R2_ols, franke_beta_params = franke_MSE_R2_score_ols_analysis(degree,z)
+franke_MSE_ols, franke_R2_ols, franke_beta_params = franke_MSE_R2_score_ols_analysis(degree,xv,yv,z)
 
 # Plotting of R2 and MSE scores against polynomial order
 fig, ax = plt.subplots()
@@ -200,7 +206,7 @@ plt.show()
 
 # Surface plot
 fig = plt.figure()
-ax = fig.gca(projection='3d')  # Make poejction of 3d space down to a 2d fit
+ax = fig.gca(projection='3d')  # Make projection of 3d space down to a 2d fit
 # Plot the surface.
 surf = ax.plot_surface(xv, yv, z, cmap=cm.coolwarm,
                        linewidth=0, antialiased=False)
