@@ -14,9 +14,8 @@ if __name__ == '__main__':
 
     x = np.arange(0, 1, 0.05)
     y = np.arange(0, 1, 0.05)
-    x_mesh, y_mesh = np.meshgrid(x, y, indexing='ij')
 
-    z = FrankeFunction(x_mesh, y_mesh)
+    z = FrankeFunction(x, y)
 
 
     OLS_regression = LinRegression(5, x, y, z)
@@ -28,12 +27,12 @@ if __name__ == '__main__':
     print(f'Split performed: {OLS_regression.splitted}')
 
 
-    OLS_regression.scale()
+    OLS_regression.scale(scaling_method='StandardScaling')
     print(f'Scaling performed: {OLS_regression.scaled}\n'
           f'Scaling methode: {OLS_regression.scaling_method}')
 
 
-    OLS_regression.train_model(train_on_scaled=True)
+    OLS_regression.train_model(train_on_scaled=True, regression_method='OLS')
     print(f'The optimal parametres are: {OLS_regression.beta}')
 
     OLS_regression.predict_training()

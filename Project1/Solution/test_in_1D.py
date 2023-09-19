@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 plt.style.use('Solarize_Light2')
 
 
+
 np.random.seed(200)
 n = 100
 # Make data set.

@@ -9,16 +9,16 @@ class LinRegression:
     supported_methods = {'regression_method': ['OLS', 'Ridge'],
                          'scaling_method': ['StandardScaling']}
 
-    def __init__(self, poly_degree, x, y, z=None, regression_method=None, scaling_method='None'):
+    def __init__(self, poly_degree, x, y, z=None, regression_method=None, scaling_method=None):
 
         self.poly_degree = poly_degree
-        poly = PolynomialFeatures(degree=self.poly_degree)
+
         if z is None:
-            self.X = poly.fit_transform(x.reshape(-1, 1))
+            self.X = PolynomialFeatures(degree=self.poly_degree).fit_transform(x.reshape(-1, 1))
             self.y = y
         else:
             # Horizontally concat columns to creat design matrix
-            self.X = poly.fit_transform(np.c_[x, y])
+            self.X = self.create_design_matrix(x, y, self.poly_degree)
             self.y = z
 
         # Define matrices and vectors
@@ -56,6 +56,21 @@ class LinRegression:
                 supported_methods = self.supported_methods['scaling_method']
                 raise ValueError(f'scaling_method was {scaling_method}, expected {supported_methods}')
 
+    def create_design_matrix(self, x, y, n ):  # From example week 35
+        if len(x.shape) > 1:
+            x = np.ravel(x)
+            y = np.ravel(y)
+
+        N = len(x)
+        l = int((n+1)*(n+2)/2)		# Number of elements in beta
+        X = np.ones((N,l))
+
+        for i in range(1,n+1):
+            q = int((i)*(i+1)/2)
+            for k in range(i+1):
+                X[:,q+k] = (x**(i-k))*(y**k)
+
+        return X
 
     def check_vectors_same_length(self, a, b):
         """
@@ -112,6 +127,7 @@ class LinRegression:
                 raise ValueError(f'scaling_method was {scaling_method}, expected {supported_methods}')
 
         if self.scaling_method == 'StandardScaling':
+            # assuming std = 1
             self.y_scaler = np.mean(self.y_train)
             self.y_train_scaled = self.y_train - self.y_scaler
 
@@ -160,7 +176,8 @@ class LinRegression:
         if self.regression_method == 'OLS':
             self.beta = np.linalg.pinv(X_train.T @ X_train) @ (X_train.T @ y_train)
         elif self.regression_method == 'ridge':
-            I = np.eye(self.poly_degree, self.poly_degree)
+            cols = np.shape(X_train)[1]
+            I = np.eye(cols, cols)
             self.beta = np.linalg.pinv(X_train.T @ X_train + la*I) @ X_train.T @ y_train
             
         return self.beta
