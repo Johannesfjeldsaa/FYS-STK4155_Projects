@@ -246,8 +246,3 @@ class LinRegression:
         R2 = 1 - SSR/TSS
 
         return R2
-
-    def R2_score(self, y_data, y_model):
-        n = np.size(y_model)
-        y_sample_mean = np.sum(y_data) / n
-        return (1 - (np.sum((y_data - y_model) ** 2)) / (np.sum((y_data - y_sample_mean) ** 2)))

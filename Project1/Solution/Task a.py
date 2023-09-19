@@ -10,11 +10,11 @@ from setup import save_fig, data_path
 
 if __name__ == '__main__':
 
-    # Generate x, y meshgrid in order to implement the FrankeFunction
-    np.random.seed(100)
+    np.random.seed(2500)
 
-    x = np.arange(0, 1, 0.05)
-    y = np.arange(0, 1, 0.05)
+    N = 1000
+    x = np.sort(np.random.uniform(0, 1, N))
+    y = np.sort(np.random.uniform(0, 1, N))
 
     z = FrankeFunction(x, y)
 
@@ -23,26 +23,22 @@ if __name__ == '__main__':
     print(np.shape(OLS_regression.X))
     print(np.shape(OLS_regression.y))
 
-    OLS_regression.split_data(4/5)
+    OLS_regression.split_data(1/5)
 
     print(f'Split performed: {OLS_regression.splitted}')
 
 
-    #OLS_regression.scale(scaling_method='StandardScaling')
+    OLS_regression.scale(scaling_method='StandardScaling')
     print(f'Scaling performed: {OLS_regression.scaled}\n'
-          f'Scaling methode: {OLS_regression.scaling_method}')
+           f'Scaling methode: {OLS_regression.scaling_method}')
 
 
-    OLS_regression.train_model(train_on_scaled=False, regression_method='OLS')
+    OLS_regression.train_model(train_on_scaled=True, regression_method='OLS')
     print(f'The optimal parametres are: {OLS_regression.beta}')
 
     OLS_regression.predict_training()
 
     OLS_regression.predict_test()
-
-    print(OLS_regression.y_test[0])
-    print(OLS_regression.y_pred_test[0])
-    print(OLS_regression.y_scaler)
 
 
     # The mean squared error
@@ -51,32 +47,31 @@ if __name__ == '__main__':
 
     from sklearn.metrics import r2_score
     print(f'R^2 training: {OLS_regression.R_squared(OLS_regression.y_train, OLS_regression.y_pred_train):.4f}')
-    print(f'R^2 test Ine: {OLS_regression.R2_score(OLS_regression.y_test, OLS_regression.y_pred_test):.4f}')
-    print(f'R^2 test Johannes: {OLS_regression.R_squared(OLS_regression.y_test, OLS_regression.y_pred_test):.4f}')
-    print(f'R^2 test Scikit: {r2_score(OLS_regression.y_test, OLS_regression.y_pred_test):.4f}')
+    print(f'R^2 test: {OLS_regression.R_squared(OLS_regression.y_test, OLS_regression.y_pred_test):.4f}')
 
 
 
-    # Plot the surface.
-
-    from mpl_toolkits.mplot3d import Axes3D
-    import matplotlib.pyplot as plt
-    from matplotlib import cm
-    from matplotlib.ticker import LinearLocator, FormatStrFormatter
-
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-
-    surf = ax.plot_surface(x, y, z, cmap=cm.coolwarm,
-                           linewidth=0, antialiased=False)
-
-    # Customize the z axis.
-    ax.set_zlim(-0.10, 1.40)
-    ax.zaxis.set_major_locator(LinearLocator(10))
-    ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
-
-    # Add a color bar which maps values to colors.
-    fig.colorbar(surf, shrink=0.5, aspect=5)
-    plt.show()
-
+    """
+        # Plot the surface.
+    
+        from mpl_toolkits.mplot3d import Axes3D
+        import matplotlib.pyplot as plt
+        from matplotlib import cm
+        from matplotlib.ticker import LinearLocator, FormatStrFormatter
+    
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+    
+        surf = ax.plot_surface(x, y, z, cmap=cm.coolwarm,
+                               linewidth=0, antialiased=False)
+    
+        # Customize the z axis.
+        ax.set_zlim(-0.10, 1.40)
+        ax.zaxis.set_major_locator(LinearLocator(10))
+        ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
+    
+        # Add a color bar which maps values to colors.
+        fig.colorbar(surf, shrink=0.5, aspect=5)
+        plt.show()
+    """
 
