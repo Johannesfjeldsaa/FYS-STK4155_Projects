@@ -72,6 +72,15 @@ class LinRegression:
 
         return X
 
+    def design_matrix_equal_identity(self):
+        cols = np.shape(self.X)[1]
+        self.X = np.eye(cols, cols)
+
+        if (self.X.T @ self.X).all() == (np.eye(cols, cols)).all():
+            print('hurra')
+
+
+
     def check_vectors_same_length(self, a, b):
         """
         Check if two vectors (1D arrays) and have the same length.
@@ -182,6 +191,9 @@ class LinRegression:
             
         return self.beta
 
+    def predict(self):
+        self.y_pred = self.X @ self.beta
+
     def predict_training(self):
         if self.scaled is True:
             self.y_pred_train = self.X_train_scaled @ self.beta + self.y_scaler
@@ -227,15 +239,15 @@ class LinRegression:
 
         self.check_vectors_same_length(true_y, predicted_y)
 
-
+        mean_true_y = np.mean(true_y)
         SSR = np.sum((true_y - predicted_y) ** 2)  # Residual som of squares, measures the unexplained variability ("errors")
-        TSS = np.sum((true_y - np.mean(true_y)) ** 2)  # Total sum of squares, measures the total variability
+        TSS = np.sum((true_y - mean_true_y) ** 2)  # Total sum of squares, measures the total variability
 
         R2 = 1 - SSR/TSS
 
         return R2
 
-    def R2_score(y_data, y_model):
+    def R2_score(self, y_data, y_model):
         n = np.size(y_model)
         y_sample_mean = np.sum(y_data) / n
         return (1 - (np.sum((y_data - y_model) ** 2)) / (np.sum((y_data - y_sample_mean) ** 2)))
