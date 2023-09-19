@@ -150,7 +150,7 @@ class LinRegression:
                 X_train = self.X_train_scaled
                 y_train = self.y_train_scaled
             else:
-                raise ValueError(f'Parse train_on_scaled=False in order to train on unscaled data.')
+                raise ValueError(f'Scale data before using train_on_scaled=True')
         elif train_on_scaled is False:
             X_train = self.X_train
             y_train = self.y_train
