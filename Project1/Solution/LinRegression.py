@@ -174,7 +174,7 @@ class LinRegression:
             raise ValueError(f'train_on_scaled takes arguments True or False, not {train_on_scaled}')
 
         if self.regression_method == 'OLS':
-            self.beta = np.linalg.pinv(X_train.T @ X_train) @ (X_train.T @ y_train)
+            self.beta = np.linalg.pinv(X_train.T @ X_train) @ X_train.T @ y_train
         elif self.regression_method == 'ridge':
             cols = np.shape(X_train)[1]
             I = np.eye(cols, cols)
@@ -227,9 +227,15 @@ class LinRegression:
 
         self.check_vectors_same_length(true_y, predicted_y)
 
+
         SSR = np.sum((true_y - predicted_y) ** 2)  # Residual som of squares, measures the unexplained variability ("errors")
         TSS = np.sum((true_y - np.mean(true_y)) ** 2)  # Total sum of squares, measures the total variability
 
         R2 = 1 - SSR/TSS
 
         return R2
+
+    def R2_score(y_data, y_model):
+        n = np.size(y_model)
+        y_sample_mean = np.sum(y_data) / n
+        return (1 - (np.sum((y_data - y_model) ** 2)) / (np.sum((y_data - y_sample_mean) ** 2)))

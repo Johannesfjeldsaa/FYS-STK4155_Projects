@@ -18,7 +18,7 @@ if __name__ == '__main__':
     z = FrankeFunction(x, y)
 
 
-    OLS_regression = LinRegression(5, x, y, z)
+    OLS_regression = LinRegression(3, x, y, z)
     print(np.shape(OLS_regression.X))
     print(np.shape(OLS_regression.y))
 
@@ -48,8 +48,10 @@ if __name__ == '__main__':
     print(f'Mean squared error training: {OLS_regression.MSE(OLS_regression.y_train, OLS_regression.y_pred_train):.4f}')
     print(f'Mean squared error test: {OLS_regression.MSE(OLS_regression.y_test, OLS_regression.y_pred_test):.4f}')
 
+    from sklearn.metrics import r2_score
     print(f'R^2 training: {OLS_regression.R_squared(OLS_regression.y_train, OLS_regression.y_pred_train):.4f}')
-    print(f'R^2 squared error test: {OLS_regression.R_squared(OLS_regression.y_test, OLS_regression.y_pred_test):.4f}')
+    #rint(f'R^2 test: {r2_score(OLS_regression.y_test, OLS_regression.y_pred_test):.4f}')
+    print(f'R^2 test: {OLS_regression.R_squared(OLS_regression.y_test, OLS_regression.y_pred_test):.4f}')
 
 
     # Plot the surface.

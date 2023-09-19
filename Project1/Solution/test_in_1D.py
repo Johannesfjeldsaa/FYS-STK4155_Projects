@@ -33,7 +33,7 @@ Linreg.split_data(.4)
 
 print(f'Split performed: {Linreg.splitted}')
 
-beta = Linreg.train_by_OLS(train_on_scaled=False)
+beta = Linreg.train_model(regression_method='OLS', train_on_scaled=False)
 
 
 y_tilde = Linreg.predict_training()
