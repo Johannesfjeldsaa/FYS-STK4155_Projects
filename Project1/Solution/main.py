@@ -1,13 +1,13 @@
+from Franke_function import FrankeFunction
+from LinRegression import LinRegression
+from Plotting import Plotting
+from setup import save_fig, data_path
+
 import numpy as np
 
 import matplotlib.pyplot as plt
 plt.style.use('Solarize_Light2')
 
-
-from Franke_function import FrankeFunction
-from LinRegression import LinRegression
-from Plotting import Plotting
-from setup import save_fig, data_path
 
 if __name__ == '__main__':
 

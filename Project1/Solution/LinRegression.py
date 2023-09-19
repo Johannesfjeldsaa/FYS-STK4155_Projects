@@ -6,7 +6,7 @@ from sklearn.preprocessing import PolynomialFeatures
 
 
 class LinRegression:
-    supported_methods = {'regression_method': ['OLS', 'Ridge'],
+    supported_methods = {'regression_method': ['OLS', 'Ridge', 'Lasso'],
                          'scaling_method': ['StandardScaling']}
 
     def __init__(self, poly_degree, x, y, z=None, regression_method=None, scaling_method=None):
@@ -33,6 +33,7 @@ class LinRegression:
         self.y_test = None
         self.y_pred_test = None
         self.y_scaler = None
+        self.beta = None
 
         ### Define attributes of the linear regression
         self.splitted = False
