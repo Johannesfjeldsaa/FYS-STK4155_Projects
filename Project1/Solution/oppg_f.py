@@ -49,6 +49,8 @@ groups = [x[i:i+group_size] for i in range(0, n, group_size)]
 # loop through the groups, using one of them as a test set each time for performing
 # different regression and MSE testing
 
+MSE_score_test_data = []
+MSE_score_train_data = []
 
 for i in range(k):
     # Use the i-th part as the test set and the rest as the train set
@@ -63,11 +65,17 @@ for i in range(k):
     Linreg_train.cross_validation = True
     Linreg_test.cross_validation = True
 
-    # Now perform OLS, Ridge, Lasso
+    # Find betas OLS, Ridge, Lasso
     Linreg_train.train_model(regression_method='OLS', train_on_scaled=False)
     Linreg_test.train_model(regression_method='OLS', train_on_scaled=False)
 
+    # Predict model data
+    Linreg_train.predict()
+    Linreg_test.predict()
 
+    # Perform MSE and saving them for each K group
+    MSE_score_train_data.append(Linreg_train.MSE(y_train_data,Linreg_train.y_pred))
+    MSE_score_test_data.append(Linreg_test.MSE(y_test_data, Linreg_test.y_pred))
 
 # range penalty parameter for ridge and lasso
 lmb_Ridge_Lasso = np.linspace(0,10,20)
