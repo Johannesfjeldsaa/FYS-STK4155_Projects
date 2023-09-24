@@ -37,6 +37,8 @@ class LinRegression:
 
         ### Define attributes of the linear regression
         self.splitted = False
+        self.cross_validation = False
+
         # Regression
         if regression_method is None:
             self.regression_method = 'OLS'
@@ -72,6 +74,7 @@ class LinRegression:
                 X[:,q+k] = (x**(i-k))*(y**k)
 
         return X
+
 
     def design_matrix_equal_identity(self):
         cols = np.shape(self.X)[1]
@@ -111,7 +114,6 @@ class LinRegression:
         if self.scaled is True:
             raise ValueError('Split before you scale!')
 
-
         (self.X_train,
          self.X_test,
          self.y_train,
@@ -148,9 +150,10 @@ class LinRegression:
 
         self.scaled = True
 
-    def train_model(self, regression_method=None, train_on_scaled=None, la=None):
-        if self.splitted is not True:
+    def train_model(self, regression_method=None, train_on_scaled=None, la=None): # kfold_train=None, kfold_test=None):
+        if self.splitted is not True and self.cross_validation is not True:
             raise ArithmeticError('Split data before performing model training.')
+
 
         if regression_method and self.regression_method is None:
             print('No method for training was provided, using OLS')
@@ -171,17 +174,22 @@ class LinRegression:
 
         train_on_scaled = train_on_scaled if train_on_scaled is not None else False
 
-        if train_on_scaled:
-            if self.scaled is True:
-                X_train = self.X_train_scaled
-                y_train = self.y_train_scaled
+        if self.cross_validation is not True:
+            if train_on_scaled:
+                if self.scaled is True:
+                    X_train = self.X_train_scaled
+                    y_train = self.y_train_scaled
+                else:
+                    raise ValueError(f'Scale data before using train_on_scaled=True')
+            elif train_on_scaled is False:
+                X_train = self.X_train
+                y_train = self.y_train
             else:
-                raise ValueError(f'Scale data before using train_on_scaled=True')
-        elif train_on_scaled is False:
-            X_train = self.X_train
-            y_train = self.y_train
-        else:
-            raise ValueError(f'train_on_scaled takes arguments True or False, not {train_on_scaled}')
+                raise ValueError(f'train_on_scaled takes arguments True or False, not {train_on_scaled}')
+
+        if self.cross_validation is True:
+            X_train = self.X
+            y_train = self.y
 
         if self.regression_method == 'OLS':
             self.beta = np.linalg.pinv(X_train.T @ X_train) @ X_train.T @ y_train
