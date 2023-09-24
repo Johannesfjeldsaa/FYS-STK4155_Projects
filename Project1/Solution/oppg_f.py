@@ -25,9 +25,7 @@ n=100
 x = np.linspace(-3, 3, n).reshape(-1, 1)
 y = np.exp(-x ** 2) + 1.5 * np.exp(-(x - 2) ** 2) + np.random.normal(0, 0.1, x.shape)
 
-#Create a linear regression class
 polydegree = 5
-Linreg = LinRegression(polydegree, x, y)
 
 np.random.seed(1917)
 
@@ -51,7 +49,6 @@ groups = [x[i:i+group_size] for i in range(0, n, group_size)]
 # loop through the groups, using one of them as a test set each time for performing
 # different regression and MSE testing
 
-Linreg.cross_validation = True
 
 for i in range(k):
     # Use the i-th part as the test set and the rest as the train set
@@ -60,14 +57,16 @@ for i in range(k):
     y_train_data = np.exp(-train_data ** 2) + 1.5 * np.exp(-(train_data - 2) ** 2) + np.random.normal(0, 0.1, train_data.shape)
     y_test_data = np.exp(-test_data ** 2) + 1.5 * np.exp(-(test_data - 2) ** 2) + np.random.normal(0, 0.1, test_data.shape)
 
-    # create design_matrices out of the new data
-    X_kfold_train = Linreg.create_design_matrix(train_data,y_train_data,n)
-    X_kfold_test = Linreg.create_design_matrix(test_data, y_test_data, n)
-
+    # Create linreggression class for each new x and y
+    Linreg_train = LinRegression(polydegree, train_data, y_train_data)
+    Linreg_test = LinRegression(polydegree, test_data, y_test_data)
+    Linreg_train.cross_validation = True
+    Linreg_test.cross_validation = True
 
     # Now perform OLS, Ridge, Lasso
-    Linreg.train_model(regression_method='OLS', train_on_scaled=False, X_cv_train=X_kfold_train, y_cv_train=y_train_data) ## fordi data splittes med cross validation blir det feil i linreg classe her!
-    print(Linreg.beta)
+    Linreg_train.train_model(regression_method='OLS', train_on_scaled=False)
+    Linreg_test.train_model(regression_method='OLS', train_on_scaled=False)
+
 
 
 # range penalty parameter for ridge and lasso
