@@ -163,13 +163,6 @@ class LinRegression:
                 supported_methods = self.supported_methods['regression_method']
                 raise ValueError(f'regression_method was {regression_method}, expected {supported_methods}')
 
-
-        if self.regression_method in ['Ridge', 'Lasso']:
-            try:
-                float(la)
-            except ValueError:
-                print(f'la must be float, not {type(la)}')
-
         train_on_scaled = train_on_scaled if train_on_scaled is not None else False
 
         if train_on_scaled:
@@ -191,7 +184,7 @@ class LinRegression:
             I = np.eye(cols, cols)
             self.beta = np.linalg.pinv(X_train.T @ X_train + la*I) @ X_train.T @ y_train
         elif self.regression_method == "Lasso":
-            RegLasso = linear_model.Lasso(la, fit_intercept=False)
+            RegLasso = linear_model.Lasso(la, fit_intercept=False) #, tol=0.00001, max_iter=int(10e5))
             RegLasso.fit(X_train, y_train)
             self.beta = RegLasso.coef_
             
