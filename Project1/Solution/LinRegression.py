@@ -3,6 +3,7 @@
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import PolynomialFeatures
+from sklearn import linear_model
 
 
 class LinRegression:
@@ -163,7 +164,7 @@ class LinRegression:
                 raise ValueError(f'regression_method was {regression_method}, expected {supported_methods}')
 
 
-        if self.regression_method == 'Ridge':
+        if self.regression_method in ['Ridge', 'Lasso']:
             try:
                 float(la)
             except ValueError:
@@ -189,6 +190,10 @@ class LinRegression:
             cols = np.shape(X_train)[1]
             I = np.eye(cols, cols)
             self.beta = np.linalg.pinv(X_train.T @ X_train + la*I) @ X_train.T @ y_train
+        elif self.regression_method == "Lasso":
+            RegLasso = linear_model.Lasso(la, fit_intercept=False)
+            RegLasso.fit(X_train, y_train)
+            self.beta = RegLasso.coef_
             
         return self.beta
 

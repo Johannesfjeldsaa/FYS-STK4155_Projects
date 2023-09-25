@@ -64,3 +64,77 @@ if __name__ == '__main__':
     plots_task_1a.plot_MSE_scores()
     plots_task_1a.plot_R2_scores()
     plots_task_1a.plot_betaparams_polynomial_order()
+
+
+#%% Task c) Lasso regression
+
+    max_polydegree = 5
+    
+    nlambdas = 100
+    lambdas = np.logspace(-4, 4, nlambdas)
+    
+    for polydegree in range(1, max_polydegree+1):
+        MSE_test_scores_lasso = []
+        MSE_train_scores_lasso = []
+        
+        R2_test_scores_lasso = []
+        R2_train_scores_lasso = []
+        
+        beta_parameters_lasso = []
+        
+        for la in lambdas:
+            
+            Lasso_regression = LinRegression(polydegree, x, y, z) #create class
+            Lasso_regression.split_data(1/5) # perform split of data
+            
+            Lasso_regression.scale(scaling_method='StandardScaling') # Scaling data
+            
+            Lasso_regression.train_model(train_on_scaled=True, regression_method='Lasso', la=la)
+            
+            beta_parameters_lasso.append(Lasso_regression.beta)
+            
+            Lasso_regression.predict_training()
+
+            Lasso_regression.predict_test()
+
+            MSE_training = Lasso_regression.MSE(Lasso_regression.y_train, 
+                                                Lasso_regression.y_pred_train)
+            MSE_test = Lasso_regression.MSE(Lasso_regression.y_test, 
+                                            Lasso_regression.y_pred_test)
+            
+            MSE_train_scores_lasso.append(MSE_training)
+            MSE_test_scores_lasso.append(MSE_test)
+            
+            R2_training = Lasso_regression.R_squared(Lasso_regression.y_train, 
+                                                     Lasso_regression.y_pred_train)
+            R2_test = Lasso_regression.R_squared(Lasso_regression.y_test, 
+                                                 Lasso_regression.y_pred_test)
+            
+            R2_train_scores_lasso.append(R2_training)
+            R2_test_scores_lasso.append(R2_test)
+        
+        plt.figure()
+        plt.title(f"MSE Lasso, Polydegree: {polydegree}")
+        plt.plot(np.log10(lambdas), MSE_train_scores_lasso, 'r--', label = 'Train')
+        plt.plot(np.log10(lambdas), MSE_test_scores_lasso, 'b--', label = 'Test')
+        plt.legend()
+        plt.show()
+        
+        plt.figure()
+        plt.title("R2 Lasso, Polydegree: {polydegree}")
+        plt.plot(np.log10(lambdas), R2_train_scores_lasso, 'r--', label = 'Train')
+        plt.plot(np.log10(lambdas), R2_test_scores_lasso, 'b--', label = 'Test')
+        plt.legend()
+        plt.show()
+            
+            
+            
+            
+            
+            
+            
+            
+            
+    
+    
+    
