@@ -5,6 +5,7 @@ from setup import save_fig, data_path
 
 import numpy as np
 import pandas as pd
+import math
 
 import matplotlib.pyplot as plt
 plt.style.use('Solarize_Light2')
@@ -75,7 +76,7 @@ if __name__ == '__main__':
     nlambdas = 100
     lambdas = np.logspace(-5, 4, nlambdas)
     
-    num_lambdas_to_plot = 7 # Number of lambdas we want to plot
+    num_lambdas_to_plot = 9 # Number of lambdas we want to plot
     indices_to_plot = np.round(np.linspace(0, len(lambdas) - 1,
                                            num_lambdas_to_plot)).astype(int)
     
@@ -86,6 +87,8 @@ if __name__ == '__main__':
     R2_train_lasso_df = pd.DataFrame(index=degrees)
     
     lasso_summary = pd.DataFrame(index=degrees)
+    
+    polynomials_to_plot = [5]  # Change to empty list for no single polynomial degree plot
     
     # Sjekk ut GridSearch
     for polydegree in degrees:
@@ -147,20 +150,41 @@ if __name__ == '__main__':
         lasso_summary.loc[polydegree, "R2 test"] = R2_test_scores_lasso[min_index]
         lasso_summary.loc[polydegree, "R2 train"] = R2_train_scores_lasso[min_index]
         
-        # Uncomment to plot all lambdas for each polynomial degree:
-        # plt.figure()
-        # plt.title(f"MSE Lasso, Polydegree: {polydegree}")
-        # plt.plot(np.log10(lambdas), MSE_train_scores_lasso, 'r--', label = 'Train')
-        # plt.plot(np.log10(lambdas), MSE_test_scores_lasso, 'b--', label = 'Test')
-        # plt.legend()
-        # plt.show()
+        if polydegree in polynomials_to_plot:
+            plt.figure()
+            plt.title(f"MSE Lasso, Polydegree: {polydegree}")
+            plt.plot(np.log10(lambdas), MSE_train_scores_lasso, 'r--', label = 'Train')
+            plt.plot(np.log10(lambdas), MSE_test_scores_lasso, 'b--', label = 'Test')
+            plt.legend()
+            plt.show()
+            
+            plt.figure()
+            plt.title(f"R2 Lasso, Polydegree: {polydegree}")
+            plt.plot(np.log10(lambdas), R2_train_scores_lasso, 'r--', label = 'Train')
+            plt.plot(np.log10(lambdas), R2_test_scores_lasso, 'b--', label = 'Test')
+            plt.legend()
+            plt.show()
+    
+    # Making a plot of MSE values for chosen lambdas:
+    ncols = 3
+    nrows = int(math.ceil(num_lambdas_to_plot/ncols))
+    fig, axes = plt.subplots(nrows, ncols, figsize=(12, 7), dpi=100, sharey=True, sharex=True)
+
+    for column, ax in zip(MSE_train_lasso_df.columns, axes.ravel()):
+    
+        title = fr"$\lambda$ = {column}" if column != "OLS" else column
         
-        # plt.figure()
-        # plt.title(f"R2 Lasso, Polydegree: {polydegree}")
-        # plt.plot(np.log10(lambdas), R2_train_scores_lasso, 'r--', label = 'Train')
-        # plt.plot(np.log10(lambdas), R2_test_scores_lasso, 'b--', label = 'Test')
-        # plt.legend()
-        # plt.show()
+        ax.set_title(title)
+        
+        ax.plot(MSE_train_lasso_df.index, MSE_train_lasso_df[column], label="Train")
+        ax.plot(MSE_test_lasso_df.index, MSE_test_lasso_df[column], "--", label="Test")
+        
+        plt.xticks(degrees)
+    
+    fig.supxlabel("Polynomial degree")
+    fig.supylabel("Mean Squared Error (MSE)")
+    plt.tight_layout()
+    plt.legend(ncols=2, loc="center", bbox_to_anchor=(0.2, -0.17))
     
 
             
