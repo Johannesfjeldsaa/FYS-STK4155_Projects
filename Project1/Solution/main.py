@@ -4,10 +4,9 @@ from Plotting import Plotting
 from setup import save_fig, data_path
 
 import numpy as np
-
 import matplotlib.pyplot as plt
 plt.style.use('Solarize_Light2')
-
+import seaborn as sns
 
 if __name__ == '__main__':
 
@@ -23,6 +22,8 @@ if __name__ == '__main__':
 
     # Solution to exercise a)
 
+    print('\n EXERCISE a) \n')
+
     MSE_test_scores = []
     R2_test_scores = []
     beta_parameters = []
@@ -32,17 +33,11 @@ if __name__ == '__main__':
 
         OLS_regression = LinRegression(polyorder, x, y, z) #create class
 
-        print(OLS_regression.X)
         OLS_regression.split_data(1/5) # perform split of data
 
-        print(f'Split performed: {OLS_regression.splitted}')
-
         OLS_regression.scale(scaling_method='StandardScaling')
-        print(f'Scaling performed: {OLS_regression.scaled}\n'
-               f'Scaling methode: {OLS_regression.scaling_method}')
 
         OLS_regression.train_model(train_on_scaled=True, regression_method='OLS')
-        print(f'The optimal parametres are: {OLS_regression.beta}')
         beta_parameters.append(OLS_regression.beta)
 
         OLS_regression.predict_training()
@@ -54,16 +49,12 @@ if __name__ == '__main__':
 
         MSE_test_scores.append(MSE_test)
 
-        # The mean squared error
-        print(f'Mean squared error training: {MSE_training:.4f}')
-        print(f'Mean squared error test: {MSE_test:.4f}')
-
         R2_training = OLS_regression.R_squared(OLS_regression.y_train, OLS_regression.y_pred_train)
         R2_test = OLS_regression.R_squared(OLS_regression.y_test, OLS_regression.y_pred_test)
 
         R2_test_scores.append(R2_test)
-        print(f'R^2 training: {R2_training:.4f}')
-        print(f'R^2 test: {R2_test:.4f}')
+
+
 
     # Plotting results of task 1a OLS regression
     plots_task_1a = Plotting(5, MSE_test_scores, R2_test_scores, beta_parameters)
@@ -72,3 +63,48 @@ if __name__ == '__main__':
     plots_task_1a.plot_betaparams_polynomial_order()
 
 
+    # Solution to exercise b)
+
+    print('\n EXERCISE b) \n')
+
+    lambdas = np.logspace(-4, 0, 8)
+
+    MSE_test_scores_ridge = {}
+    R2_test_scores_ridge = {}
+    beta_parameters_ridge = {}
+
+    for la in lambdas:
+        print(la)
+        polydegree = 3
+
+        MSE_test_scores_ridge_per_la = []
+        R2_test_scores_ridge_per_la = []
+        beta_parameters_ridge_per_la = []
+
+        for polyorder in range(1, polydegree + 1):
+            ridge_regression = LinRegression(polyorder, x, y, z)  # create class
+
+            ridge_regression.split_data(1 / 5)  # perform split of data
+
+            ridge_regression.scale(scaling_method='StandardScaling')
+
+            ridge_regression.train_model(train_on_scaled=True, regression_method='Ridge')
+            beta_parameters_ridge_per_la.append(ridge_regression.beta)
+
+            ridge_regression.predict_training()
+
+            ridge_regression.predict_test()
+
+            MSE_training = ridge_regression.MSE(ridge_regression.y_train, ridge_regression.y_pred_train)
+            MSE_test = ridge_regression.MSE(ridge_regression.y_test, ridge_regression.y_pred_test)
+
+            MSE_test_scores_ridge_per_la.append(MSE_test)
+
+            R2_training = ridge_regression.R_squared(ridge_regression.y_train, ridge_regression.y_pred_train)
+            R2_test = ridge_regression.R_squared(ridge_regression.y_test, ridge_regression.y_pred_test)
+
+            R2_test_scores_ridge_per_la.append(R2_test)
+
+        beta_parameters_ridge[la] = beta_parameters_ridge_per_la
+        MSE_test_scores_ridge[la] = MSE_test_scores_ridge_per_la
+        R2_test_scores_ridge[la] = R2_test_scores_ridge_per_la

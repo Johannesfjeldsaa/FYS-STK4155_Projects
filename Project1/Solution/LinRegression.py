@@ -34,6 +34,8 @@ class LinRegression:
         self.y_pred_test = None
         self.y_scaler = None
         self.beta = None
+        self.residuals_test = None
+        self.residuals_train = None
 
         ### Define attributes of the linear regression
         self.splitted = False
@@ -185,7 +187,7 @@ class LinRegression:
 
         if self.regression_method == 'OLS':
             self.beta = np.linalg.pinv(X_train.T @ X_train) @ X_train.T @ y_train
-        elif self.regression_method == 'ridge':
+        elif self.regression_method == 'Ridge':
             cols = np.shape(X_train)[1]
             I = np.eye(cols, cols)
             self.beta = np.linalg.pinv(X_train.T @ X_train + la*I) @ X_train.T @ y_train
@@ -201,6 +203,8 @@ class LinRegression:
         else:
             self.y_pred_train = self.X_train @ self.beta
 
+        self.residuals_train = self.y_train - self.y_pred_train
+
         return self.y_pred_train
 
     def predict_test(self):
@@ -208,6 +212,9 @@ class LinRegression:
             self.y_pred_test = (self.X_test_scaled @ self.beta) + self.y_scaler
         else:
             self.y_pred_test = (self.X_test @ self.beta)
+
+        # Calculate residuals
+        self.residuals_test = self.y_test - self.y_pred_test
 
         return self.y_pred_test
 
