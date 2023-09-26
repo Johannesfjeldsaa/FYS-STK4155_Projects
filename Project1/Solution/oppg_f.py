@@ -2,6 +2,8 @@ import numpy as np
 from LinRegression import LinRegression
 from Franke_function import FrankeFunction
 import matplotlib.pyplot as plt
+import random
+
 """
 Part f): Cross-validation as resampling techniques, adding more complexity¶
 The aim here is to write your own code for another widely popular resampling technique,
@@ -20,6 +22,7 @@ both Ridge and Lasso regression.
 
 """
 
+"""
 # number of datapoints
 n=100
 
@@ -81,11 +84,13 @@ for i in range(k):
 
 # range penalty parameter for ridge and lasso
 lmb_Ridge_Lasso = np.linspace(0,10,20)
+"""
 
 """
 Now test for the frankefunction
 """
 
+"""
 x = np.linspace(-3, 3, n).reshape(-1, 1)
 x_shuffle = np.random.shuffle(x) #Shuffles with replacement so x gets shuffled
 y = np.exp(-x ** 2) + 1.5 * np.exp(-(x - 2) ** 2) + np.random.normal(0, 0.1, x.shape)
@@ -98,7 +103,11 @@ groups = [x[i:i+group_size] for i in range(0, n, group_size)]
 # different regression and MSE testing
 
 """
+
+"""
 now plot for model complexity and average of each k fold
+"""
+
 """
 
 n= 100
@@ -162,7 +171,7 @@ plt.plot(range(1,polydegree+1), mean_MSE_test_from_cross_validation, label='MSE 
 plt.legend()
 plt.show()
 
-
+"""
 
 """
 Now redo with the design matrix being randomly shuffled by rows, taking out k-1 row as training 
@@ -170,7 +179,60 @@ and  k row is design matrix for testing
 
 """
 
-x = np.linspace(0,10,20)
-y = np.linspace(0,10,20)
+polydegree = 3
+x = np.linspace(0,10,100)
+y = np.linspace(0,10,100)
 z = FrankeFunction(x,y)
+n = len(x)
+
+# lag design matrix, which needs to be reshuffled ( together with z ) an done cross validation on rows
+cross_validation = LinRegression(polydegree,x,y,z)
+
+k = 10
+
+# shuffle data and create groups
+
+k_groups = cross_validation.create_kfold_groups(5)
+
+# create lists of matrices to perform MSE, r^2 find optimal betas on
+
+test_matrices_iterations, train_matrices_iterations = cross_validation.create_list_train_test_cross_validation()
+
+print(test_matrices_iterations[0])
+print(train_matrices_iterations[0])
+
+# loop through the groups, using one of them as a test set each time for performing
+# different regression and MSE testing
+
+opt_training_beta = []
+opt_test_beta = []
+MSE_score_test = []
+MSE_score_test = []
+
+
+
+# Create linreggression class for each new x and y
+Linreg_train = LinRegression(polydegree, train_data, y_train_data)
+Linreg_test = LinRegression(polydegree, test_data, y_test_data)
+Linreg_train.cross_validation = True
+Linreg_test.cross_validation = True
+
+# Find betas OLS, Ridge, Lasso
+Linreg_train.train_model(regression_method='OLS', train_on_scaled=False)
+Linreg_test.train_model(regression_method='OLS', train_on_scaled=False)
+
+# Predict model data
+Linreg_train.predict()
+Linreg_test.predict()
+
+# Perform MSE and saving them for each K group
+MSE_score_train_data.append(Linreg_train.MSE(y_train_data,Linreg_train.y_pred))
+MSE_score_test_data.append(Linreg_test.MSE(y_test_data, Linreg_test.y_pred))
+
+
+
+
+
+cross_validation_test = LinRegression(polydegree,x,y,z)
+
 
