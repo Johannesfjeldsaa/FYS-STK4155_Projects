@@ -10,12 +10,12 @@ import math
 import matplotlib.pyplot as plt
 plt.style.use('Solarize_Light2')
 
-
+#%%
 if __name__ == '__main__':
 
     np.random.seed(2500)
 
-    N = 1000
+    N = 10000
     x = np.sort(np.random.uniform(0, 1, N))
     y = np.sort(np.random.uniform(0, 1, N))
 
@@ -72,9 +72,10 @@ if __name__ == '__main__':
 
     max_polydegree = 5
     degrees = np.arange(1, max_polydegree+1)
+    #degrees = [5]
     
     nlambdas = 100
-    lambdas = np.logspace(-5, 4, nlambdas)
+    lambdas = np.logspace(-5, 1, nlambdas)
     
     num_lambdas_to_plot = 9 # Number of lambdas we want to plot
     indices_to_plot = np.round(np.linspace(0, len(lambdas) - 1,
@@ -142,14 +143,19 @@ if __name__ == '__main__':
                 
                 R2_train_lasso_df.loc[polydegree, la] = R2_training
                 R2_test_lasso_df.loc[polydegree, la] = R2_test
-            
+        
+        lasso_summary.loc[polydegree, "Polynomial degree"] = polydegree
         lasso_summary.loc[polydegree, "Min test MSE"] = np.min(MSE_test_scores_lasso)
         min_index = np.argmin(MSE_test_scores_lasso)
-        lasso_summary.loc[polydegree, "Lambda"] = lambdas[min_index]
         lasso_summary.loc[polydegree, "Train MSE"] = MSE_train_scores_lasso[min_index]
-        lasso_summary.loc[polydegree, "R2 test"] = R2_test_scores_lasso[min_index]
-        lasso_summary.loc[polydegree, "R2 train"] = R2_train_scores_lasso[min_index]
+        lasso_summary.loc[polydegree, "Lambda"] = lambdas[min_index]
         
+        max_r2_index = np.argmax(R2_test_scores_lasso)
+        lasso_summary.loc[polydegree, "R2 test max"] = np.max(R2_test_scores_lasso)
+        lasso_summary.loc[polydegree, "R2 train"] = R2_train_scores_lasso[max_r2_index]
+        lasso_summary.loc[polydegree, "Lambda R2 max"] = lambdas[max_r2_index]
+        lasso_summary.loc[polydegree, "Same lambda"] = True if (min_index - max_r2_index) == 0 else False
+
         if polydegree in polynomials_to_plot:
             plt.figure()
             plt.title(f"MSE Lasso, Polydegree: {polydegree}")
