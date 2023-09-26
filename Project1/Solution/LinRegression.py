@@ -23,6 +23,7 @@ class LinRegression:
             self.y = z
 
         # Define matrices and vectors
+        self.x = x
         self.X_train = None
         self.X_train_scaled = None
         self.X_test = None
@@ -170,20 +171,34 @@ class LinRegression:
         return self.k_groups
 
 
-    def create_list_train_test_cross_validation(self):
+    def create_list_cross_validation_analysis(self):
+        """
+        Method that will iterate through the k groups to make lists of test and training matrices
+        that can be used to find betas, Perform MSE, etc.
 
-        test_rows_iterations = []   # List of the test matrice row groups as they get iterated through
-        train_rows_iterations = []   #  List of train matrices row groups as they get iterated through
+        :return:
+        test_matrix_iterations: list of test matrices to perform analysis on
+        train_matrix_iterations: list of train matrices to perform analysis on
+        """
+
+        test_matrix_iterations = []   # List of the test matrice row groups as they get iterated through
+        train_matrix_iterations = []   #  List of train matrices row groups as they get iterated through
 
         if self.k_groups is not None:
+
             for i in range(self.k_folds):
                 # Use the i-th part as the test set and the rest as the train set
-                test_rows_iterations.append(self.k_groups[i])
-                train_rows_iterations.append(np.concatenate(self.k_groups[:i] + self.k_groups[i+1:],axis=0))
+                test_matrix_iterations.append(self.k_groups[i])
+                train_matrix_iterations.append(np.concatenate(self.k_groups[:i] + self.k_groups[i+1:],axis=0))
+            test_matrix_iterations = np.array(test_matrix_iterations)
+            train_matrix_iterations = np.array(train_matrix_iterations)
+
         else:
             raise ValueError('You must divide into groups before performing cross validation')
 
-        return test_rows_iterations, train_rows_iterations
+        return test_matrix_iterations, train_matrix_iterations
+
+
 
     def scale(self, scaling_method=None):
         if self.splitted is not True:
