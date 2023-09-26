@@ -36,6 +36,7 @@ class LinRegression:
         self.y_scaler = None
         self.beta = None
         self.k_folds = None
+        self.k_groups = None
 
         ### Define attributes of the linear regression
         self.splitted = False
@@ -164,23 +165,25 @@ class LinRegression:
 
         # makes k groups of the shuffled rows of the design matrix
 
-        self.group_rows = [matrix_shuffled[i:i + group_size] for i in range(0, n, group_size)]
+        self.k_groups = [matrix_shuffled[i:i + group_size] for i in range(0, n, group_size)]
 
-        return self.group_rows
+        return self.k_groups
 
 
-    def create_x_data_cross_validation(self, k_folds):
+    def create_list_train_test_cross_validation(self):
 
-        test_data_iteration_k = []   # List of the test groups as they get iterated through
-        train_data_iteration_k = []   #  List of train groups as they get iterated through
+        test_rows_iterations = []   # List of the test matrice row groups as they get iterated through
+        train_rows_iterations = []   #  List of train matrices row groups as they get iterated through
 
         if self.k_groups is not None:
-            for i in range(k_folds):
+            for i in range(self.k_folds):
                 # Use the i-th part as the test set and the rest as the train set
-                test_data_iteration_k.append(self.groups[i])
-                train_data_iteration_k.append(np.concatenate(self.groups[:i] + self.groups[i+1:],axis=0))
+                test_rows_iterations.append(self.k_groups[i])
+                train_rows_iterations.append(np.concatenate(self.k_groups[:i] + self.k_groups[i+1:],axis=0))
+        else:
+            raise ValueError('You must divide into groups before performing cross validation')
 
-        return test_data_iteration_k, train_data_iteration_k
+        return test_rows_iterations, train_rows_iterations
 
     def scale(self, scaling_method=None):
         if self.splitted is not True:
