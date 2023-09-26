@@ -13,6 +13,7 @@ plt.style.use('Solarize_Light2')
 #%%
 if __name__ == '__main__':
 
+    # Set seed and generate random data used for a)-c)
     np.random.seed(2500)
 
     N = 10000
@@ -20,6 +21,9 @@ if __name__ == '__main__':
     y = np.sort(np.random.uniform(0, 1, N))
 
     z = FrankeFunction(x, y)
+
+
+    # Solution to exercise a)
 
     MSE_test_scores = []
     R2_test_scores = []
@@ -29,6 +33,8 @@ if __name__ == '__main__':
     for polyorder in range(1,polydegree+1):
 
         OLS_regression = LinRegression(polyorder, x, y, z) #create class
+
+        print(OLS_regression.X)
         OLS_regression.split_data(1/5) # perform split of data
 
         print(f'Split performed: {OLS_regression.splitted}')
@@ -193,10 +199,4 @@ if __name__ == '__main__':
     plt.legend(ncols=2, loc="center", bbox_to_anchor=(0.2, -0.17))
     
 
-            
-            
-            
-            
-    
-    
-    
+ 
