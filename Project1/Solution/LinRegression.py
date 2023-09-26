@@ -11,8 +11,6 @@ class LinRegression:
 
     def __init__(self, poly_degree, x, y, z=None, regression_method=None, scaling_method=None):
 
-        self.poly_degree = poly_degree
-
         if z is None:
             self.X = PolynomialFeatures(degree=self.poly_degree).fit_transform(x.reshape(-1, 1))
             self.y = y
@@ -34,10 +32,12 @@ class LinRegression:
         self.y_pred_test = None
         self.y_scaler = None
         self.beta = None
+        self.k_groups = None
 
         ### Define attributes of the linear regression
         self.splitted = False
         self.cross_validation = False
+        self.bootstrapping = False
 
         # Regression
         if regression_method is None:
@@ -123,6 +123,35 @@ class LinRegression:
         self.splitted = True
 
         return self.X_train, self.X_test, self.y_train, self.y_test
+
+
+    def create_kfold_groups(self, k_folds):
+        """
+        Method that will resample the data in k-fold groups.
+
+        :return: k number of equally large groups with entries in x reshuffled
+        """
+        np.random.shuffle(self.x)  # Shuffles with replacement so x gets shuffled
+        n = len(self.x)  # Number of entries
+
+        # Split the data into k equal groups
+        group_size = n // k_folds  # divide with integral result (discard remainder)
+        self.k_groups = [self.x[i:i + group_size] for i in range(0, n, group_size)]
+
+        return self.k_groups
+
+    def create_x_data_cross_validation(self, k_folds):
+
+        test_data_iteration_k = []   # List of the test groups as they get iterated through
+        train_data_iteration_k = []   #  List of train groups as they get iterated through
+
+        if self.k_groups is not None:
+            for i in range(k_folds):
+                # Use the i-th part as the test set and the rest as the train set
+                test_data_iteration_k.append(self.groups[i])
+                train_data_iteration_k.append(np.concatenate(self.groups[:i] + self.groups[i+1:],axis=0))
+
+        return test_data_iteration_k, train_data_iteration_k
 
     def scale(self, scaling_method=None):
         if self.splitted is not True:
