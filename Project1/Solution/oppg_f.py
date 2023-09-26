@@ -1,6 +1,7 @@
 import numpy as np
 from LinRegression import LinRegression
 from Franke_function import FrankeFunction
+import matplotlib.pyplot as plt
 """
 Part f): Cross-validation as resampling techniques, adding more complexity¶
 The aim here is to write your own code for another widely popular resampling technique,
@@ -96,36 +97,80 @@ groups = [x[i:i+group_size] for i in range(0, n, group_size)]
 # loop through the groups, using one of them as a test set each time for performing
 # different regression and MSE testing
 
-MSE_score_test_data = []
-MSE_score_train_data = []
+"""
+now plot for model complexity and average of each k fold
+"""
 
-for i in range(k):
-    # Use the i-th part as the test set and the rest as the train set
-    test_data = groups[i]
-    train_data = np.concatenate(groups[:i] + groups[i+1:],axis=0)
-    y_train_data = np.exp(-train_data ** 2) + 1.5 * np.exp(-(train_data - 2) ** 2)\
-                   + np.random.normal(0, 0.1, train_data.shape)
-    y_test_data = np.exp(-test_data ** 2) + 1.5 * np.exp(-(test_data - 2) ** 2)\
-                  + np.random.normal(0, 0.1, test_data.shape)
+n= 100
+k = 10
+x = np.linspace(-3, 3, n).reshape(-1, 1)
 
-    z_train = FrankeFunction(train_data, y_train_data)
-    z_test = FrankeFunction(test_data, y_test_data)
+mean_MSE_training_from_cross_validation = []
+mean_MSE_test_from_cross_validation = []
 
-    # Create linreggression class for each new x and y
-    Linreg_franke_train = LinRegression(polydegree, train_data, y_train_data, z_train)
-    Linreg_franke_train.cross_validation = True
+for polydegree in range(polydegree+1):
 
-    Linreg_franke_test = LinRegression(polydegree, test_data, y_test_data, z_test)
-    Linreg_franke_test.cross_validation = True
+    if polydegree != 0:
 
-    # Find betas OLS, Ridge, Lasso
-    Linreg_franke_train.train_model(regression_method='OLS', train_on_scaled=False)
-    Linreg_franke_test.train_model(regression_method='OLS', train_on_scaled=False)
+        # Split the data into k equal groups
+        group_size = n // k  # divide with integral result (discard remainder)
+        groups = [x[i:i + group_size] for i in range(0, n, group_size)]
 
-    # Predict model data
-    Linreg_franke_train.predict()
-    Linreg_franke_test.predict()
+        MSE_score_test_data = []
+        MSE_score_train_data = []
 
-    # Perform MSE and saving them for each K group
-    MSE_score_train_data.append(Linreg_franke_train.MSE(y_train_data,Linreg_franke_train.y_pred))
-    MSE_score_test_data.append(Linreg_franke_test.MSE(y_test_data, Linreg_franke_test.y_pred))
+        for i in range(k):
+            # Use the i-th part as the test set and the rest as the train set
+            test_data = groups[i]
+            train_data = np.concatenate(groups[:i] + groups[i+1:],axis=0)
+            y_train_data = np.exp(-train_data ** 2) + 1.5 * np.exp(-(train_data - 2) ** 2)\
+                           #+ np.random.normal(0, 0.1, train_data.shape)
+            y_test_data = np.exp(-test_data ** 2) + 1.5 * np.exp(-(test_data - 2) ** 2)\
+                          #+ np.random.normal(0, 0.1, test_data.shape)
+
+            z_train = FrankeFunction(train_data, y_train_data)
+            z_test = FrankeFunction(test_data, y_test_data)
+
+            # Create linreggression class for each new x and y
+            Linreg_franke_train = LinRegression(polydegree, train_data, y_train_data, z_train)
+            Linreg_franke_train.cross_validation = True
+
+            Linreg_franke_test = LinRegression(polydegree, test_data, y_test_data, z_test)
+            Linreg_franke_test.cross_validation = True
+
+            # Find betas OLS, Ridge, Lasso
+            Linreg_franke_train.train_model(regression_method='OLS', train_on_scaled=False)
+            Linreg_franke_test.train_model(regression_method='OLS', train_on_scaled=False)
+
+            # Predict model data
+            Linreg_franke_train.predict()
+            Linreg_franke_test.predict()
+
+            # Perform MSE and saving them for each K group
+            MSE_score_train_data.append(Linreg_franke_train.MSE(y_train_data,Linreg_franke_train.y_pred))
+            MSE_score_test_data.append(Linreg_franke_test.MSE(y_test_data, Linreg_franke_test.y_pred))
+
+        mean_MSE_training_from_cross_validation.append(np.mean(MSE_score_train_data))
+        mean_MSE_test_from_cross_validation.append(np.mean(MSE_score_test_data))
+
+
+plt.figure()
+plt.xlabel('model complexity')
+plt.ylabel('Mean MSE from cross validation')
+plt.plot(range(1,polydegree+1), mean_MSE_training_from_cross_validation, label='MSE train')
+plt.plot(range(1,polydegree+1), mean_MSE_test_from_cross_validation, label='MSE test')
+plt.legend()
+plt.show()
+
+
+
+"""
+Now redo with the design matrix being randomly shuffled by rows, taking out k-1 row as training 
+and  k row is design matrix for testing
+
+"""
+
+x = np.linspace(0,10,20)
+y = np.linspace(0,10,20)
+z = FrankeFunction(x,y)
+
