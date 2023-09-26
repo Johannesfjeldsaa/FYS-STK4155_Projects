@@ -5,15 +5,13 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn import linear_model
 
-from sklearn.utils.testing import ignore_warnings
-from sklearn.exceptions import ConvergenceWarning
 
 
 class LinRegression:
     supported_methods = {'regression_method': ['OLS', 'Ridge', 'Lasso'],
                          'scaling_method': ['StandardScaling']}
 
-    def __init__(self, poly_degree, x, y, z=None, regression_method=None, scaling_method=None):
+    def __init__(self, poly_degree, x, y, z=None):
 
         self.poly_degree = poly_degree
 
@@ -38,30 +36,15 @@ class LinRegression:
         self.y_pred_test = None
         self.y_scaler = None
         self.beta = None
+        self.regression_method = None
+        self.scaling_method = None
 
         ### Define attributes of the linear regression
         self.splitted = False
-        # Regression
-        if regression_method is None:
-            self.regression_method = 'OLS'
-        else:
-            if regression_method in self.supported_methods['regression_method']:
-                self.regression_method = regression_method
-            else:
-                supported_methods = self.supported_methods['regression_method']
-                raise ValueError(f'regression_method was {regression_method}, expected {supported_methods}')
-        # Scaling
         self.scaled = False
-        if scaling_method is None:
-            self.scaling_method = None
-        else:
-            if scaling_method in self.supported_methods['scaling_method']:
-                self.scaling_method = scaling_method
-            else:
-                supported_methods = self.supported_methods['scaling_method']
-                raise ValueError(f'scaling_method was {scaling_method}, expected {supported_methods}')
 
-    def create_design_matrix(self, x, y, n ):  # From example week 35
+
+    def create_design_matrix(self, x, y, n):  # From example week 35
         if len(x.shape) > 1:
             x = np.ravel(x)
             y = np.ravel(y)
@@ -152,12 +135,11 @@ class LinRegression:
 
         self.scaled = True
     
-    @ignore_warnings(category=ConvergenceWarning)
     def train_model(self, regression_method=None, train_on_scaled=None, la=None):
         if self.splitted is not True:
             raise ArithmeticError('Split data before performing model training.')
 
-        if regression_method and self.regression_method is None:
+        if regression_method is None:
             print('No method for training was provided, using OLS')
             self.regression_method = 'OLS'
         else:
@@ -183,7 +165,7 @@ class LinRegression:
 
         if self.regression_method == 'OLS':
             self.beta = np.linalg.pinv(X_train.T @ X_train) @ X_train.T @ y_train
-        elif self.regression_method == 'ridge':
+        elif self.regression_method == 'Ridge':
             cols = np.shape(X_train)[1]
             I = np.eye(cols, cols)
             self.beta = np.linalg.pinv(X_train.T @ X_train + la*I) @ X_train.T @ y_train

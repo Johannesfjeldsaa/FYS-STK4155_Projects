@@ -1,3 +1,4 @@
+#%%
 from Franke_function import FrankeFunction
 from LinRegression import LinRegression
 from Plotting import Plotting
@@ -6,197 +7,170 @@ from setup import save_fig, data_path
 import numpy as np
 import pandas as pd
 import math
-
+import itertools
 import matplotlib.pyplot as plt
 plt.style.use('Solarize_Light2')
 
-#%%
+
+
 if __name__ == '__main__':
 
+    def run_experiment_a_c(regression_method, scaling_method, polynomal_orders, x, y, z=None, lambda_values=None):
+        """
+
+        :param regression_method:
+        :param polynomal_orders: list
+        :param x:
+        :param y:
+        :param z:
+        :param lambda_values: list
+        :return:
+        """
+
+        MSE_test_df = pd.DataFrame(index=polynomal_orders)
+        MSE_train_df = pd.DataFrame(index=polynomal_orders)
+
+        R2_test_df = pd.DataFrame(index=polynomal_orders)
+        R2_train_df = pd.DataFrame(index=polynomal_orders)
+
+        # Number of elements in beta with higest order polynomial
+        l = int((max(polynomal_orders)+1)*(max(polynomal_orders)+2)/2)
+
+        beta_parameters_df = pd.DataFrame(index=polynomal_orders, columns=range(l))
+
+        summary_df = pd.DataFrame(index=polynomal_orders)
+
+        for polyorder in polynomal_orders:
+            LinReg = LinRegression(polyorder, x, y, z)  # create class
+            LinReg.split_data(1 / 5)  # perform split of data
+
+            LinReg.scale(scaling_method=scaling_method)  # Scaling data
+
+            if lambda_values is None:  # OLS
+                LinReg.train_model(train_on_scaled=True, regression_method=regression_method)
+                LinReg.predict_training()
+                LinReg.predict_test()
+
+                MSE_test_df.loc[polyorder, 'OLS'] = LinReg.MSE(LinReg.y_test, LinReg.y_pred_test)
+                MSE_train_df.loc[polyorder, 'OLS'] = LinReg.MSE(LinReg.y_train, LinReg.y_pred_train)
+                R2_test_df.loc[polyorder, 'OLS'] = LinReg.R_squared(LinReg.y_test, LinReg.y_pred_test)
+                R2_train_df.loc[polyorder, 'OLS'] = LinReg.R_squared(LinReg.y_train, LinReg.y_pred_train)
+                beta_parameters_df.loc[polyorder] = list(itertools.chain(LinReg.beta, [np.nan for _ in range(l - len(LinReg.beta))]))
+
+            else:  ## Ridge and Lasso
+
+                beta_parameters_list = []
+                for la in lambda_values:
+                    LinReg.train_model(train_on_scaled=True,
+                                       regression_method=regression_method,
+                                       la=la)
+                    LinReg.predict_training()
+                    LinReg.predict_test()
+
+                    MSE_test_df.loc[polyorder, la] = LinReg.MSE(LinReg.y_test, LinReg.y_pred_test)
+                    MSE_train_df.loc[polyorder, la] = LinReg.MSE(LinReg.y_train, LinReg.y_pred_train)
+                    R2_test_df.loc[polyorder, la] = LinReg.R_squared(LinReg.y_test, LinReg.y_pred_test)
+                    R2_train_df.loc[polyorder, la] = LinReg.R_squared(LinReg.y_train, LinReg.y_pred_train)
+
+                    beta_parameters_list.append(LinReg.beta)
+
+                # lag summary
+                optimal_la_MSE = MSE_test_df.loc[polyorder].idxmin()
+                summary_df.loc[polyorder, 'Optimal lambda MSE'] = optimal_la_MSE
+                summary_df.loc[polyorder, 'Min test MSE'] = MSE_test_df.loc[polyorder, optimal_la_MSE]
+                optimal_la_R2 = R2_test_df.loc[polyorder].idxmax()
+                summary_df.loc[polyorder, 'Optimal lambda R2'] = optimal_la_R2
+                summary_df.loc[polyorder, 'Max test R2'] = R2_test_df.loc[polyorder, optimal_la_R2]
+
+                # velg ut tilhørende betaparameter
+                indx = MSE_test_df.columns.get_loc(optimal_la_MSE)
+                optimal_betas = beta_parameters_list[indx]
+                beta_parameters_df.loc[polyorder] = list(itertools.chain(optimal_betas, [np.nan for _ in range(l - len(optimal_betas))]))
+
+                # legg til i beta_parameters_df
+        return MSE_train_df, MSE_test_df, R2_train_df, R2_test_df, beta_parameters_df, summary_df
+
+
+#%%
     # Set seed and generate random data used for a)-c)
     np.random.seed(2500)
 
-    N = 10000
+    N = 1000
     x = np.sort(np.random.uniform(0, 1, N))
     y = np.sort(np.random.uniform(0, 1, N))
 
     z = FrankeFunction(x, y)
-
-
+#%%
     # Solution to exercise a)
 
-    MSE_test_scores = []
-    R2_test_scores = []
-    beta_parameters = []
-    polydegree = 5
+    print('\n ###### Task A) \n')
+    polynomal_orders = [1, 2, 3, 4, 5]
+    (MSE_train_df,
+     MSE_test_df,
+     R2_train_df,
+     R2_test_df,
+     beta_parameters_df,
+     summary_df) = run_experiment_a_c(regression_method = 'OLS',
+                                      scaling_method='StandardScaling',
+                                             polynomal_orders=polynomal_orders,
+                                             x=x,
+                                             y=y,
+                                             z=z)
 
-    for polyorder in range(1,polydegree+1):
-
-        OLS_regression = LinRegression(polyorder, x, y, z) #create class
-
-        print(OLS_regression.X)
-        OLS_regression.split_data(1/5) # perform split of data
-
-        print(f'Split performed: {OLS_regression.splitted}')
-
-        OLS_regression.scale(scaling_method='StandardScaling')
-        print(f'Scaling performed: {OLS_regression.scaled}\n'
-               f'Scaling methode: {OLS_regression.scaling_method}')
-
-        OLS_regression.train_model(train_on_scaled=True, regression_method='OLS')
-        print(f'The optimal parametres are: {OLS_regression.beta}')
-        beta_parameters.append(OLS_regression.beta)
-
-        OLS_regression.predict_training()
-
-        OLS_regression.predict_test()
-
-        MSE_training = OLS_regression.MSE(OLS_regression.y_train, OLS_regression.y_pred_train)
-        MSE_test = OLS_regression.MSE(OLS_regression.y_test, OLS_regression.y_pred_test)
-
-        MSE_test_scores.append(MSE_test)
-
-        # The mean squared error
-        print(f'Mean squared error training: {MSE_training:.4f}')
-        print(f'Mean squared error test: {MSE_test:.4f}')
-
-        R2_training = OLS_regression.R_squared(OLS_regression.y_train, OLS_regression.y_pred_train)
-        R2_test = OLS_regression.R_squared(OLS_regression.y_test, OLS_regression.y_pred_test)
-
-        R2_test_scores.append(R2_test)
-        print(f'R^2 training: {R2_training:.4f}')
-        print(f'R^2 test: {R2_test:.4f}')
-
+    print(MSE_test_df)
+    print(R2_test_df)
+    print(beta_parameters_df)
     # Plotting results of task 1a OLS regression
-    plots_task_1a = Plotting(5, MSE_test_scores, R2_test_scores, beta_parameters)
+    plots_task_1a = Plotting(max(polynomal_orders),MSE_test_df['OLS'], R2_test_df['OLS'], None)
     plots_task_1a.plot_MSE_scores()
     plots_task_1a.plot_R2_scores()
-    plots_task_1a.plot_betaparams_polynomial_order()
+    #plots_task_1a.plot_betaparams_polynomial_order()
 
-
-#%% Task c) Lasso regression
-
-    max_polydegree = 5
-    degrees = np.arange(1, max_polydegree+1)
-    #degrees = [5]
-    
+# %%
+    print('\n #### Task b) #### \n')
     nlambdas = 100
     lambdas = np.logspace(-5, 1, nlambdas)
-    
-    num_lambdas_to_plot = 9 # Number of lambdas we want to plot
-    indices_to_plot = np.round(np.linspace(0, len(lambdas) - 1,
-                                           num_lambdas_to_plot)).astype(int)
-    
-    MSE_test_lasso_df = pd.DataFrame(index=degrees)
-    MSE_train_lasso_df = pd.DataFrame(index=degrees)
-    
-    R2_test_lasso_df = pd.DataFrame(index=degrees)
-    R2_train_lasso_df = pd.DataFrame(index=degrees)
-    
-    lasso_summary = pd.DataFrame(index=degrees)
-    
-    polynomials_to_plot = [5]  # Change to empty list for no single polynomial degree plot
-    
-    # Sjekk ut GridSearch
-    for polydegree in degrees:
-        print(f"Polynomial degree: {polydegree}")
-        
-        MSE_train_scores_lasso = []
-        MSE_test_scores_lasso = []
-        
-        R2_train_scores_lasso = []
-        R2_test_scores_lasso = []
-        
-        beta_parameters_lasso = []
-        
-        Lasso_regression = LinRegression(polydegree, x, y, z) #create class
-        Lasso_regression.split_data(1/5) # perform split of data
-            
-        Lasso_regression.scale(scaling_method='StandardScaling') # Scaling data
-        
-        for i, la in enumerate(lambdas):
-            
-            Lasso_regression.train_model(train_on_scaled=True, regression_method='Lasso', la=la)
-            
-            beta_parameters_lasso.append(Lasso_regression.beta)
-            
-            Lasso_regression.predict_training()
 
-            Lasso_regression.predict_test()
+    polynomal_orders = [1, 2, 3, 4, 5]
 
-            MSE_training = Lasso_regression.MSE(Lasso_regression.y_train, 
-                                                Lasso_regression.y_pred_train)
-            MSE_test = Lasso_regression.MSE(Lasso_regression.y_test, 
-                                            Lasso_regression.y_pred_test)
-            
-            MSE_train_scores_lasso.append(MSE_training)
-            MSE_test_scores_lasso.append(MSE_test)
-            
-            
-            R2_training = Lasso_regression.R_squared(Lasso_regression.y_train, 
-                                                     Lasso_regression.y_pred_train)
-            R2_test = Lasso_regression.R_squared(Lasso_regression.y_test, 
-                                                 Lasso_regression.y_pred_test)
-            
-            R2_train_scores_lasso.append(R2_training)
-            R2_test_scores_lasso.append(R2_test)
+    (MSE_train_df,
+     MSE_test_df,
+     R2_train_df,
+     R2_test_df,
+     beta_parameters_df,
+     summary_df) = run_experiment_a_c(regression_method='Ridge',
+                                      scaling_method='StandardScaling',
+                                      polynomal_orders=polynomal_orders,
+                                      lambda_values=lambdas,
+                                      x=x,
+                                      y=y,
+                                      z=z)
+    print(MSE_test_df)
+    print(R2_test_df)
+    print(beta_parameters_df)
+    print(summary_df)
 
-                
-            # Getting out equally spaced lambdas to make plots of
-            if i in indices_to_plot:
-                MSE_train_lasso_df.loc[polydegree, la] = MSE_training
-                MSE_test_lasso_df.loc[polydegree, la] = MSE_test
-                
-                R2_train_lasso_df.loc[polydegree, la] = R2_training
-                R2_test_lasso_df.loc[polydegree, la] = R2_test
-        
-        lasso_summary.loc[polydegree, "Polynomial degree"] = polydegree
-        lasso_summary.loc[polydegree, "Min test MSE"] = np.min(MSE_test_scores_lasso)
-        min_index = np.argmin(MSE_test_scores_lasso)
-        lasso_summary.loc[polydegree, "Train MSE"] = MSE_train_scores_lasso[min_index]
-        lasso_summary.loc[polydegree, "Lambda"] = lambdas[min_index]
-        
-        max_r2_index = np.argmax(R2_test_scores_lasso)
-        lasso_summary.loc[polydegree, "R2 test max"] = np.max(R2_test_scores_lasso)
-        lasso_summary.loc[polydegree, "R2 train"] = R2_train_scores_lasso[max_r2_index]
-        lasso_summary.loc[polydegree, "Lambda R2 max"] = lambdas[max_r2_index]
-        lasso_summary.loc[polydegree, "Same lambda"] = True if (min_index - max_r2_index) == 0 else False
+#%%
+    print('\n #### Task c) #### \n')
 
-        if polydegree in polynomials_to_plot:
-            plt.figure()
-            plt.title(f"MSE Lasso, Polydegree: {polydegree}")
-            plt.plot(np.log10(lambdas), MSE_train_scores_lasso, 'r--', label = 'Train')
-            plt.plot(np.log10(lambdas), MSE_test_scores_lasso, 'b--', label = 'Test')
-            plt.legend()
-            plt.show()
-            
-            plt.figure()
-            plt.title(f"R2 Lasso, Polydegree: {polydegree}")
-            plt.plot(np.log10(lambdas), R2_train_scores_lasso, 'r--', label = 'Train')
-            plt.plot(np.log10(lambdas), R2_test_scores_lasso, 'b--', label = 'Test')
-            plt.legend()
-            plt.show()
-    
-    # Making a plot of MSE values for chosen lambdas:
-    ncols = 3
-    nrows = int(math.ceil(num_lambdas_to_plot/ncols))
-    fig, axes = plt.subplots(nrows, ncols, figsize=(12, 7), dpi=100, sharey=True, sharex=True)
+    nlambdas = 100
+    lambdas = np.logspace(-5, 1, nlambdas)
 
-    for column, ax in zip(MSE_train_lasso_df.columns, axes.ravel()):
-    
-        title = fr"$\lambda$ = {column}" if column != "OLS" else column
-        
-        ax.set_title(title)
-        
-        ax.plot(MSE_train_lasso_df.index, MSE_train_lasso_df[column], label="Train")
-        ax.plot(MSE_test_lasso_df.index, MSE_test_lasso_df[column], "--", label="Test")
-        
-        plt.xticks(degrees)
-    
-    fig.supxlabel("Polynomial degree")
-    fig.supylabel("Mean Squared Error (MSE)")
-    plt.tight_layout()
-    plt.legend(ncols=2, loc="center", bbox_to_anchor=(0.2, -0.17))
-    
+    polynomal_orders = [1, 2, 3, 4, 5]
 
- 
+    (MSE_train_df,
+     MSE_test_df,
+     R2_train_df,
+     R2_test_df,
+     beta_parameters_df,
+     summary_df) = run_experiment_a_c(regression_method='Lasso',
+                                      scaling_method='StandardScaling',
+                                      polynomal_orders=polynomal_orders,
+                                      lambda_values=lambdas,
+                                      x=x,
+                                      y=y,
+                                      z=z)
+    print(MSE_test_df)
+    print(R2_test_df)
+    print(beta_parameters_df)
+    print(summary_df)
