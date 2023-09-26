@@ -38,6 +38,7 @@ class LinRegression:
         self.beta = None
         self.k_folds = None
         self.k_groups = None
+        self.y_groups = None
 
         ### Define attributes of the linear regression
         self.splitted = False
@@ -137,21 +138,9 @@ class LinRegression:
         :return: k number of equally large groups with entries in x reshuffled
         """
 
-        # For 1D cases:
-        """
-        np.random.shuffle(self.x)  # Shuffles with replacement so x gets shuffled
-        n = len(self.x)  # Number of entries
-
-        # Split the data into k equal groups
-        group_size = n // k_folds  # divide with integral result (discard remainder)
-        self.k_groups = [self.x[i:i + group_size] for i in range(0, n, group_size)]
-
-        return self.k_groups
-        """
-
-        #  For 2D cases
         self.k_folds = k_folds
         n = len(self.x)
+        np.random.seed(100)
 
         # Shuffle the data, and keep design matrix and z values aligned
         list_tuple_to_shuffle = list(zip(self.X, self.y))
@@ -167,8 +156,10 @@ class LinRegression:
         # makes k groups of the shuffled rows of the design matrix
 
         self.k_groups = [matrix_shuffled[i:i + group_size] for i in range(0, n, group_size)]
+        self.y_groups = [z_shuffled[i:i + group_size] for i in range(0, n, group_size)]
+        self.cross_validation = True
 
-        return self.k_groups
+        return self.k_groups, self.y_groups
 
 
     def create_list_cross_validation_analysis(self):
@@ -182,21 +173,26 @@ class LinRegression:
         """
 
         test_matrix_iterations = []   # List of the test matrice row groups as they get iterated through
-        train_matrix_iterations = []   #  List of train matrices row groups as they get iterated through
+        train_matrix_iterations = []
+        y_train = [] #  List of train matrices row groups as they get iterated through
+        y_test = []
 
-        if self.k_groups is not None:
+        if self.k_groups and self.y_groups is not None:
 
             for i in range(self.k_folds):
                 # Use the i-th part as the test set and the rest as the train set
-                test_matrix_iterations.append(self.k_groups[i])
-                train_matrix_iterations.append(np.concatenate(self.k_groups[:i] + self.k_groups[i+1:],axis=0))
-            test_matrix_iterations = np.array(test_matrix_iterations)
-            train_matrix_iterations = np.array(train_matrix_iterations)
+                test_matrix_iterations.append(np.array(self.k_groups[i]))
+                train_matrix_iterations.append(np.array(np.concatenate(self.k_groups[:i] + self.k_groups[i+1:],axis=0)))
+                y_test.append(self.y_groups[i])
+                y_train.append(np.concatenate(self.y_groups[:i] + self.y_groups[i+1:],axis=0))
+
+            #test_matrix_iterations = np.array(test_matrix_iterations)
+            #train_matrix_iterations = np.array(train_matrix_iterations)
 
         else:
             raise ValueError('You must divide into groups before performing cross validation')
 
-        return test_matrix_iterations, train_matrix_iterations
+        return test_matrix_iterations, train_matrix_iterations, y_test, y_train
 
 
 
@@ -226,7 +222,8 @@ class LinRegression:
 
         self.scaled = True
 
-    def train_model(self, regression_method=None, train_on_scaled=None, la=None): # kfold_train=None, kfold_test=None):
+    def train_model(self, regression_method=None, train_on_scaled=None, la=None,
+                    cv_X=None, cv_y=None):
         if self.splitted is not True and self.cross_validation is not True:
             raise ArithmeticError('Split data before performing model training.')
 
@@ -264,8 +261,15 @@ class LinRegression:
                 raise ValueError(f'train_on_scaled takes arguments True or False, not {train_on_scaled}')
 
         if self.cross_validation is True:
-            X_train = self.X
-            y_train = self.y
+            if cv_X is not None:
+                X_train = cv_X
+                self.X = cv_X
+            else:
+                raise ValueError('Must pass in training matrices for finding beta in cross validation')
+            if cv_y is not None:
+                y_train = cv_y
+            else:
+                raise ValueError('Must pass in belonging y_train for finding beta in cross validation')
 
         if self.regression_method == 'OLS':
             self.beta = np.linalg.pinv(X_train.T @ X_train) @ X_train.T @ y_train
