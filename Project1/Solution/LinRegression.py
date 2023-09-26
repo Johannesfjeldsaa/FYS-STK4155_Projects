@@ -3,13 +3,16 @@
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import PolynomialFeatures
-
+import random
 
 class LinRegression:
     supported_methods = {'regression_method': ['OLS', 'Ridge', 'Lasso'],
                          'scaling_method': ['StandardScaling']}
 
+
     def __init__(self, poly_degree, x, y, z=None, regression_method=None, scaling_method=None):
+
+        self.poly_degree = poly_degree
 
         if z is None:
             self.X = PolynomialFeatures(degree=self.poly_degree).fit_transform(x.reshape(-1, 1))
@@ -32,7 +35,7 @@ class LinRegression:
         self.y_pred_test = None
         self.y_scaler = None
         self.beta = None
-        self.k_groups = None
+        self.k_folds = None
 
         ### Define attributes of the linear regression
         self.splitted = False
@@ -131,6 +134,9 @@ class LinRegression:
 
         :return: k number of equally large groups with entries in x reshuffled
         """
+
+        # For 1D cases:
+        """
         np.random.shuffle(self.x)  # Shuffles with replacement so x gets shuffled
         n = len(self.x)  # Number of entries
 
@@ -139,6 +145,29 @@ class LinRegression:
         self.k_groups = [self.x[i:i + group_size] for i in range(0, n, group_size)]
 
         return self.k_groups
+        """
+
+        #  For 2D cases
+        self.k_folds = k_folds
+        n = len(self.x)
+
+        # Shuffle the data, and keep design matrix and z values aligned
+        list_tuple_to_shuffle = list(zip(self.X, self.y))
+        random.shuffle(list_tuple_to_shuffle)
+        matrix_shuffled, z_shuffled = zip(*list_tuple_to_shuffle)
+
+        # matrix_shuffled and z_shuffled come out as tuples, and so must be converted to lists.
+        matrix_shuffled, z_shuffled = list(matrix_shuffled), list(z_shuffled)
+
+        # Split the matrix into k groups of rows from the shuffled matrix
+        group_size = n // self.k_folds  # divide with integral result (discard remainder)
+
+        # makes k groups of the shuffled rows of the design matrix
+
+        self.group_rows = [matrix_shuffled[i:i + group_size] for i in range(0, n, group_size)]
+
+        return self.group_rows
+
 
     def create_x_data_cross_validation(self, k_folds):
 
