@@ -4,17 +4,19 @@ from Plotting import Plotting
 from setup import save_fig, data_path
 
 import numpy as np
+import pandas as pd
+import math
 
 import matplotlib.pyplot as plt
 plt.style.use('Solarize_Light2')
 
-
+#%%
 if __name__ == '__main__':
 
     # Set seed and generate random data used for a)-c)
     np.random.seed(2500)
 
-    N = 1000
+    N = 10000
     x = np.sort(np.random.uniform(0, 1, N))
     y = np.sort(np.random.uniform(0, 1, N))
 
@@ -72,3 +74,129 @@ if __name__ == '__main__':
     plots_task_1a.plot_betaparams_polynomial_order()
 
 
+#%% Task c) Lasso regression
+
+    max_polydegree = 5
+    degrees = np.arange(1, max_polydegree+1)
+    #degrees = [5]
+    
+    nlambdas = 100
+    lambdas = np.logspace(-5, 1, nlambdas)
+    
+    num_lambdas_to_plot = 9 # Number of lambdas we want to plot
+    indices_to_plot = np.round(np.linspace(0, len(lambdas) - 1,
+                                           num_lambdas_to_plot)).astype(int)
+    
+    MSE_test_lasso_df = pd.DataFrame(index=degrees)
+    MSE_train_lasso_df = pd.DataFrame(index=degrees)
+    
+    R2_test_lasso_df = pd.DataFrame(index=degrees)
+    R2_train_lasso_df = pd.DataFrame(index=degrees)
+    
+    lasso_summary = pd.DataFrame(index=degrees)
+    
+    polynomials_to_plot = [5]  # Change to empty list for no single polynomial degree plot
+    
+    # Sjekk ut GridSearch
+    for polydegree in degrees:
+        print(f"Polynomial degree: {polydegree}")
+        
+        MSE_train_scores_lasso = []
+        MSE_test_scores_lasso = []
+        
+        R2_train_scores_lasso = []
+        R2_test_scores_lasso = []
+        
+        beta_parameters_lasso = []
+        
+        Lasso_regression = LinRegression(polydegree, x, y, z) #create class
+        Lasso_regression.split_data(1/5) # perform split of data
+            
+        Lasso_regression.scale(scaling_method='StandardScaling') # Scaling data
+        
+        for i, la in enumerate(lambdas):
+            
+            Lasso_regression.train_model(train_on_scaled=True, regression_method='Lasso', la=la)
+            
+            beta_parameters_lasso.append(Lasso_regression.beta)
+            
+            Lasso_regression.predict_training()
+
+            Lasso_regression.predict_test()
+
+            MSE_training = Lasso_regression.MSE(Lasso_regression.y_train, 
+                                                Lasso_regression.y_pred_train)
+            MSE_test = Lasso_regression.MSE(Lasso_regression.y_test, 
+                                            Lasso_regression.y_pred_test)
+            
+            MSE_train_scores_lasso.append(MSE_training)
+            MSE_test_scores_lasso.append(MSE_test)
+            
+            
+            R2_training = Lasso_regression.R_squared(Lasso_regression.y_train, 
+                                                     Lasso_regression.y_pred_train)
+            R2_test = Lasso_regression.R_squared(Lasso_regression.y_test, 
+                                                 Lasso_regression.y_pred_test)
+            
+            R2_train_scores_lasso.append(R2_training)
+            R2_test_scores_lasso.append(R2_test)
+
+                
+            # Getting out equally spaced lambdas to make plots of
+            if i in indices_to_plot:
+                MSE_train_lasso_df.loc[polydegree, la] = MSE_training
+                MSE_test_lasso_df.loc[polydegree, la] = MSE_test
+                
+                R2_train_lasso_df.loc[polydegree, la] = R2_training
+                R2_test_lasso_df.loc[polydegree, la] = R2_test
+        
+        lasso_summary.loc[polydegree, "Polynomial degree"] = polydegree
+        lasso_summary.loc[polydegree, "Min test MSE"] = np.min(MSE_test_scores_lasso)
+        min_index = np.argmin(MSE_test_scores_lasso)
+        lasso_summary.loc[polydegree, "Train MSE"] = MSE_train_scores_lasso[min_index]
+        lasso_summary.loc[polydegree, "Lambda"] = lambdas[min_index]
+        
+        max_r2_index = np.argmax(R2_test_scores_lasso)
+        lasso_summary.loc[polydegree, "R2 test max"] = np.max(R2_test_scores_lasso)
+        lasso_summary.loc[polydegree, "R2 train"] = R2_train_scores_lasso[max_r2_index]
+        lasso_summary.loc[polydegree, "Lambda R2 max"] = lambdas[max_r2_index]
+        lasso_summary.loc[polydegree, "Same lambda"] = True if (min_index - max_r2_index) == 0 else False
+
+        if polydegree in polynomials_to_plot:
+            plt.figure()
+            plt.title(f"MSE Lasso, Polydegree: {polydegree}")
+            plt.plot(np.log10(lambdas), MSE_train_scores_lasso, 'r--', label = 'Train')
+            plt.plot(np.log10(lambdas), MSE_test_scores_lasso, 'b--', label = 'Test')
+            plt.legend()
+            plt.show()
+            
+            plt.figure()
+            plt.title(f"R2 Lasso, Polydegree: {polydegree}")
+            plt.plot(np.log10(lambdas), R2_train_scores_lasso, 'r--', label = 'Train')
+            plt.plot(np.log10(lambdas), R2_test_scores_lasso, 'b--', label = 'Test')
+            plt.legend()
+            plt.show()
+    
+    # Making a plot of MSE values for chosen lambdas:
+    ncols = 3
+    nrows = int(math.ceil(num_lambdas_to_plot/ncols))
+    fig, axes = plt.subplots(nrows, ncols, figsize=(12, 7), dpi=100, sharey=True, sharex=True)
+
+    for column, ax in zip(MSE_train_lasso_df.columns, axes.ravel()):
+    
+        title = fr"$\lambda$ = {column}" if column != "OLS" else column
+        
+        ax.set_title(title)
+        
+        ax.plot(MSE_train_lasso_df.index, MSE_train_lasso_df[column], label="Train")
+        ax.plot(MSE_test_lasso_df.index, MSE_test_lasso_df[column], "--", label="Test")
+        
+        plt.xticks(degrees)
+    
+    fig.supxlabel("Polynomial degree")
+    fig.supylabel("Mean Squared Error (MSE)")
+    plt.tight_layout()
+    plt.legend(ncols=2, loc="center", bbox_to_anchor=(0.2, -0.17))
+    
+
+ 

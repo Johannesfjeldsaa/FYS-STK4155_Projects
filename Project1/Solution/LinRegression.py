@@ -3,6 +3,10 @@
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import PolynomialFeatures
+from sklearn import linear_model
+
+from sklearn.utils.testing import ignore_warnings
+from sklearn.exceptions import ConvergenceWarning
 
 
 class LinRegression:
@@ -147,7 +151,8 @@ class LinRegression:
 
 
         self.scaled = True
-
+    
+    @ignore_warnings(category=ConvergenceWarning)
     def train_model(self, regression_method=None, train_on_scaled=None, la=None):
         if self.splitted is not True:
             raise ArithmeticError('Split data before performing model training.')
@@ -161,13 +166,6 @@ class LinRegression:
             else:
                 supported_methods = self.supported_methods['regression_method']
                 raise ValueError(f'regression_method was {regression_method}, expected {supported_methods}')
-
-
-        if self.regression_method == 'Ridge':
-            try:
-                float(la)
-            except ValueError:
-                print(f'la must be float, not {type(la)}')
 
         train_on_scaled = train_on_scaled if train_on_scaled is not None else False
 
@@ -189,6 +187,10 @@ class LinRegression:
             cols = np.shape(X_train)[1]
             I = np.eye(cols, cols)
             self.beta = np.linalg.pinv(X_train.T @ X_train + la*I) @ X_train.T @ y_train
+        elif self.regression_method == "Lasso":
+            RegLasso = linear_model.Lasso(la, fit_intercept=False, max_iter=int(10e4))
+            RegLasso.fit(X_train, y_train)
+            self.beta = RegLasso.coef_
             
         return self.beta
 
