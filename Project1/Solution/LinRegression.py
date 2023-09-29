@@ -225,7 +225,8 @@ class LinRegression:
             # loop over trials in order to estimate the expectation value of the MSE
             estimated_mse_folds = cross_val_score(OLS, self.X, self.y,
                                                   scoring='neg_mean_squared_error', cv=kfold)
-            print(estimated_mse_folds)
+            estimated_r2_folds = cross_val_score(OLS, self.X, self.y, scoring='r2', cv=kfold)
+            print(estimated_r2_folds)
 
         elif self.regression_method == 'Ridge':
             pass
@@ -234,7 +235,7 @@ class LinRegression:
         else:
             raise ValueError('A valid regression model is not given')
 
-        return np.mean(-estimated_mse_folds)
+        return np.mean(-estimated_mse_folds), np.mean(estimated_r2_folds)
 
 
     def scale(self, scaling_method=None):
