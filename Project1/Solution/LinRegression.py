@@ -134,7 +134,7 @@ class LinRegression:
         return self.X_train, self.X_test, self.y_train, self.y_test
 
 
-    def cross_validation_train_model(self, k_folds, regression_method=None):
+    def cross_validation_train_model(self, k_folds, regression_method=None, lmb=None):
         """
         Method to perform cross validation resampling and then train the model.
         This method have not considered scaling, and doesnt take any scaling inputs for now.
@@ -204,6 +204,15 @@ class LinRegression:
                 MSE_test.append(self.MSE(y_test_cv, y_test_pred))
                 R2_test.append(self.R_squared(y_test_cv, y_test_pred))
 
+            elif self.regression_method == 'Ridge':  # fill in together
+                pass
+
+            elif self.regression_method == 'Lasso':  # fill in together
+                pass
+
+            else:
+                raise ValueError('A valid regression method has not been passed') # fill in together
+
         B_matrix = np.array(opt_beta)
         opt_beta_model = []
 
@@ -214,7 +223,7 @@ class LinRegression:
         return opt_beta_model, np.mean(MSE_test), np.mean(MSE_train), \
                np.mean(R2_test), np.mean(R2_train)
 
-    def scikit_cross_validation_train_model(self, k):
+    def scikit_cross_validation_train_model(self, k, lmb=None):
 
         # make k groups
         kfold = KFold(n_splits=k, shuffle=True)
@@ -226,12 +235,22 @@ class LinRegression:
             estimated_mse_folds = cross_val_score(OLS, self.X, self.y,
                                                   scoring='neg_mean_squared_error', cv=kfold)
             estimated_r2_folds = cross_val_score(OLS, self.X, self.y, scoring='r2', cv=kfold)
-            print(estimated_r2_folds)
 
         elif self.regression_method == 'Ridge':
-            pass
+            Ridge = LinearRegression.Ridge(lmb, fit_intercept=False)
+
+            # loop over trials in order to estimate the expectation value of the MSE
+            estimated_mse_folds = cross_val_score(Ridge, self.X, self.y,
+                                                  scoring='neg_mean_squared_error', cv=kfold)
+            estimated_r2_folds = cross_val_score(Ridge, self.X, self.y, scoring='r2', cv=kfold)
+
         elif self.regression_method == 'Lasso':
-            pass
+            Lasso = LinearRegression.Lasso(fit_intercept=False)
+
+            # loop over trials in order to estimate the expectation value of the MSE
+            estimated_mse_folds = cross_val_score(Lasso, self.X, self.y,
+                                                  scoring='neg_mean_squared_error', cv=kfold)
+            estimated_r2_folds = cross_val_score(Lasso, self.X, self.y, scoring='r2', cv=kfold)
         else:
             raise ValueError('A valid regression model is not given')
 
