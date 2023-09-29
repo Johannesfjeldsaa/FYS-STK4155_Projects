@@ -12,7 +12,6 @@ class LinRegression:
     def __init__(self, poly_degree, x, y, z=None, regression_method=None, scaling_method=None):
 
         self.poly_degree = poly_degree
-        self.z = None
 
 
         if z is None:
@@ -21,11 +20,10 @@ class LinRegression:
         else:
             # Horizontally concat columns to creat design matrix
             self.X = self.create_design_matrix(x, y, self.poly_degree)
-            self.z = z
+            self.y = z
 
         # Define matrices and vectors
         self.x = x
-        self.y = y
         self.X_train = None
         self.X_train_scaled = None
         self.X_test = None
@@ -133,16 +131,29 @@ class LinRegression:
         return self.X_train, self.X_test, self.y_train, self.y_test
 
 
-    def create_kfold_groups(self, k_folds):
+    def cross_validation_train_model(self, k_folds, seed, regression_method=None):
         """
-        Method that will resample the data in k-fold groups.
+        Method to perform cross validation resampling and then train the model.
+        This method have not considered scaling, and doesnt take any scaling inputs for now.
+        Should be able to perform training on OLS, Ridge and Lasso.
 
-        :return: k number of equally large groups with entries in x reshuffled
+        :param k: k folds to decide how large the resampling groups should be.
+
+        :return:
+        mean_B_parameters: optimal beta parameters for the model
+        mean_MSE_test: The mean MSE obtained from the iterated test sets
+        mean_MSE_train: The mean MSE obtained from the iterated training sets
+        mean_R2_test: The mean R2 obtained from the iterated test sets
+        mean_R2_train: The mean R2 obtained from the iterated training sets
         """
+
+        self.cross_validation = True   # set the marker for cross validation being executed
+
+        # create the k groups:
 
         self.k_folds = k_folds
         n = len(self.x)
-        np.random.seed(100)
+        np.random.seed(seed) # create same random shuffling each time.
 
         # Shuffle the data, and keep design matrix and z values aligned
         list_tuple_to_shuffle = list(zip(self.X, self.y))
@@ -156,63 +167,50 @@ class LinRegression:
         group_size = n // self.k_folds  # divide with integral result (discard remainder)
 
         # makes k groups of the shuffled rows of the design matrix
-
         self.k_groups = [matrix_shuffled[i:i + group_size] for i in range(0, n, group_size)]
         self.y_groups = [z_shuffled[i:i + group_size] for i in range(0, n, group_size)]
-        self.cross_validation = True
 
-        return self.k_groups, self.y_groups
+        # Lists to store temporarily found scores and parameters
+        opt_beta = []
+        MSE_test = []
+        MSE_train = []
+        R2_test = []
+        R2_train = []
 
+        # Go through iterations of changing out test and training sets
+        for i in range(self.k_folds):
+            # Use the i-th part as the test set and the rest as the train set
+            test_matrix = np.array(self.k_groups[i])
+            train_matrix = np.array(np.concatenate(self.k_groups[:i]
+                                                   + self.k_groups[i + 1:], axis=0))
+            y_test_cv = (self.y_groups[i])
+            y_train_cv = np.concatenate(self.y_groups[:i] + self.y_groups[i + 1:], axis=0)
 
-    def create_list_cross_validation_analysis(self):
-        """
-        Method that will iterate through the k groups to make lists of test and training matrices
-        that can be used to find betas, Perform MSE, etc.
+            # perform for OLS first, but in Ridge and Lasso when working
+            if self.regression_method == 'OLS':
+                self.train_model(regression_method=self.regression_method,
+                                 cv_X=train_matrix, cv_y=y_train_cv)
+                opt_beta.append(self.beta)   # store optimal betas for each cross validation set
 
-        :return:
-        test_matrix_iterations: list of test matrices to perform analysis on
-        train_matrix_iterations: list of train matrices to perform analysis on
-        """
+                # find for training set: X_training @ beta
+                y_train_pred = train_matrix @ self.beta
+                MSE_train.append(self.MSE(y_train_cv, y_train_pred))
+                R2_train.append(self.R_squared(y_train_cv, y_train_pred))
 
-        test_matrix_iterations = []   # List of the test matrice row groups as they get iterated through
-        train_matrix_iterations = []
-        y_train = [] #  List of train matrices row groups as they get iterated through
-        y_test = []
+                # find for test set: test_matrix @ beta
+                y_test_pred = test_matrix @ self.beta
+                MSE_test.append(self.MSE(y_test_cv, y_test_pred))
+                R2_test.append(self.R_squared(y_test_cv, y_test_pred))
 
-        if self.k_groups and self.y_groups is not None:
+        B_matrix = np.array(opt_beta)
+        opt_beta_model = []
 
-            for i in range(self.k_folds):
-                # Use the i-th part as the test set and the rest as the train set
-                test_matrix_iterations.append(np.array(self.k_groups[i]))
-                train_matrix_iterations.append(np.array(np.concatenate(self.k_groups[:i] + self.k_groups[i+1:],axis=0)))
-                y_test.append(self.y_groups[i])
-                y_train.append(np.concatenate(self.y_groups[:i] + self.y_groups[i+1:],axis=0))
+        for i in range(len(B_matrix[0,:])):
+            column = B_matrix[:,i]
+            opt_beta_model.append(np.mean(column))
 
-            #test_matrix_iterations = np.array(test_matrix_iterations)
-            #train_matrix_iterations = np.array(train_matrix_iterations)
-
-        else:
-            raise ValueError('You must divide into groups before performing cross validation')
-
-        return test_matrix_iterations, train_matrix_iterations, y_test, y_train
-
-    def cross_validation_train_model(self, k):
-        """
-        Method to perform cross validation resampling and then train the model.
-        :param k: k folds to decide how large the resampling groups should be.
-        :return:
-        mean_B_parameters: optimal beta parameters for the model
-        mean_MSE_test: The mean obtained from test sets
-        mean
-        """
-
-        cross_validation = LinRegression(self.poly_degree, self.x, self.y, self.z)
-
-        mean_B_parameters = []
-        mean_MSE_test = []
-        mean_MSE_train = []
-        mean_R2_test = []
-        mean_R2_train = []
+        return opt_beta_model, np.mean(MSE_test), np.mean(MSE_train), \
+               np.mean(R2_test), np.mean(R2_train)
 
 
 
@@ -283,7 +281,6 @@ class LinRegression:
         if self.cross_validation is True:
             if cv_X is not None:
                 X_train = cv_X
-                self.X = cv_X
             else:
                 raise ValueError('Must pass in training matrices for finding beta in cross validation')
             if cv_y is not None:
