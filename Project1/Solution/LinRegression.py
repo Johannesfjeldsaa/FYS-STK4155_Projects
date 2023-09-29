@@ -9,10 +9,11 @@ class LinRegression:
     supported_methods = {'regression_method': ['OLS', 'Ridge', 'Lasso'],
                          'scaling_method': ['StandardScaling']}
 
-
     def __init__(self, poly_degree, x, y, z=None, regression_method=None, scaling_method=None):
 
         self.poly_degree = poly_degree
+        self.z = None
+
 
         if z is None:
             self.X = PolynomialFeatures(degree=self.poly_degree).fit_transform(x.reshape(-1, 1))
@@ -20,10 +21,11 @@ class LinRegression:
         else:
             # Horizontally concat columns to creat design matrix
             self.X = self.create_design_matrix(x, y, self.poly_degree)
-            self.y = z
+            self.z = z
 
         # Define matrices and vectors
         self.x = x
+        self.y = y
         self.X_train = None
         self.X_train_scaled = None
         self.X_test = None
@@ -193,6 +195,24 @@ class LinRegression:
             raise ValueError('You must divide into groups before performing cross validation')
 
         return test_matrix_iterations, train_matrix_iterations, y_test, y_train
+
+    def cross_validation_train_model(self, k):
+        """
+        Method to perform cross validation resampling and then train the model.
+        :param k: k folds to decide how large the resampling groups should be.
+        :return:
+        mean_B_parameters: optimal beta parameters for the model
+        mean_MSE_test: The mean obtained from test sets
+        mean
+        """
+
+        cross_validation = LinRegression(self.poly_degree, self.x, self.y, self.z)
+
+        mean_B_parameters = []
+        mean_MSE_test = []
+        mean_MSE_train = []
+        mean_R2_test = []
+        mean_R2_train = []
 
 
 
