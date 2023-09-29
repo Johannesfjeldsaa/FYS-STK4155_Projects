@@ -3,7 +3,10 @@
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import PolynomialFeatures
-import random
+from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import KFold
+from sklearn.linear_model import LinearRegression, Ridge, Lasso
+from sklearn.metrics import mean_squared_error, r2_score
 
 class LinRegression:
     supported_methods = {'regression_method': ['OLS', 'Ridge', 'Lasso'],
@@ -131,7 +134,7 @@ class LinRegression:
         return self.X_train, self.X_test, self.y_train, self.y_test
 
 
-    def cross_validation_train_model(self, k_folds, seed, regression_method=None):
+    def cross_validation_train_model(self, k_folds, regression_method=None):
         """
         Method to perform cross validation resampling and then train the model.
         This method have not considered scaling, and doesnt take any scaling inputs for now.
@@ -153,11 +156,10 @@ class LinRegression:
 
         self.k_folds = k_folds
         n = len(self.x)
-        np.random.seed(seed) # create same random shuffling each time.
 
         # Shuffle the data, and keep design matrix and z values aligned
         list_tuple_to_shuffle = list(zip(self.X, self.y))
-        random.shuffle(list_tuple_to_shuffle)
+        np.random.shuffle(list_tuple_to_shuffle)
         matrix_shuffled, z_shuffled = zip(*list_tuple_to_shuffle)
 
         # matrix_shuffled and z_shuffled come out as tuples, and so must be converted to lists.
@@ -212,6 +214,27 @@ class LinRegression:
         return opt_beta_model, np.mean(MSE_test), np.mean(MSE_train), \
                np.mean(R2_test), np.mean(R2_train)
 
+    def scikit_cross_validation_train_model(self, k):
+
+        # make k groups
+        kfold = KFold(n_splits=k, shuffle=True)
+
+        if self.regression_method == 'OLS':
+            OLS = LinearRegression(fit_intercept=False)
+
+            # loop over trials in order to estimate the expectation value of the MSE
+            estimated_mse_folds = cross_val_score(OLS, self.X, self.y,
+                                                  scoring='neg_mean_squared_error', cv=kfold)
+            print(estimated_mse_folds)
+
+        elif self.regression_method == 'Ridge':
+            pass
+        elif self.regression_method == 'Lasso':
+            pass
+        else:
+            raise ValueError('A valid regression model is not given')
+
+        return np.mean(-estimated_mse_folds)
 
 
     def scale(self, scaling_method=None):
