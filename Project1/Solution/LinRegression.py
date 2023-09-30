@@ -56,14 +56,14 @@ class LinRegression:
         self.bootstrapping = False
 
         # Regression
-        if regression_method is None:
-            self.regression_method = 'OLS'
-        else:
-            if regression_method in self.supported_methods['regression_method']:
-                self.regression_method = regression_method
-            else:
-                supported_methods = self.supported_methods['regression_method']
-                raise ValueError(f'regression_method was {regression_method}, expected {supported_methods}')
+        # if regression_method is None:
+        #     self.regression_method = 'OLS'
+        # else:
+        #     if regression_method in self.supported_methods['regression_method']:
+        #         self.regression_method = regression_method
+        #     else:
+        #         supported_methods = self.supported_methods['regression_method']
+        #         raise ValueError(f'regression_method was {regression_method}, expected {supported_methods}')
         # Scaling
 
         self.regression_method = None
