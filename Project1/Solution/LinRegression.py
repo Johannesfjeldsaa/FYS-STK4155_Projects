@@ -3,16 +3,22 @@
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import PolynomialFeatures
+
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import KFold
 from sklearn.linear_model import LinearRegression, Ridge, Lasso
 from sklearn.metrics import mean_squared_error, r2_score
 
+from sklearn import linear_model
+
+
+
+
 class LinRegression:
     supported_methods = {'regression_method': ['OLS', 'Ridge', 'Lasso'],
                          'scaling_method': ['StandardScaling']}
 
-    def __init__(self, poly_degree, x, y, z=None, regression_method=None, scaling_method=None):
+    def __init__(self, poly_degree, x, y, z=None):
 
         self.poly_degree = poly_degree
 
@@ -39,6 +45,7 @@ class LinRegression:
         self.y_pred_test = None
         self.y_scaler = None
         self.beta = None
+
         self.k_folds = None
         self.k_groups = None
         self.y_groups = None
@@ -58,17 +65,17 @@ class LinRegression:
                 supported_methods = self.supported_methods['regression_method']
                 raise ValueError(f'regression_method was {regression_method}, expected {supported_methods}')
         # Scaling
-        self.scaled = False
-        if scaling_method is None:
-            self.scaling_method = None
-        else:
-            if scaling_method in self.supported_methods['scaling_method']:
-                self.scaling_method = scaling_method
-            else:
-                supported_methods = self.supported_methods['scaling_method']
-                raise ValueError(f'scaling_method was {scaling_method}, expected {supported_methods}')
 
-    def create_design_matrix(self, x, y, n ):  # From example week 35
+        self.regression_method = None
+        self.scaling_method = None
+
+        ### Define attributes of the linear regression
+        self.splitted = False
+
+        self.scaled = False
+
+
+    def create_design_matrix(self, x, y, n):  # From example week 35
         if len(x.shape) > 1:
             x = np.ravel(x)
             y = np.ravel(y)
@@ -78,7 +85,7 @@ class LinRegression:
         X = np.ones((N,l))
 
         for i in range(1,n+1):
-            q = int((i)*(i+1)/2)
+            q = int(i * (i + 1) / 2)
             for k in range(i+1):
                 X[:,q+k] = (x**(i-k))*(y**k)
 
@@ -283,6 +290,7 @@ class LinRegression:
 
         self.scaled = True
 
+
     def train_model(self, regression_method=None, train_on_scaled=None, la=None,
                     cv_X=None, cv_y=None):
         if self.splitted is not True and self.cross_validation is not True:
@@ -298,13 +306,6 @@ class LinRegression:
             else:
                 supported_methods = self.supported_methods['regression_method']
                 raise ValueError(f'regression_method was {regression_method}, expected {supported_methods}')
-
-
-        if self.regression_method == 'Ridge':
-            try:
-                float(la)
-            except ValueError:
-                print(f'la must be float, not {type(la)}')
 
         train_on_scaled = train_on_scaled if train_on_scaled is not None else False
 
@@ -333,10 +334,14 @@ class LinRegression:
 
         if self.regression_method == 'OLS':
             self.beta = np.linalg.pinv(X_train.T @ X_train) @ X_train.T @ y_train
-        elif self.regression_method == 'ridge':
+        elif self.regression_method == 'Ridge':
             cols = np.shape(X_train)[1]
             I = np.eye(cols, cols)
             self.beta = np.linalg.pinv(X_train.T @ X_train + la*I) @ X_train.T @ y_train
+        elif self.regression_method == "Lasso":
+            RegLasso = linear_model.Lasso(la, fit_intercept=False, max_iter=int(10e4))
+            RegLasso.fit(X_train, y_train)
+            self.beta = RegLasso.coef_
             
         return self.beta
 
