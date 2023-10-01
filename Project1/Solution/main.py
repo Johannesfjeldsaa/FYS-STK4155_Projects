@@ -105,23 +105,24 @@ if __name__ == '__main__':
 
     print('\n ###### Task A) \n')
     polynomal_orders = [1, 2, 3, 4, 5]
-    (MSE_train_df,
-     MSE_test_df,
-     R2_train_df,
-     R2_test_df,
-     beta_parameters_df,
-     summary_df) = run_experiment_a_c(regression_method = 'OLS',
-                                      scaling_method='StandardScaling',
-                                             polynomal_orders=polynomal_orders,
-                                             x=x,
-                                             y=y,
-                                             z=z)
+    (MSE_train_df_OLS,
+     MSE_test_df_OLS,
+     R2_train_df_OLS,
+     R2_test_df_OLS,
+     beta_parameters_df_OLS,
+     summary_df_OLS) = run_experiment_a_c(regression_method = 'OLS',
+                                          scaling_method='StandardScaling',
+                                          polynomal_orders=polynomal_orders,
+                                          x=x,
+                                          y=y,
+                                          z=z)
 
-    print(MSE_test_df)
-    print(R2_test_df)
-    print(beta_parameters_df)
+    print(MSE_test_df_OLS)
+    print(R2_test_df_OLS)
+    print(beta_parameters_df_OLS)
     # Plotting results of task 1a OLS regression
-    plots_task_1a = Plotting(polynomal_orders, MSE_test_df, R2_test_df, beta_parameters_df)
+    plots_task_1a = Plotting(polynomal_orders, MSE_test_df_OLS, 
+                             R2_test_df_OLS, beta_parameters_df_OLS)
     plots_task_1a.plot_MSE_scores()
     plots_task_1a.plot_R2_scores()
     plots_task_1a.plot_betaparams_polynomial_order()
@@ -160,6 +161,8 @@ if __name__ == '__main__':
     
     plots_task_1b.plot_MSE_some_lambdas(lambdas_to_plot=lambdas[idx_to_plot])
     
+    plots_task_1b.plot_betaparams_polynomial_order()
+    
     
 #%%
     print('\n #### Task c) #### \n')
@@ -196,4 +199,47 @@ if __name__ == '__main__':
     
     plots_task_1c.plot_MSE_some_lambdas(lambdas_to_plot=lambdas[idx_to_plot])
     
+    plots_task_1c.plot_betaparams_polynomial_order()
     
+    
+#%% Making summary plots for task a) through c)
+# Var ikke sikker på hvordan inkludere dette i Plotting klassen ettersom det 
+# trengs input fra alle 3 metodene (OLS, Ridge, Lasso)
+
+plt.figure()
+
+plt.plot(MSE_test_df_OLS.index, MSE_test_df_OLS.OLS, label="OLS")
+plt.plot(summary_df_ridge.index, summary_df_ridge["Min test MSE"],
+         "--", label="Ridge")
+plt.plot(summary_df_lasso.index, summary_df_lasso["Min test MSE"],
+         "-.", label="Lasso")
+
+plt.xticks(summary_df_ridge.index)
+
+plt.ylabel("Mean Squared Error")
+plt.xlabel("Polynomial degree")
+plt.legend()
+
+plt.show()
+
+plt.figure()
+
+plt.plot(R2_test_df_OLS.index, R2_test_df_OLS.OLS, label="OLS")
+plt.plot(summary_df_ridge.index, summary_df_ridge["Max test R2"],
+         "--", label="Ridge")
+plt.plot(summary_df_lasso.index, summary_df_lasso["Max test R2"],
+         "-.", label="Lasso")
+
+plt.xticks(summary_df_ridge.index)
+
+plt.ylabel(r"R$^2$")
+plt.xlabel("Polynomial degree")
+plt.legend()
+
+plt.show()
+
+
+
+
+
+

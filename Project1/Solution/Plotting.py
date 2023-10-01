@@ -173,4 +173,32 @@ class Plotting:
             
         fig.supxlabel("Polynomial degree")
         fig.supylabel("Mean Squared Error (MSE)")
+        
+    def plot_R2_some_lambdas(self, lambdas_to_plot, num_plot_columns=3):
+        """
+        Function for plotting the Mean Squared Error as a function of polynomial
+        degree for specified lambda values.
+
+
+        """
+        num_plot_rows = int(np.ceil(len(lambdas_to_plot)/num_plot_columns))
+        
+        fig, axes = plt.subplots(num_plot_rows, num_plot_columns,
+                                 figsize=(12, 7), sharey=True, sharex=True,
+                                 layout="constrained")
+        
+
+        for la, ax in zip(lambdas_to_plot, axes.ravel()):
+            #la_rounded = 
+            title = fr"$\lambda$ = {signif(la, 3)}"
+            ax.set_title(title)
+
+            ax.plot(self.MSE_scores.index, self.MSE_scores.loc[:, la], 
+                    alpha=0.7, lw=2, color='r', label='MSE')
+            
+            plt.xticks(self.poly_degrees)
+            
+        fig.supxlabel("Polynomial degree")
+        fig.supylabel("Mean Squared Error (MSE)")
+    
     
