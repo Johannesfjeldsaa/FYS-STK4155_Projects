@@ -160,7 +160,6 @@ class LinRegression:
         self.cross_validation = True   # set the marker for cross validation being executed
 
         # create the k groups:
-
         self.k_folds = k_folds
         n = len(self.x)
 
@@ -196,8 +195,8 @@ class LinRegression:
             y_train_cv = np.concatenate(self.y_groups[:i] + self.y_groups[i + 1:], axis=0)
 
             # perform for OLS first, but in Ridge and Lasso when working
-            if self.regression_method == 'OLS':
-                self.train_model(regression_method=self.regression_method,
+            if regression_method == 'OLS':
+                self.train_model(regression_method=regression_method,
                                  cv_X=train_matrix, cv_y=y_train_cv)
                 opt_beta.append(self.beta)   # store optimal betas for each cross validation set
 
@@ -211,14 +210,39 @@ class LinRegression:
                 MSE_test.append(self.MSE(y_test_cv, y_test_pred))
                 R2_test.append(self.R_squared(y_test_cv, y_test_pred))
 
-            elif self.regression_method == 'Ridge':  # fill in together
-                pass
+            elif regression_method =='Ridge':  # fill in together
+                self.train_model(regression_method=regression_method,
+                                 la=lmb, cv_X=train_matrix, cv_y=y_train_cv)
+                opt_beta.append(self.beta)   # store optimal betas for each cross validation set
 
-            elif self.regression_method == 'Lasso':  # fill in together
-                pass
+                # find for training set: X_training @ beta
+                y_train_pred = train_matrix @ self.beta
+                MSE_train.append(self.MSE(y_train_cv, y_train_pred))
+                R2_train.append(self.R_squared(y_train_cv, y_train_pred))
+
+                # find for test set: test_matrix @ beta
+                y_test_pred = test_matrix @ self.beta
+                MSE_test.append(self.MSE(y_test_cv, y_test_pred))
+                R2_test.append(self.R_squared(y_test_cv, y_test_pred))
+
+
+            elif regression_method == 'Lasso':  # fill in together
+                self.train_model(regression_method=regression_method,
+                                 la=lmb, cv_X=train_matrix, cv_y=y_train_cv)
+                opt_beta.append(self.beta)   # store optimal betas for each cross validation set
+
+                # find for training set: X_training @ beta
+                y_train_pred = train_matrix @ self.beta
+                MSE_train.append(self.MSE(y_train_cv, y_train_pred))
+                R2_train.append(self.R_squared(y_train_cv, y_train_pred))
+
+                # find for test set: test_matrix @ beta
+                y_test_pred = test_matrix @ self.beta
+                MSE_test.append(self.MSE(y_test_cv, y_test_pred))
+                R2_test.append(self.R_squared(y_test_cv, y_test_pred))
 
             else:
-                raise ValueError('A valid regression method has not been passed') # fill in together
+                raise ValueError('A valid regression method has not been passed')
 
         B_matrix = np.array(opt_beta)
         opt_beta_model = []
@@ -230,12 +254,12 @@ class LinRegression:
         return opt_beta_model, np.mean(MSE_test), np.mean(MSE_train), \
                np.mean(R2_test), np.mean(R2_train)
 
-    def scikit_cross_validation_train_model(self, k, lmb=None):
+    def scikit_cross_validation_train_model(self, k, regression_method=None, lmb=None):
 
         # make k groups
         kfold = KFold(n_splits=k, shuffle=True)
 
-        if self.regression_method == 'OLS':
+        if regression_method == 'OLS':
             OLS = LinearRegression(fit_intercept=False)
 
             # loop over trials in order to estimate the expectation value of the MSE
@@ -243,21 +267,21 @@ class LinRegression:
                                                   scoring='neg_mean_squared_error', cv=kfold)
             estimated_r2_folds = cross_val_score(OLS, self.X, self.y, scoring='r2', cv=kfold)
 
-        elif self.regression_method == 'Ridge':
-            Ridge = LinearRegression.Ridge(lmb, fit_intercept=False)
+        elif regression_method == 'Ridge':
+            ridge = Ridge(lmb, fit_intercept=False)
 
             # loop over trials in order to estimate the expectation value of the MSE
-            estimated_mse_folds = cross_val_score(Ridge, self.X, self.y,
+            estimated_mse_folds = cross_val_score(ridge, self.X, self.y,
                                                   scoring='neg_mean_squared_error', cv=kfold)
-            estimated_r2_folds = cross_val_score(Ridge, self.X, self.y, scoring='r2', cv=kfold)
+            estimated_r2_folds = cross_val_score(ridge, self.X, self.y, scoring='r2', cv=kfold)
 
-        elif self.regression_method == 'Lasso':
-            Lasso = LinearRegression.Lasso(fit_intercept=False)
+        elif regression_method == 'Lasso':
+            lasso = Lasso(fit_intercept=False)
 
             # loop over trials in order to estimate the expectation value of the MSE
-            estimated_mse_folds = cross_val_score(Lasso, self.X, self.y,
+            estimated_mse_folds = cross_val_score(lasso, self.X, self.y,
                                                   scoring='neg_mean_squared_error', cv=kfold)
-            estimated_r2_folds = cross_val_score(Lasso, self.X, self.y, scoring='r2', cv=kfold)
+            estimated_r2_folds = cross_val_score(lasso, self.X, self.y, scoring='r2', cv=kfold)
         else:
             raise ValueError('A valid regression model is not given')
 
