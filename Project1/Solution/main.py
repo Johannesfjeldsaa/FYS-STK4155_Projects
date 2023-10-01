@@ -6,7 +6,7 @@ from setup import save_fig, data_path
 
 import numpy as np
 import pandas as pd
-import math
+#import math
 import itertools
 import matplotlib.pyplot as plt
 plt.style.use('Solarize_Light2')
@@ -121,10 +121,10 @@ if __name__ == '__main__':
     print(R2_test_df)
     print(beta_parameters_df)
     # Plotting results of task 1a OLS regression
-    plots_task_1a = Plotting(max(polynomal_orders),MSE_test_df['OLS'], R2_test_df['OLS'], None)
+    plots_task_1a = Plotting(polynomal_orders, MSE_test_df, R2_test_df, beta_parameters_df)
     plots_task_1a.plot_MSE_scores()
     plots_task_1a.plot_R2_scores()
-    #plots_task_1a.plot_betaparams_polynomial_order()
+    plots_task_1a.plot_betaparams_polynomial_order()
 
 # %%
     print('\n #### Task b) #### \n')
@@ -133,23 +133,34 @@ if __name__ == '__main__':
 
     polynomal_orders = [1, 2, 3, 4, 5]
 
-    (MSE_train_df,
-     MSE_test_df,
-     R2_train_df,
-     R2_test_df,
-     beta_parameters_df,
-     summary_df) = run_experiment_a_c(regression_method='Ridge',
-                                      scaling_method='StandardScaling',
-                                      polynomal_orders=polynomal_orders,
-                                      lambda_values=lambdas,
-                                      x=x,
-                                      y=y,
-                                      z=z)
-    print(MSE_test_df)
-    print(R2_test_df)
-    print(beta_parameters_df)
-    print(summary_df)
-
+    (MSE_train_df_ridge,
+     MSE_test_df_ridge,
+     R2_train_df_ridge,
+     R2_test_df_ridge,
+     beta_parameters_df_ridge,
+     summary_df_ridge) = run_experiment_a_c(regression_method='Ridge',
+                                            scaling_method='StandardScaling',
+                                            polynomal_orders=polynomal_orders,
+                                            lambda_values=lambdas,
+                                            x=x,
+                                            y=y,
+                                            z=z)
+    print(MSE_test_df_ridge)
+    print(R2_test_df_ridge)
+    print(beta_parameters_df_ridge)
+    print(summary_df_ridge)
+    
+    plots_task_1b = Plotting(polynomal_orders, MSE_test_df_ridge, 
+                             R2_test_df_ridge, beta_parameters_df_ridge)
+    plots_task_1b.plot_MSE_for_all_lambdas(5)
+    
+    num_lambdas_to_plot = 6
+    idx_to_plot = np.round(np.linspace(0, len(lambdas) - 1,
+                                       num_lambdas_to_plot)).astype(int)
+    
+    plots_task_1b.plot_MSE_some_lambdas(lambdas_to_plot=lambdas[idx_to_plot])
+    
+    
 #%%
     print('\n #### Task c) #### \n')
 
@@ -158,19 +169,31 @@ if __name__ == '__main__':
 
     polynomal_orders = [1, 2, 3, 4, 5]
 
-    (MSE_train_df,
-     MSE_test_df,
-     R2_train_df,
-     R2_test_df,
-     beta_parameters_df,
-     summary_df) = run_experiment_a_c(regression_method='Lasso',
-                                      scaling_method='StandardScaling',
-                                      polynomal_orders=polynomal_orders,
-                                      lambda_values=lambdas,
-                                      x=x,
-                                      y=y,
-                                      z=z)
-    print(MSE_test_df)
-    print(R2_test_df)
-    print(beta_parameters_df)
-    print(summary_df)
+    (MSE_train_df_lasso,
+     MSE_test_df_lasso,
+     R2_train_df_lasso,
+     R2_test_df_lasso,
+     beta_parameters_df_lasso,
+     summary_df_lasso) = run_experiment_a_c(regression_method='Lasso',
+                                            scaling_method='StandardScaling',
+                                            polynomal_orders=polynomal_orders,
+                                            lambda_values=lambdas,
+                                            x=x,
+                                            y=y,
+                                            z=z)
+    print(MSE_test_df_lasso)
+    print(R2_test_df_lasso)
+    print(beta_parameters_df_lasso)
+    print(summary_df_lasso)
+    
+    plots_task_1c = Plotting(polynomal_orders, MSE_test_df_lasso, 
+                             R2_test_df_lasso, beta_parameters_df_lasso)
+    plots_task_1c.plot_MSE_for_all_lambdas(5)
+    
+    num_lambdas_to_plot = 6
+    idx_to_plot = np.round(np.linspace(0, len(lambdas) - 1,
+                                       num_lambdas_to_plot)).astype(int)
+    
+    plots_task_1c.plot_MSE_some_lambdas(lambdas_to_plot=lambdas[idx_to_plot])
+    
+    

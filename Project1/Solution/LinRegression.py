@@ -70,7 +70,6 @@ class LinRegression:
         self.scaling_method = None
 
         ### Define attributes of the linear regression
-        self.splitted = False
 
         self.scaled = False
 
@@ -265,10 +264,11 @@ class LinRegression:
 
 
     def scale(self, scaling_method=None):
+        
         if self.splitted is not True:
             raise ValueError('Split before you scale!')
 
-        if scaling_method and self.scaling_method is None:
+        if (scaling_method is None) and (self.scaling_method is None):
             print('No scaling method provided, using standard scaling')
             self.scaling_method = 'StandardScaling'
         else:
@@ -297,7 +297,7 @@ class LinRegression:
             raise ArithmeticError('Split data before performing model training.')
 
 
-        if regression_method and self.regression_method is None:
+        if (regression_method is None) and (self.regression_method is None):
             print('No method for training was provided, using OLS')
             self.regression_method = 'OLS'
         else:
@@ -339,7 +339,7 @@ class LinRegression:
             I = np.eye(cols, cols)
             self.beta = np.linalg.pinv(X_train.T @ X_train + la*I) @ X_train.T @ y_train
         elif self.regression_method == "Lasso":
-            RegLasso = linear_model.Lasso(la, fit_intercept=False, max_iter=int(10e4))
+            RegLasso = linear_model.Lasso(la, fit_intercept=False, max_iter=int(10e6))
             RegLasso.fit(X_train, y_train)
             self.beta = RegLasso.coef_
             
