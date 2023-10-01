@@ -152,7 +152,6 @@ class Plotting:
         Function for plotting the Mean Squared Error as a function of polynomial
         degree for specified lambda values.
 
-
         """
         num_plot_rows = int(np.ceil(len(lambdas_to_plot)/num_plot_columns))
         
@@ -176,9 +175,8 @@ class Plotting:
         
     def plot_R2_some_lambdas(self, lambdas_to_plot, num_plot_columns=3):
         """
-        Function for plotting the Mean Squared Error as a function of polynomial
+        Function for plotting the R squared as a function of polynomial
         degree for specified lambda values.
-
 
         """
         num_plot_rows = int(np.ceil(len(lambdas_to_plot)/num_plot_columns))

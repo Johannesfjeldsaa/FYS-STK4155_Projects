@@ -1,17 +1,12 @@
 ### Import packages ###
 
 import numpy as np
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score, KFold
 from sklearn.preprocessing import PolynomialFeatures
-
-from sklearn.model_selection import cross_val_score
-from sklearn.model_selection import KFold
 from sklearn.linear_model import LinearRegression, Ridge, Lasso
 from sklearn.metrics import mean_squared_error, r2_score
 
 from sklearn import linear_model
-
-
 
 
 class LinRegression:
@@ -21,7 +16,6 @@ class LinRegression:
     def __init__(self, poly_degree, x, y, z=None):
 
         self.poly_degree = poly_degree
-
 
         if z is None:
             self.X = PolynomialFeatures(degree=self.poly_degree).fit_transform(x.reshape(-1, 1))
@@ -55,26 +49,25 @@ class LinRegression:
         self.cross_validation = False
         self.bootstrapping = False
 
-        # Regression
-        # if regression_method is None:
-        #     self.regression_method = 'OLS'
-        # else:
-        #     if regression_method in self.supported_methods['regression_method']:
-        #         self.regression_method = regression_method
-        #     else:
-        #         supported_methods = self.supported_methods['regression_method']
-        #         raise ValueError(f'regression_method was {regression_method}, expected {supported_methods}')
-        # Scaling
-
         self.regression_method = None
         self.scaling_method = None
-
-        ### Define attributes of the linear regression
 
         self.scaled = False
 
 
-    def create_design_matrix(self, x, y, n):  # From example week 35
+    def create_design_matrix(self, x, y, n):
+        """
+        Creates a design matrix from two input variables
+        Copied from example week 35
+        
+        Parameters:
+        x (array-like): The first variable
+        y (array-like): The second variable
+        n (int): The polynomial degree
+
+        Returns:
+        The design matrix
+        """
         if len(x.shape) > 1:
             x = np.ravel(x)
             y = np.ravel(y)
@@ -122,9 +115,17 @@ class LinRegression:
 
     def split_data(self, test_size):
         """
-
-        :param test_size:
-        :return:
+        Splits the data into test and training set using the scikit-learn 
+        method train_test_split
+        
+        Parameters:
+        test_size (float): The fraction of the data to use as test data
+        
+        Returns:
+        X_train: Training part of design matrix
+        X_test: Test part of design matrix
+        y_train: Training part of output values
+        y_test: Test part og output values
         """
         if self.scaled is True:
             raise ValueError('Split before you scale!')
@@ -264,7 +265,14 @@ class LinRegression:
 
 
     def scale(self, scaling_method=None):
+        """
+        Scales the data according to the chosen scaling method
         
+        Parameters:
+        scaling_method (string): The chosen scaling method.
+        
+        """
+    
         if self.splitted is not True:
             raise ValueError('Split before you scale!')
 
@@ -287,12 +295,42 @@ class LinRegression:
             self.X_train_scaled = self.X_train - self.X_scaler
             self.X_test_scaled = self.X_test - self.X_scaler  # Use mean from training data
 
+        self.scaled = True # Marks that the data are now scaled
 
-        self.scaled = True
 
-
-    def train_model(self, regression_method=None, train_on_scaled=None, la=None,
+    def train_model(self, regression_method=None, train_on_scaled=False, la=None,
                     cv_X=None, cv_y=None):
+        """
+        Function for training the model.
+
+        Parameters
+        ----------
+        regression_method : String, optional
+            The regression method to use. The default is None.
+        train_on_scaled : String, optional
+            Weather to train on scaled data or not. The default is False.
+        la : Float, optional
+            The lambda value to use for ridge or lasso regression. 
+            The default is None.
+        cv_X : TYPE, optional
+            DESCRIPTION. The default is None.
+        cv_y : TYPE, optional
+            DESCRIPTION. The default is None.
+
+        Raises
+        ------
+        ArithmeticError
+            Gives warning if the data is not split before training the model.
+        ValueError
+            Gives warning if train_on_scaled is True and data is not scaled
+
+        Returns
+        -------
+        array-like
+            The fitted beta parameters.
+
+        """
+    
         if self.splitted is not True and self.cross_validation is not True:
             raise ArithmeticError('Split data before performing model training.')
 
@@ -307,7 +345,7 @@ class LinRegression:
                 supported_methods = self.supported_methods['regression_method']
                 raise ValueError(f'regression_method was {regression_method}, expected {supported_methods}')
 
-        train_on_scaled = train_on_scaled if train_on_scaled is not None else False
+        #train_on_scaled = train_on_scaled if train_on_scaled is not None else False
 
         if self.cross_validation is not True:
             if train_on_scaled:
@@ -346,9 +384,17 @@ class LinRegression:
         return self.beta
 
     def predict(self):
+        """
+        Function for predicting the output using the trained model
+
+        """
         self.y_pred = self.X @ self.beta
 
     def predict_training(self):
+        """
+        Function for predicting the training output using the trained model
+
+        """
         if self.scaled is True:
             self.y_pred_train = self.X_train_scaled @ self.beta + self.y_scaler
         else:
@@ -357,6 +403,10 @@ class LinRegression:
         return self.y_pred_train
 
     def predict_test(self):
+        """
+        Function for predicting the test output using the trained model
+
+        """
         if self.scaled is True:
             self.y_pred_test = (self.X_test_scaled @ self.beta) + self.y_scaler
         else:
@@ -386,8 +436,8 @@ class LinRegression:
         Calculates the coefficient of determination R^2. R^2 quantifies the proportion of total variability in the
         dataset that is explained by the model.
 
-        :param true_y:
-        :param predicted_y:
+        :param true_y: 
+        :param predicted_y: 
         :return:
         '''
 
