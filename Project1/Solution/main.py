@@ -11,6 +11,9 @@ import itertools
 import matplotlib.pyplot as plt
 plt.style.use('Solarize_Light2')
 
+from imageio import imread
+import matplotlib.pyplot as plt
+ 
 
 
 if __name__ == '__main__':
@@ -275,4 +278,45 @@ if __name__ == '__main__':
     
     plots_task_1e.plot_MSE_test_and_training()
 
+#%% 
 
+    print('\n #### Task g) #### \n')
+    
+    # Load the terrain
+    terrain = imread(r'DataFiles\SRTM_data_Norway_1.tif')
+    
+    N = 1000
+    m = 5 # polynomial order
+    
+    #x = np.random.randint(0, N, N)
+    #y = np.random.randint(0, N, N)
+    
+    x = np.arange(0, N, 1)
+    y = np.arange(0, N, 1)
+    
+    x_mesh, y_mesh = np.meshgrid(x, y)
+    
+    z = terrain[x_mesh.ravel(), y_mesh.ravel()]
+    
+    #%%
+    
+    x = np.linspace(0, 1, np.shape(terrain)[0])
+    
+    #%%
+    terrain = terrain[:N,:N]
+    # Creates mesh of image pixels
+    x = np.linspace(0, 1, np.shape(terrain)[0])
+    y = np.linspace(0, 1, np.shape(terrain)[1])
+    x_mesh, y_mesh = np.meshgrid(x,y)
+    
+    z = terrain
+    #X = create_X(x_mesh, y_mesh, m)
+    
+    
+    # Show the terrain
+    plt.figure()
+    plt.title('Terrain over Norway 1')
+    plt.imshow(terrain, cmap='gray')
+    plt.xlabel('X')
+    plt.ylabel('Y')
+    plt.show()
