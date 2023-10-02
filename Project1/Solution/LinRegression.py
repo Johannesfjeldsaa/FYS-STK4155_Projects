@@ -202,6 +202,7 @@ class LinRegression:
 
             self.train_model(regression_method=regression_method, la=self.lmb,
                              X_train=train_matrix, y_train=y_train_cv)
+
             opt_beta.append(self.beta)   # store optimal betas for each cross validation set
 
             # find for training set: X_training @ beta
@@ -213,7 +214,6 @@ class LinRegression:
             y_test_pred = test_matrix @ self.beta
             MSE_test.append(self.MSE(y_test_cv, y_test_pred))
             R2_test.append(self.R_squared(y_test_cv, y_test_pred))
-
 
         B_matrix = np.array(opt_beta)
         opt_beta_model = []
@@ -377,6 +377,7 @@ class LinRegression:
         #train_on_scaled = train_on_scaled if train_on_scaled is not None else False
 
         if (X_train is None) and (y_train is None):
+
             if train_on_scaled:
                 if self.scaled is True:
                     X_train = self.X_train_scaled

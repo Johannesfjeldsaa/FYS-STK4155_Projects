@@ -98,13 +98,18 @@ if __name__ == '__main__':
     N = 1000
     x = np.sort(np.random.uniform(0, 1, N))
     y = np.sort(np.random.uniform(0, 1, N))
-
-    z = FrankeFunction(x, y)
+    
+    # Without noise:
+    #z = FrankeFunction(x, y)
+    
+    # With noise:
+    z = FrankeFunction(x, y) + np.random.normal(0, 0.1, x.shape)
 #%%
     # Solution to exercise a)
 
     print('\n ###### Task A) \n')
     polynomal_orders = [1, 2, 3, 4, 5]
+
     (MSE_train_df_OLS,
      MSE_test_df_OLS,
      R2_train_df_OLS,
@@ -206,40 +211,68 @@ if __name__ == '__main__':
 # Var ikke sikker på hvordan inkludere dette i Plotting klassen ettersom det 
 # trengs input fra alle 3 metodene (OLS, Ridge, Lasso)
 
-plt.figure()
+    plt.figure()
+    
+    plt.plot(MSE_test_df_OLS.index, MSE_test_df_OLS.OLS, label="OLS")
+    plt.plot(summary_df_ridge.index, summary_df_ridge["Min test MSE"],
+             "--", label="Ridge")
+    plt.plot(summary_df_lasso.index, summary_df_lasso["Min test MSE"],
+             "-.", label="Lasso")
+    
+    plt.xticks(summary_df_ridge.index)
+    
+    plt.ylabel("Mean Squared Error")
+    plt.xlabel("Polynomial degree")
+    plt.legend()
+    
+    plt.show()
+    
+    plt.figure()
+    
+    plt.plot(R2_test_df_OLS.index, R2_test_df_OLS.OLS, label="OLS")
+    plt.plot(summary_df_ridge.index, summary_df_ridge["Max test R2"],
+             "--", label="Ridge")
+    plt.plot(summary_df_lasso.index, summary_df_lasso["Max test R2"],
+             "-.", label="Lasso")
+    
+    plt.xticks(summary_df_ridge.index)
+    
+    plt.ylabel(r"R$^2$")
+    plt.xlabel("Polynomial degree")
+    plt.legend()
+    
+    plt.show()
 
-plt.plot(MSE_test_df_OLS.index, MSE_test_df_OLS.OLS, label="OLS")
-plt.plot(summary_df_ridge.index, summary_df_ridge["Min test MSE"],
-         "--", label="Ridge")
-plt.plot(summary_df_lasso.index, summary_df_lasso["Min test MSE"],
-         "-.", label="Lasso")
+#%% 
 
-plt.xticks(summary_df_ridge.index)
+    print('\n #### Task e) #### \n')
 
-plt.ylabel("Mean Squared Error")
-plt.xlabel("Polynomial degree")
-plt.legend()
-
-plt.show()
-
-plt.figure()
-
-plt.plot(R2_test_df_OLS.index, R2_test_df_OLS.OLS, label="OLS")
-plt.plot(summary_df_ridge.index, summary_df_ridge["Max test R2"],
-         "--", label="Ridge")
-plt.plot(summary_df_lasso.index, summary_df_lasso["Max test R2"],
-         "-.", label="Lasso")
-
-plt.xticks(summary_df_ridge.index)
-
-plt.ylabel(r"R$^2$")
-plt.xlabel("Polynomial degree")
-plt.legend()
-
-plt.show()
-
-
-
-
+    np.random.seed(2500)
+    
+    N = 500
+    x = np.sort(np.random.uniform(0, 1, N))
+    y = np.sort(np.random.uniform(0, 1, N))
+    
+    # With noise:
+    z = FrankeFunction(x, y) + np.random.normal(0, 0.2, x.shape)
+    
+    polynomal_orders = [i for i in range(1, 80)]
+    (MSE_train_df_OLS,
+     MSE_test_df_OLS,
+     R2_train_df_OLS,
+     R2_test_df_OLS,
+     beta_parameters_df_OLS,
+     summary_df_OLS) = run_experiment_a_c(regression_method = 'OLS',
+                                          scaling_method='StandardScaling',
+                                          polynomal_orders=polynomal_orders,
+                                          x=x,
+                                          y=y,
+                                          z=z)
+    
+    plots_task_1e = Plotting(polynomal_orders, MSE_test_df_OLS, 
+                             R2_test_df_OLS, beta_parameters_df_OLS, 
+                             MSE_train_df_OLS)
+    
+    plots_task_1e.plot_MSE_test_and_training()
 
 
