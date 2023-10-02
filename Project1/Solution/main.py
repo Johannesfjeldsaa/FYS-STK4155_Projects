@@ -489,7 +489,7 @@ if __name__ == '__main__':
 
 
     """
-    Plot for model complexity on x axis, MSE and R2 on y_axis. bootstrap, cross validation
+    Plot for model complexity on x axis, MSE on y_axis. bootstrap, cross validation
     and own code is included as lines. FIrst for OLS and k = 5,8 and 10
     """
 
