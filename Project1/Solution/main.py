@@ -325,10 +325,10 @@ if __name__ == '__main__':
                 variance_liste[polyorder-1] = variance
 
         elif k_folds is not None:
-
-
+            pass
         else:
             raise ValueError('Valid resampling method not entered')
+
 
         return bootstrap_df, polydegree_liste, error_liste, bias_liste, variance_liste
 
@@ -352,6 +352,8 @@ if __name__ == '__main__':
     # Plot the bias variance analysis
 
     plt.figure()
+    plt.xlabel('Model complexity')
+    plt.ylabel('Error score')
     plt.plot(polydegree_liste, error_liste, label='Error')
     plt.plot(polydegree_liste, bias_liste, label='bias')
     plt.plot(polydegree_liste, variance_liste, label='Variance')
