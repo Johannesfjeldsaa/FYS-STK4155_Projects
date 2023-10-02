@@ -273,7 +273,7 @@ class LinRegression:
 
             # Evaluate the new model on the same test data each time.
 
-            beta_OLS = self.train_model(regression_method='OLS', X_train=x_, y_train=y_)
+            self.train_model(regression_method='OLS', X_train=x_, y_train=y_)
 
             y_pred[:, i] = self.predict_test().ravel()
 
