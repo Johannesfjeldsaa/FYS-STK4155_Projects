@@ -167,9 +167,10 @@ if __name__ == '__main__':
     plots_task_1b.plot_MSE_some_lambdas(lambdas_to_plot=lambdas[idx_to_plot])
     
     plots_task_1b.plot_betaparams_polynomial_order()
+
+    """
     
-    
-#%%
+    #%%
     print('\n #### Task c) #### \n')
 
     nlambdas = 100
@@ -242,9 +243,9 @@ if __name__ == '__main__':
     plt.legend()
     
     plt.show()
+    """
 
-#%% 
-
+# %%
     print('\n #### Task e) #### \n')
 
     np.random.seed(2500)
@@ -255,8 +256,9 @@ if __name__ == '__main__':
     
     # With noise:
     z = FrankeFunction(x, y) + np.random.normal(0, 0.2, x.shape)
-    
-    polynomal_orders = [i for i in range(1, 80)]
+
+    # First reproduce figure similar figure 2.11 in hastie
+    polynomal_orders = [i for i in range(1, 5)]
     (MSE_train_df_OLS,
      MSE_test_df_OLS,
      R2_train_df_OLS,
@@ -274,5 +276,87 @@ if __name__ == '__main__':
                              MSE_train_df_OLS)
     
     plots_task_1e.plot_MSE_test_and_training()
+
+    # Make plot to show bias variance analysis of only OLS regression, making own function for
+    # bootstrapping and cross validation
+
+    n_boostraps = 100
+    k = 5
+    max_polydegree = 11
+    polynomal_orders = [degree for degree in range(1,max_polydegree)]
+
+    def run_task_e_f(regression_method, polynomal_orders, x, y, z, n_boostraps=None, k_folds=None):
+
+        if n_boostraps is not None:
+
+            # Make dataframe with results
+            bootstrap_df = pd.DataFrame(index=polynomal_orders)
+
+            #error_bootstrap_df = pd.DataFrame(index=polynomal_orders)
+            #bias_bootstrap_df = pd.DataFrame(index=polynomal_orders)
+            #variance_bootstrap_df = pd.DataFrame(index=polynomal_orders)
+
+            #y_pred_df = pd.DataFrame(index=polynomal_orders)
+
+            # lists to store plotting data
+            error_liste = np.zeros(len(polynomal_orders))
+            bias_liste = np.zeros(len(polynomal_orders))
+            variance_liste = np.zeros(len(polynomal_orders))
+            polydegree_liste = np.zeros(len(polynomal_orders))
+
+            for polyorder in polynomal_orders:
+                bootstrap_class = LinRegression(polyorder, x, y, z)  # create class
+                bootstrap_class.split_data(1 / 5)  # perform split of data
+
+                y_pred, error, bias, variance = bootstrap_class.bootstrapping_train_model(n_boostraps)
+
+                bootstrap_df.loc[polyorder, 'Bias'] = bias
+                bootstrap_df.loc[polyorder, 'Variance'] = variance
+                bootstrap_df.loc[polyorder, 'Error'] = error
+                bootstrap_df.loc[polyorder, 'Bias + variance'] = bias + variance
+                if error >= bias + variance:
+                    bootstrap_df.loc[polyorder, 'Error >= Bias+Variance'] = True
+                else:
+                    bootstrap_df.loc[polyorder, 'Error >= Bias+Variance'] = False
+
+                polydegree_liste[polyorder-1] = polyorder
+                error_liste[polyorder-1] = error
+                bias_liste[polyorder-1] = bias
+                variance_liste[polyorder-1] = variance
+
+        elif k_folds is not None:
+
+
+        else:
+            raise ValueError('Valid resampling method not entered')
+
+        return bootstrap_df, polydegree_liste, error_liste, bias_liste, variance_liste
+
+
+
+
+
+    np.random.seed(2500)
+
+    N = 500
+    x = np.sort(np.random.uniform(0, 1, N))
+    y = np.sort(np.random.uniform(0, 1, N))
+
+    # With noise:
+    z = FrankeFunction(x, y) + np.random.normal(0, 0.2, x.shape)
+    bootstrap_df,polydegree_liste, error_liste, bias_liste, variance_liste  = \
+        run_task_e_f(regression_method='OLS', polynomal_orders=polynomal_orders, x=x, y=y, z=z, n_boostraps=100)
+
+    print(bootstrap_df)
+
+    # Plot the bias variance analysis
+
+    plt.figure()
+    plt.plot(polydegree_liste, error_liste, label='Error')
+    plt.plot(polydegree_liste, bias_liste, label='bias')
+    plt.plot(polydegree_liste, variance_liste, label='Variance')
+    plt.legend()
+    plt.show()
+
 
 
