@@ -285,18 +285,13 @@ if __name__ == '__main__':
     max_polydegree = 11
     polynomal_orders = [degree for degree in range(1,max_polydegree)]
 
-    def run_task_e_f(regression_method, polynomal_orders, x, y, z, n_boostraps=None, k_folds=None):
+    def run_task_e_f(regression_method, polynomal_orders, x, y, z, n_boostraps=None, k_folds=None,
+                     lambda_values=None):
 
         if n_boostraps is not None:
 
             # Make dataframe with results
             bootstrap_df = pd.DataFrame(index=polynomal_orders)
-
-            #error_bootstrap_df = pd.DataFrame(index=polynomal_orders)
-            #bias_bootstrap_df = pd.DataFrame(index=polynomal_orders)
-            #variance_bootstrap_df = pd.DataFrame(index=polynomal_orders)
-
-            #y_pred_df = pd.DataFrame(index=polynomal_orders)
 
             # lists to store plotting data
             error_liste = np.zeros(len(polynomal_orders))
@@ -324,16 +319,78 @@ if __name__ == '__main__':
                 bias_liste[polyorder-1] = bias
                 variance_liste[polyorder-1] = variance
 
-        elif k_folds is not None:
-            pass
+            return bootstrap_df, polydegree_liste, error_liste, bias_liste, variance_liste
+
+        # cross validation
+        elif k_folds and regression_method is not None:
+
+            # Dataframes to store in own code
+            MSE_test_df = pd.DataFrame(index=polynomal_orders)
+            R2_test_df = pd.DataFrame(index=polynomal_orders)
+            #optimal_beta_df = pd.DataFrame(index=polynomal_orders)
+
+            #Scikit own dataframes to store inf
+            scikit_MSE_test_df = pd.DataFrame(index=polynomal_orders)
+            scikit_r2_test_df = pd.DataFrame(index=polynomal_orders)
+
+            # need to find optimal beta for ridge and lasso
+            summary_df = pd.DataFrame(index=polynomal_orders)
+
+            l = int((max(polynomal_orders) + 1) * (max(polynomal_orders) + 2) / 2)
+
+
+            for polyorder in polynomal_orders:
+
+                cross_validation_class = LinRegression(polyorder, x, y, z)
+
+                if lambda_values is None:  # OLS
+
+                    mean_B_parameters, mean_MSE_test, mean_MSE_train, mean_R2_test, mean_R2_train \
+                        = cross_validation_class.cross_validation_train_model(k, regression_method)
+
+                    #optimal_beta_df.loc[polyorder] = list(itertools.chain(mean_B_parameters,
+                     #                                                     [np.nan for _ in range(l - len(mean_B_parameters))]))
+
+                    MSE_test_df.loc[polyorder, 'OLS'] = mean_MSE_test
+                    R2_test_df.loc[polyorder, 'OLS'] = mean_R2_test
+
+                    scikit_MSE_test_df.loc[polyorder] = cross_validation_class.scikit_cross_validation_train_model(k, regression_method=regression_method)[0]
+                    scikit_r2_test_df.loc[polyorder] = cross_validation_class.scikit_cross_validation_train_model(k, regression_method=regression_method)[1]
+
+
+                else: # Ridge and Lasso
+
+                    for la in lambda_values:
+                        mean_B_parameters, mean_MSE_test, mean_MSE_train, mean_R2_test, mean_R2_train \
+                            = cross_validation_class.cross_validation_train_model(k, regression_method, lmb=la)
+
+                        #optimal_beta_df.loc[polyorder, la] = list(itertools.chain(mean_B_parameters,[np.nan for _ in range(l - len(mean_B_parameters))]))
+
+                        MSE_test_df.loc[polyorder, la] = mean_MSE_test
+                        R2_test_df.loc[polyorder, la] = mean_R2_test
+
+                        scikit_MSE_test_df.loc[polyorder, la] = \
+                        cross_validation_class.scikit_cross_validation_train_model(k,
+                                                                                   regression_method=regression_method, lmb=la)[
+                            0]
+                        scikit_r2_test_df.loc[polyorder, la] = \
+                        cross_validation_class.scikit_cross_validation_train_model(k,
+                                                                                   regression_method=regression_method, lmb=la)[
+                            1]
+
+
+                    # lag summary
+                    optimal_la_MSE = MSE_test_df.loc[polyorder].idxmin()
+                    summary_df.loc[polyorder, 'Optimal lambda MSE'] = optimal_la_MSE
+                    summary_df.loc[polyorder, 'Min test MSE'] = MSE_test_df.loc[polyorder, optimal_la_MSE]
+                    optimal_la_R2 = R2_test_df.loc[polyorder].idxmax()
+                    summary_df.loc[polyorder, 'Optimal lambda R2'] = optimal_la_R2
+                    summary_df.loc[polyorder, 'Max test R2'] = R2_test_df.loc[polyorder, optimal_la_R2]
+
+            return MSE_test_df, R2_test_df, scikit_MSE_test_df , scikit_r2_test_df, summary_df
+
         else:
             raise ValueError('Valid resampling method not entered')
-
-
-        return bootstrap_df, polydegree_liste, error_liste, bias_liste, variance_liste
-
-
-
 
 
     np.random.seed(2500)
@@ -345,11 +402,11 @@ if __name__ == '__main__':
     # With noise:
     z = FrankeFunction(x, y) + np.random.normal(0, 0.2, x.shape)
     bootstrap_df,polydegree_liste, error_liste, bias_liste, variance_liste  = \
-        run_task_e_f(regression_method='OLS', polynomal_orders=polynomal_orders, x=x, y=y, z=z, n_boostraps=100)
+        run_task_e_f(regression_method='OLS', polynomal_orders=polynomal_orders, x=x, y=y, z=z, n_boostraps=n_boostraps)
 
     print(bootstrap_df)
 
-    # Plot the bias variance analysis
+    # Plot the bias variance analysis (e)
 
     plt.figure()
     plt.xlabel('Model complexity')
@@ -360,5 +417,33 @@ if __name__ == '__main__':
     plt.legend()
     plt.show()
 
+# %%
+    print('\n #### Task f) #### \n')
 
+    # Lambdas for run through with ridge and lasso
+    nlambdas = 100
+    lambdas = np.logspace(-5, 1, nlambdas)
+
+    # Hente ut data for å plotte OLS
+    MSE_test_df, R2_test_df, scikit_MSE_test_df, scikit_r2_test_df, summary_df = run_task_e_f(regression_method='OLS', polynomal_orders=polynomal_orders,x=x, y=y, z=z,k_folds=5)
+
+
+    print( '---------- OLS ---------')
+
+    print(MSE_test_df)  # kjørt for OLS kan hentes ut og plottes
+    print(R2_test_df)  # kjørt for OLS kan hentes ut og plottes
+
+
+
+
+    # Hente ut tat for å plotte Ridge
+    MSE_test_df, R2_test_df, scikit_MSE_test_df, scikit_r2_test_df, summary_df = run_task_e_f(
+        regression_method='Ridge', polynomal_orders=polynomal_orders, x=x, y=y, z=z, k_folds=5, lambda_values=lambdas)
+
+    print('-----------   Ridge --------------')
+    print(MSE_test_df)
+    print(R2_test_df)
+    print(scikit_MSE_test_df)
+    print(scikit_r2_test_df)
+    print(summary_df)  # gives optimal lambda for each model
 
