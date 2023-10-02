@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import random
 
 
-polydegree = 10
+polydegree = 5
 x = np.linspace(0,1,100)
 y = np.linspace(0,1,100)
 z = FrankeFunction(x,y)
