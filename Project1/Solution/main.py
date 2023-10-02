@@ -168,7 +168,6 @@ if __name__ == '__main__':
     
     plots_task_1b.plot_betaparams_polynomial_order()
 
-    """
     
     #%%
     print('\n #### Task c) #### \n')
@@ -243,7 +242,7 @@ if __name__ == '__main__':
     plt.legend()
     
     plt.show()
-    """
+
 
 # %%
     print('\n #### Task e) #### \n')
@@ -354,8 +353,8 @@ if __name__ == '__main__':
                     MSE_test_df.loc[polyorder, 'OLS'] = mean_MSE_test
                     R2_test_df.loc[polyorder, 'OLS'] = mean_R2_test
 
-                    scikit_MSE_test_df.loc[polyorder] = cross_validation_class.scikit_cross_validation_train_model(k, regression_method=regression_method)[0]
-                    scikit_r2_test_df.loc[polyorder] = cross_validation_class.scikit_cross_validation_train_model(k, regression_method=regression_method)[1]
+                    scikit_MSE_test_df.loc[polyorder, 'OLS'] = cross_validation_class.scikit_cross_validation_train_model(k, regression_method=regression_method)[0]
+                    scikit_r2_test_df.loc[polyorder, 'OLS'] = cross_validation_class.scikit_cross_validation_train_model(k, regression_method=regression_method)[1]
 
 
                 else: # Ridge and Lasso
@@ -424,26 +423,129 @@ if __name__ == '__main__':
     nlambdas = 100
     lambdas = np.logspace(-5, 1, nlambdas)
 
-    # Hente ut data for å plotte OLS
-    MSE_test_df, R2_test_df, scikit_MSE_test_df, scikit_r2_test_df, summary_df = run_task_e_f(regression_method='OLS', polynomal_orders=polynomal_orders,x=x, y=y, z=z,k_folds=5)
-
-
-    print( '---------- OLS ---------')
-
-    print(MSE_test_df)  # kjørt for OLS kan hentes ut og plottes
-    print(R2_test_df)  # kjørt for OLS kan hentes ut og plottes
-
-
-
-
     # Hente ut tat for å plotte Ridge
-    MSE_test_df, R2_test_df, scikit_MSE_test_df, scikit_r2_test_df, summary_df = run_task_e_f(
+    MSE_test_df_Ridge, R2_test_df_Ridge, scikit_MSE_test_df_Ridge, scikit_r2_test_df_Ridge, summary_df_Ridge = run_task_e_f(
         regression_method='Ridge', polynomal_orders=polynomal_orders, x=x, y=y, z=z, k_folds=5, lambda_values=lambdas)
 
     print('-----------   Ridge --------------')
-    print(MSE_test_df)
-    print(R2_test_df)
-    print(scikit_MSE_test_df)
-    print(scikit_r2_test_df)
-    print(summary_df)  # gives optimal lambda for each model
+    print(MSE_test_df_Ridge)
+    print(R2_test_df_Ridge)
+    print(scikit_MSE_test_df_Ridge)
+    print(scikit_r2_test_df_Ridge)
+    print(summary_df_Ridge)  # gives optimal lambda for each model
+
+
+    MSE_test_df_Lasso, R2_test_df_Lasso, scikit_MSE_test_df_Lasso, scikit_r2_test_df_Lasso, summary_df_Lasso = run_task_e_f(
+        regression_method='Lasso', polynomal_orders=polynomal_orders, x=x, y=y, z=z, k_folds=5, lambda_values=lambdas)
+
+    print('-----------   Lasso --------------')
+    print(MSE_test_df_Lasso)
+    print(R2_test_df_Lasso)
+    print(scikit_MSE_test_df_Lasso)
+    print(scikit_r2_test_df_Lasso)
+    print(summary_df_Lasso)  # gives optimal lambda for each model
+
+    """
+    Plot ols, ridge and lasso for given model complexities. for ridge and lasso, the optimal
+    lambda value has been found and put into the model. the x axis will be for different k_folds
+    5-10
+    """
+
+    # For polynomial order of 10, k fold = 5-10
+
+
+    MSE_OLS = []
+    MSE_Ridge = []
+    MSE_Lasso = []
+
+    for k in range(5, 11):
+
+        MSE_test_df, R2_test_df, scikit_MSE_test_df, scikit_r2_test_df, summary_df = run_task_e_f(
+            regression_method='OLS', polynomal_orders=[10], x=x, y=y, z=z, k_folds=k)
+
+        MSE_OLS.append(MSE_test_df['OLS'].to_list())
+
+        MSE_test_df_Ridge, R2_test_df_Ridge, scikit_MSE_test_df_Ridge, scikit_r2_test_df_Ridge, summary_df_Ridge = run_task_e_f(
+            regression_method='Ridge', polynomal_orders=[10], x=x, y=y, z=z, k_folds=k,
+            lambda_values=[0.000040])  # fant denne gjennom å søke etter optimal lambda
+
+        MSE_Ridge.append(MSE_test_df_Ridge[0.000040].to_list())
+
+        MSE_test_df_Lasso, R2_test_df_Lasso, scikit_MSE_test_df_Lasso, scikit_r2_test_df_Lasso, summary_df_Lasso = run_task_e_f(
+            regression_method='Lasso', polynomal_orders=[10], x=x, y=y, z=z, k_folds=k,
+            lambda_values=[0.000040])  # hadde ikke tid til å kjøre for lasso, så fant ikke optimal lambda
+
+        MSE_Lasso.append(MSE_test_df_Lasso[0.000040].to_list())
+
+    plt.figure()
+    plt.title('Cross validation for polynomial order 10')
+    plt.xlabel('number of k folds')
+    plt.ylabel('MSE score')
+    plt.plot(range(5,11), MSE_OLS, 'r', label='OLS')
+    plt.plot(range(5,11), MSE_Ridge, 'b', label='Ridge, lmb = 0.00004')
+    plt.plot(range(5,11), MSE_Lasso, 'g', label='Lasso, lmb = 0.00004')  #finnes kanskje mer opt lambda, hadde ikke tid til å finne den
+    plt.legend()
+    plt.show()
+
+
+    """
+    Plot for model complexity on x axis, MSE and R2 on y_axis. bootstrap, cross validation
+    and own code is included as lines. FIrst for OLS and k = 5,8 and 10
+    """
+
+    max_polydegree = 11
+    polynomal_orders = [degree for degree in range(1,max_polydegree)]
+
+    # Hente ut data for å plotte OLS
+    MSE_test_df, R2_test_df, scikit_MSE_test_df, scikit_r2_test_df, summary_df = run_task_e_f(
+        regression_method='OLS', polynomal_orders=polynomal_orders, x=x, y=y, z=z, k_folds=5)
+
+    plt.figure()
+    plt.title('kfold of 5, OLS')
+    plt.xlabel('Model complexity')
+    plt.ylabel('Mean Square Error (MSE)')
+    plt.plot(polydegree_liste, error_liste, 'r', label='Bootstrapping')
+    plt.plot(polydegree_liste, MSE_test_df, 'b', label='Own code cross validation')  # mse test was run on k = 5
+    plt.plot(polydegree_liste, scikit_MSE_test_df, 'g', label='Scikit cross validation')  # mse scikit was run on k = 5
+    plt.legend()
+    plt.show()
+
+    # Hente ut data for å plotte OLS
+    MSE_test_df, R2_test_df, scikit_MSE_test_df, scikit_r2_test_df, summary_df = run_task_e_f(
+        regression_method='OLS', polynomal_orders=polynomal_orders, x=x, y=y, z=z, k_folds=8)
+
+    plt.figure()
+    plt.title('kfold of 8, OLS')
+    plt.xlabel('Model complexity')
+    plt.ylabel('Mean Square Error (MSE)')
+    plt.plot(polydegree_liste, error_liste, 'r', label='Bootstrapping')
+    plt.plot(polydegree_liste, MSE_test_df, 'b',
+             label='Own code cross validation')  # mse test was run on k = 5
+    plt.plot(polydegree_liste, scikit_MSE_test_df, 'g',
+             label='Scikit cross validation')  # mse scikit was run on k = 5
+    plt.legend()
+    plt.show()
+
+    # Hente ut data for å plotte OLS
+    MSE_test_df, R2_test_df, scikit_MSE_test_df, scikit_r2_test_df, summary_df = run_task_e_f(
+        regression_method='OLS', polynomal_orders=polynomal_orders, x=x, y=y, z=z, k_folds=10)
+
+    plt.figure()
+    plt.title('kfold of 10, OLS')
+    plt.xlabel('Model complexity')
+    plt.ylabel('Mean Square Error (MSE)')
+    plt.plot(polydegree_liste, error_liste, 'r', label='Bootstrapping')
+    plt.plot(polydegree_liste, MSE_test_df, 'b',
+             label='Own code cross validation')  # mse test was run on k = 5
+    plt.plot(polydegree_liste, scikit_MSE_test_df, 'g',
+             label='Scikit cross validation')  # mse scikit was run on k = 5
+    plt.legend()
+    plt.show()
+
+
+
+
+
+
+
 
