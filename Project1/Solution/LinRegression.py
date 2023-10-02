@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split, cross_val_score, KFold
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression, Ridge, Lasso
 from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.utils import resample
 
 from sklearn import linear_model
 
@@ -39,6 +40,7 @@ class LinRegression:
         self.y_pred_test = None
         self.y_scaler = None
         self.beta = None
+        self.lmb = None
 
         self.k_folds = None
         self.k_groups = None
@@ -46,8 +48,7 @@ class LinRegression:
 
         ### Define attributes of the linear regression
         self.splitted = False
-        self.cross_validation = False
-        self.bootstrapping = False
+        self.resampling = False
 
         self.regression_method = None
         self.scaling_method = None
@@ -157,7 +158,10 @@ class LinRegression:
         mean_R2_train: The mean R2 obtained from the iterated training sets
         """
 
-        self.cross_validation = True   # set the marker for cross validation being executed
+        self.resampling = True   # set the marker for cross validation being executed
+
+        if lmb is not None:
+            self.lmb = lmb
 
         # create the k groups:
         self.k_folds = k_folds
@@ -194,10 +198,11 @@ class LinRegression:
             y_test_cv = (self.y_groups[i])
             y_train_cv = np.concatenate(self.y_groups[:i] + self.y_groups[i + 1:], axis=0)
 
-            # perform for OLS first, but in Ridge and Lasso when working
-            #if regression_method == 'OLS':
-            self.train_model(regression_method=regression_method,
-                             la=lmb, cv_X=train_matrix, cv_y=y_train_cv)
+            # perform training after which training method has been passed
+
+            self.train_model(regression_method=regression_method, la=self.lmb,
+                             X_train=train_matrix, y_train=y_train_cv)
+
             opt_beta.append(self.beta)   # store optimal betas for each cross validation set
 
             # find for training set: X_training @ beta
@@ -209,40 +214,6 @@ class LinRegression:
             y_test_pred = test_matrix @ self.beta
             MSE_test.append(self.MSE(y_test_cv, y_test_pred))
             R2_test.append(self.R_squared(y_test_cv, y_test_pred))
-
-            # elif regression_method =='Ridge':  # fill in together
-            #     self.train_model(regression_method=regression_method,
-            #                      la=lmb, cv_X=train_matrix, cv_y=y_train_cv)
-            #     opt_beta.append(self.beta)   # store optimal betas for each cross validation set
-
-            #     # find for training set: X_training @ beta
-            #     y_train_pred = train_matrix @ self.beta
-            #     MSE_train.append(self.MSE(y_train_cv, y_train_pred))
-            #     R2_train.append(self.R_squared(y_train_cv, y_train_pred))
-
-            #     # find for test set: test_matrix @ beta
-            #     y_test_pred = test_matrix @ self.beta
-            #     MSE_test.append(self.MSE(y_test_cv, y_test_pred))
-            #     R2_test.append(self.R_squared(y_test_cv, y_test_pred))
-
-
-            # elif regression_method == 'Lasso':  # fill in together
-            #     self.train_model(regression_method=regression_method,
-            #                      la=lmb, cv_X=train_matrix, cv_y=y_train_cv)
-            #     opt_beta.append(self.beta)   # store optimal betas for each cross validation set
-
-            #     # find for training set: X_training @ beta
-            #     y_train_pred = train_matrix @ self.beta
-            #     MSE_train.append(self.MSE(y_train_cv, y_train_pred))
-            #     R2_train.append(self.R_squared(y_train_cv, y_train_pred))
-
-            #     # find for test set: test_matrix @ beta
-            #     y_test_pred = test_matrix @ self.beta
-            #     MSE_test.append(self.MSE(y_test_cv, y_test_pred))
-            #     R2_test.append(self.R_squared(y_test_cv, y_test_pred))
-
-            # else:
-            #     raise ValueError('A valid regression method has not been passed')
 
         B_matrix = np.array(opt_beta)
         opt_beta_model = []
@@ -287,6 +258,37 @@ class LinRegression:
 
         return np.mean(-estimated_mse_folds), np.mean(estimated_r2_folds)
 
+    def bootstrapping_train_model(self,n_bootstraps):
+        self.resampling = True
+
+        if self.splitted is not True:
+            raise ValueError('Split data before perfoming bootstrapping')
+
+        # The following (m x n_bootstraps) matrix holds the column vectors y_pred
+        # for each bootstrap iteration.
+
+        y_pred = np.zeros((self.y_test.shape[0], n_bootstraps))
+        for i in range(n_bootstraps):
+            x_, y_ = resample(self.X_train, self.y_train)
+
+            # Evaluate the new model on the same test data each time.
+
+            beta_OLS = self.train_model(regression_method='OLS', X_train=x_, y_train=y_)
+
+            y_pred[:, i] = self.predict_test().ravel()
+
+        # Note: Expectations and variances taken w.r.t. different training
+        # data sets, hence the axis=1. Subsequent means are taken across the test data
+        # set in order to obtain a total value, but before this we have error/bias/variance
+        # calculated per data point in the test set.
+        # Note 2: The use of keepdims=True is important in the calculation of bias as this
+        # maintains the column vector form. Dropping this yields very unexpected results.
+
+        error = np.mean(np.mean((self.y_test.reshape(len(self.y_test),1) - y_pred) ** 2, axis=1, keepdims=True))
+        bias = np.mean((self.y_test.reshape(len(self.y_test),1) - np.mean(y_pred, axis=1, keepdims=True)) ** 2)
+        variance = np.mean(np.var(y_pred, axis=1, keepdims=True))
+
+        return y_pred, error, bias, variance
 
     def scale(self, scaling_method=None):
         """
@@ -323,9 +325,12 @@ class LinRegression:
 
 
     def train_model(self, regression_method=None, train_on_scaled=False, la=None,
-                    cv_X=None, cv_y=None):
+                    X_train=None, y_train=None):
         """
         Function for training the model.
+
+        X_train and y_train given when performing resampling methods
+        (Bootstrap and cross validation).
 
         Parameters
         ----------
@@ -355,7 +360,7 @@ class LinRegression:
 
         """
     
-        if self.splitted is not True and self.cross_validation is not True:
+        if self.splitted is not True and self.resampling is not True:
             raise ArithmeticError('Split data before performing model training.')
 
 
@@ -370,8 +375,9 @@ class LinRegression:
                 raise ValueError(f'regression_method was {regression_method}, expected {supported_methods}')
 
         #train_on_scaled = train_on_scaled if train_on_scaled is not None else False
-        
-        if self.cross_validation is not True:
+
+        if (X_train is None) and (y_train is None):
+
             if train_on_scaled:
                 if self.scaled is True:
                     X_train = self.X_train_scaled
@@ -384,15 +390,15 @@ class LinRegression:
             else:
                 raise ValueError(f'train_on_scaled takes arguments True or False, not {train_on_scaled}')
 
-        if self.cross_validation is True:
-            if cv_X is not None:
-                X_train = cv_X
-            else:
-                raise ValueError('Must pass in training matrices for finding beta in cross validation')
-            if cv_y is not None:
-                y_train = cv_y
-            else:
-                raise ValueError('Must pass in belonging y_train for finding beta in cross validation')
+        #if self.resampling is True:
+        #    if cv_X is not None:
+        #        X_train = cv_X
+        #    else:
+        #        raise ValueError('Must pass in training matrices for finding beta in cross validation')
+        #    if cv_y is not None:
+        #        y_train = cv_y
+        #    else:
+        #        raise ValueError('Must pass in belonging y_train for finding beta in cross validation')
 
         if self.regression_method == 'OLS':
             self.beta = np.linalg.pinv(X_train.T @ X_train) @ X_train.T @ y_train
