@@ -23,13 +23,15 @@ class Plotting:
     contains a class for plotting betaparameters associated with a certain polynomial order.
     """
 
-    def __init__(self, poly_degrees, MSE_scores, R2_scores, beta_parameters):
+    def __init__(self, poly_degrees, MSE_scores, R2_scores, beta_parameters, 
+                 MSE_training=None):
 
         if poly_degrees == 0:
             raise ValueError('This regression does not contain any predictors')
 
         self.poly_degrees = poly_degrees
         self.MSE_scores = MSE_scores
+        self.MSE_training = MSE_training
         self.R2_scores = R2_scores
         self.beta_parameters = beta_parameters
         #self.number_of_degrees = len(range(self.poly_degree))
@@ -53,6 +55,30 @@ class Plotting:
         else:
             ax.plot(self.poly_degrees, self.MSE_scores.loc[:, la],
                     alpha=0.7, lw=2, color='r',label='MSE score')
+        plt.show()
+        
+    def plot_MSE_test_and_training(self, la=None):
+        """
+        Function plotting MSE_scores against polynomial order
+        Return: plot
+        """
+        fig, ax = plt.subplots()
+
+        ax.set_xlabel('Polynomial degree')
+        ax.set_ylabel('Mean Square Error (MSE)')
+
+        ax.xaxis.set_major_formatter(FormatStrFormatter('%g'))
+        ax.xaxis.set_ticks(self.poly_degrees)
+        
+        if la is None:
+            ax.plot(self.poly_degrees, self.MSE_scores,
+                    alpha=0.7, lw=2, color='r',label='Test')
+            ax.plot(self.poly_degrees, self.MSE_training,
+                    alpha=0.7, lw=2, color='b',label='Training')
+        else:
+            ax.plot(self.poly_degrees, self.MSE_scores.loc[:, la],
+                    alpha=0.7, lw=2, color='r',label='MSE score')
+        plt.legend()
         plt.show()
 
     def plot_R2_scores(self, la=None):
@@ -145,8 +171,6 @@ class Plotting:
         plt.tight_layout()
         plt.show()
         
-
-                
     def plot_MSE_some_lambdas(self, lambdas_to_plot, num_plot_columns=3):
         """
         Function for plotting the Mean Squared Error as a function of polynomial

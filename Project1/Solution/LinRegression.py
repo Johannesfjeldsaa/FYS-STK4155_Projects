@@ -195,54 +195,54 @@ class LinRegression:
             y_train_cv = np.concatenate(self.y_groups[:i] + self.y_groups[i + 1:], axis=0)
 
             # perform for OLS first, but in Ridge and Lasso when working
-            if regression_method == 'OLS':
-                self.train_model(regression_method=regression_method,
-                                 cv_X=train_matrix, cv_y=y_train_cv)
-                opt_beta.append(self.beta)   # store optimal betas for each cross validation set
+            #if regression_method == 'OLS':
+            self.train_model(regression_method=regression_method,
+                             la=lmb, cv_X=train_matrix, cv_y=y_train_cv)
+            opt_beta.append(self.beta)   # store optimal betas for each cross validation set
 
-                # find for training set: X_training @ beta
-                y_train_pred = train_matrix @ self.beta
-                MSE_train.append(self.MSE(y_train_cv, y_train_pred))
-                R2_train.append(self.R_squared(y_train_cv, y_train_pred))
+            # find for training set: X_training @ beta
+            y_train_pred = train_matrix @ self.beta
+            MSE_train.append(self.MSE(y_train_cv, y_train_pred))
+            R2_train.append(self.R_squared(y_train_cv, y_train_pred))
 
-                # find for test set: test_matrix @ beta
-                y_test_pred = test_matrix @ self.beta
-                MSE_test.append(self.MSE(y_test_cv, y_test_pred))
-                R2_test.append(self.R_squared(y_test_cv, y_test_pred))
+            # find for test set: test_matrix @ beta
+            y_test_pred = test_matrix @ self.beta
+            MSE_test.append(self.MSE(y_test_cv, y_test_pred))
+            R2_test.append(self.R_squared(y_test_cv, y_test_pred))
 
-            elif regression_method =='Ridge':  # fill in together
-                self.train_model(regression_method=regression_method,
-                                 la=lmb, cv_X=train_matrix, cv_y=y_train_cv)
-                opt_beta.append(self.beta)   # store optimal betas for each cross validation set
+            # elif regression_method =='Ridge':  # fill in together
+            #     self.train_model(regression_method=regression_method,
+            #                      la=lmb, cv_X=train_matrix, cv_y=y_train_cv)
+            #     opt_beta.append(self.beta)   # store optimal betas for each cross validation set
 
-                # find for training set: X_training @ beta
-                y_train_pred = train_matrix @ self.beta
-                MSE_train.append(self.MSE(y_train_cv, y_train_pred))
-                R2_train.append(self.R_squared(y_train_cv, y_train_pred))
+            #     # find for training set: X_training @ beta
+            #     y_train_pred = train_matrix @ self.beta
+            #     MSE_train.append(self.MSE(y_train_cv, y_train_pred))
+            #     R2_train.append(self.R_squared(y_train_cv, y_train_pred))
 
-                # find for test set: test_matrix @ beta
-                y_test_pred = test_matrix @ self.beta
-                MSE_test.append(self.MSE(y_test_cv, y_test_pred))
-                R2_test.append(self.R_squared(y_test_cv, y_test_pred))
+            #     # find for test set: test_matrix @ beta
+            #     y_test_pred = test_matrix @ self.beta
+            #     MSE_test.append(self.MSE(y_test_cv, y_test_pred))
+            #     R2_test.append(self.R_squared(y_test_cv, y_test_pred))
 
 
-            elif regression_method == 'Lasso':  # fill in together
-                self.train_model(regression_method=regression_method,
-                                 la=lmb, cv_X=train_matrix, cv_y=y_train_cv)
-                opt_beta.append(self.beta)   # store optimal betas for each cross validation set
+            # elif regression_method == 'Lasso':  # fill in together
+            #     self.train_model(regression_method=regression_method,
+            #                      la=lmb, cv_X=train_matrix, cv_y=y_train_cv)
+            #     opt_beta.append(self.beta)   # store optimal betas for each cross validation set
 
-                # find for training set: X_training @ beta
-                y_train_pred = train_matrix @ self.beta
-                MSE_train.append(self.MSE(y_train_cv, y_train_pred))
-                R2_train.append(self.R_squared(y_train_cv, y_train_pred))
+            #     # find for training set: X_training @ beta
+            #     y_train_pred = train_matrix @ self.beta
+            #     MSE_train.append(self.MSE(y_train_cv, y_train_pred))
+            #     R2_train.append(self.R_squared(y_train_cv, y_train_pred))
 
-                # find for test set: test_matrix @ beta
-                y_test_pred = test_matrix @ self.beta
-                MSE_test.append(self.MSE(y_test_cv, y_test_pred))
-                R2_test.append(self.R_squared(y_test_cv, y_test_pred))
+            #     # find for test set: test_matrix @ beta
+            #     y_test_pred = test_matrix @ self.beta
+            #     MSE_test.append(self.MSE(y_test_cv, y_test_pred))
+            #     R2_test.append(self.R_squared(y_test_cv, y_test_pred))
 
-            else:
-                raise ValueError('A valid regression method has not been passed')
+            # else:
+            #     raise ValueError('A valid regression method has not been passed')
 
         B_matrix = np.array(opt_beta)
         opt_beta_model = []
@@ -370,7 +370,7 @@ class LinRegression:
                 raise ValueError(f'regression_method was {regression_method}, expected {supported_methods}')
 
         #train_on_scaled = train_on_scaled if train_on_scaled is not None else False
-
+        
         if self.cross_validation is not True:
             if train_on_scaled:
                 if self.scaled is True:
