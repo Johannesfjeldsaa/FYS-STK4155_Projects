@@ -304,7 +304,7 @@ if __name__ == '__main__':
     
     z = terrain[:N, :N].ravel().reshape(-1, 1)  # Changing z from matrix to vector
     
-    polynomal_orders = [1, 2, 3] #, 4, 5]
+    polynomal_orders = [1, 2, 3, 4, 5]
     
     # Doing OLS
     (MSE_train_df_OLS,
