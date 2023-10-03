@@ -2,7 +2,7 @@
 
 import numpy as np
 from sklearn.model_selection import train_test_split, cross_val_score, KFold
-from sklearn.preprocessing import PolynomialFeatures
+from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 from sklearn.linear_model import LinearRegression, Ridge, Lasso
 from sklearn.metrics import mean_squared_error, r2_score
 
@@ -11,7 +11,7 @@ from sklearn import linear_model
 
 class LinRegression:
     supported_methods = {'regression_method': ['OLS', 'Ridge', 'Lasso'],
-                         'scaling_method': ['StandardScaling']}
+                         'scaling_method': ['StandardScaling', 'StandardScaling_scikit']}
 
     def __init__(self, poly_degree, x, y, z=None):
 
@@ -195,7 +195,6 @@ class LinRegression:
             y_train_cv = np.concatenate(self.y_groups[:i] + self.y_groups[i + 1:], axis=0)
 
             # perform for OLS first, but in Ridge and Lasso when working
-            #if regression_method == 'OLS':
             self.train_model(regression_method=regression_method,
                              la=lmb, cv_X=train_matrix, cv_y=y_train_cv)
             opt_beta.append(self.beta)   # store optimal betas for each cross validation set
@@ -210,39 +209,6 @@ class LinRegression:
             MSE_test.append(self.MSE(y_test_cv, y_test_pred))
             R2_test.append(self.R_squared(y_test_cv, y_test_pred))
 
-            # elif regression_method =='Ridge':  # fill in together
-            #     self.train_model(regression_method=regression_method,
-            #                      la=lmb, cv_X=train_matrix, cv_y=y_train_cv)
-            #     opt_beta.append(self.beta)   # store optimal betas for each cross validation set
-
-            #     # find for training set: X_training @ beta
-            #     y_train_pred = train_matrix @ self.beta
-            #     MSE_train.append(self.MSE(y_train_cv, y_train_pred))
-            #     R2_train.append(self.R_squared(y_train_cv, y_train_pred))
-
-            #     # find for test set: test_matrix @ beta
-            #     y_test_pred = test_matrix @ self.beta
-            #     MSE_test.append(self.MSE(y_test_cv, y_test_pred))
-            #     R2_test.append(self.R_squared(y_test_cv, y_test_pred))
-
-
-            # elif regression_method == 'Lasso':  # fill in together
-            #     self.train_model(regression_method=regression_method,
-            #                      la=lmb, cv_X=train_matrix, cv_y=y_train_cv)
-            #     opt_beta.append(self.beta)   # store optimal betas for each cross validation set
-
-            #     # find for training set: X_training @ beta
-            #     y_train_pred = train_matrix @ self.beta
-            #     MSE_train.append(self.MSE(y_train_cv, y_train_pred))
-            #     R2_train.append(self.R_squared(y_train_cv, y_train_pred))
-
-            #     # find for test set: test_matrix @ beta
-            #     y_test_pred = test_matrix @ self.beta
-            #     MSE_test.append(self.MSE(y_test_cv, y_test_pred))
-            #     R2_test.append(self.R_squared(y_test_cv, y_test_pred))
-
-            # else:
-            #     raise ValueError('A valid regression method has not been passed')
 
         B_matrix = np.array(opt_beta)
         opt_beta_model = []
@@ -318,6 +284,16 @@ class LinRegression:
             self.X_scaler = np.mean(self.X_train, axis=0)
             self.X_train_scaled = self.X_train - self.X_scaler
             self.X_test_scaled = self.X_test - self.X_scaler  # Use mean from training data
+        
+        if self.scaling_method == 'StandardScaling_scikit':
+            self.y_scaler = StandardScaler()
+            self.y_scaler = self.y_scaler.fit(self.y_train)
+            self.y_train_scaled = self.y_scaler.transform(self.y_train)
+            
+            self.X_scaler = StandardScaler()
+            self.X_scaler = self.X_scaler.fit(self.X_train)
+            self.X_train_scaled = self.X_scaler.transform(self.X_train)
+            self.X_test_scaled = self.X_scaler.transform(self.X_test)
 
         self.scaled = True # Marks that the data are now scaled
 
@@ -377,7 +353,7 @@ class LinRegression:
                     X_train = self.X_train_scaled
                     y_train = self.y_train_scaled
                 else:
-                    raise ValueError(f'Scale data before using train_on_scaled=True')
+                    raise ValueError('Scale data before using train_on_scaled=True')
             elif train_on_scaled is False:
                 X_train = self.X_train
                 y_train = self.y_train
@@ -401,7 +377,7 @@ class LinRegression:
             I = np.eye(cols, cols)
             self.beta = np.linalg.pinv(X_train.T @ X_train + la*I) @ X_train.T @ y_train
         elif self.regression_method == "Lasso":
-            RegLasso = linear_model.Lasso(la, fit_intercept=False, max_iter=int(10e6))
+            RegLasso = linear_model.Lasso(la, fit_intercept=False, max_iter=int(10e4))
             RegLasso.fit(X_train, y_train)
             self.beta = RegLasso.coef_
             
@@ -420,7 +396,10 @@ class LinRegression:
 
         """
         if self.scaled is True:
-            self.y_pred_train = self.X_train_scaled @ self.beta + self.y_scaler
+            if self.scaling_method == "StandardScaling":
+                self.y_pred_train = self.X_train_scaled @ self.beta + self.y_scaler
+            elif self.scaling_method == "StandardScaling_scikit":
+                self.y_pred_train = self.y_scaler.inverse_transform(self.X_train_scaled @ self.beta)
         else:
             self.y_pred_train = self.X_train @ self.beta
 
@@ -432,7 +411,10 @@ class LinRegression:
 
         """
         if self.scaled is True:
-            self.y_pred_test = (self.X_test_scaled @ self.beta) + self.y_scaler
+            if self.scaling_method == "StandardScaling":
+                self.y_pred_test = (self.X_test_scaled @ self.beta) + self.y_scaler
+            elif self.scaling_method == "StandardScaling_scikit":
+                self.y_pred_test = self.y_scaler.inverse_transform(self.X_test_scaled @ self.beta)
         else:
             self.y_pred_test = (self.X_test @ self.beta)
 
@@ -451,6 +433,7 @@ class LinRegression:
         self.check_vectors_same_length(true_y, predicted_y)
 
         n = len(true_y)
+        predicted_y = predicted_y.reshape(true_y.shape)
         SSR = np.sum((true_y - predicted_y) ** 2) # Residual som of squares, measures the unexplained variability ("errors")
         MSE = (1 / n) * SSR
         return MSE
@@ -466,7 +449,8 @@ class LinRegression:
         '''
 
         self.check_vectors_same_length(true_y, predicted_y)
-
+        
+        predicted_y = predicted_y.reshape(true_y.shape)
         mean_true_y = np.mean(true_y)
         SSR = np.sum((true_y - predicted_y) ** 2)  # Residual som of squares, measures the unexplained variability ("errors")
         TSS = np.sum((true_y - mean_true_y) ** 2)  # Total sum of squares, measures the total variability

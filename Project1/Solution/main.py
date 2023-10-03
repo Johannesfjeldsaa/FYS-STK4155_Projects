@@ -11,8 +11,10 @@ import itertools
 import matplotlib.pyplot as plt
 plt.style.use('Solarize_Light2')
 
-from imageio import imread
+from imageio.v2 import imread
 import matplotlib.pyplot as plt
+
+from tqdm import tqdm
  
 
 
@@ -43,7 +45,7 @@ if __name__ == '__main__':
 
         summary_df = pd.DataFrame(index=polynomal_orders)
 
-        for polyorder in polynomal_orders:
+        for polyorder in tqdm(polynomal_orders):
             LinReg = LinRegression(polyorder, x, y, z)  # create class
             LinReg.split_data(1 / 5)  # perform split of data
 
@@ -69,7 +71,7 @@ if __name__ == '__main__':
                                        la=la)
                     LinReg.predict_training()
                     LinReg.predict_test()
-
+                    
                     MSE_test_df.loc[polyorder, la] = LinReg.MSE(LinReg.y_test, LinReg.y_pred_test)
                     MSE_train_df.loc[polyorder, la] = LinReg.MSE(LinReg.y_train, LinReg.y_pred_train)
                     R2_test_df.loc[polyorder, la] = LinReg.R_squared(LinReg.y_test, LinReg.y_pred_test)
@@ -278,40 +280,12 @@ if __name__ == '__main__':
     
     plots_task_1e.plot_MSE_test_and_training()
 
-#%% 
 
+#%% 
     print('\n #### Task g) #### \n')
     
     # Load the terrain
     terrain = imread(r'DataFiles\SRTM_data_Norway_1.tif')
-    
-    N = 1000
-    m = 5 # polynomial order
-    
-    #x = np.random.randint(0, N, N)
-    #y = np.random.randint(0, N, N)
-    
-    x = np.arange(0, N, 1)
-    y = np.arange(0, N, 1)
-    
-    x_mesh, y_mesh = np.meshgrid(x, y)
-    
-    z = terrain[x_mesh.ravel(), y_mesh.ravel()]
-    
-    #%%
-    
-    x = np.linspace(0, 1, np.shape(terrain)[0])
-    
-    #%%
-    terrain = terrain[:N,:N]
-    # Creates mesh of image pixels
-    x = np.linspace(0, 1, np.shape(terrain)[0])
-    y = np.linspace(0, 1, np.shape(terrain)[1])
-    x_mesh, y_mesh = np.meshgrid(x,y)
-    
-    z = terrain
-    #X = create_X(x_mesh, y_mesh, m)
-    
     
     # Show the terrain
     plt.figure()
@@ -320,3 +294,119 @@ if __name__ == '__main__':
     plt.xlabel('X')
     plt.ylabel('Y')
     plt.show()
+    
+    N = 1000 # Number of datapoints to use in each direction
+    
+    # Creating the data set
+    x = np.linspace(0, 1, N)
+    y = np.linspace(0, 1, N)
+    x_mesh, y_mesh = np.meshgrid(x, y)
+    
+    z = terrain[:N, :N].ravel().reshape(-1, 1)  # Changing z from matrix to vector
+    
+    polynomal_orders = [1, 2, 3] #, 4, 5]
+    
+    # Doing OLS
+    (MSE_train_df_OLS,
+     MSE_test_df_OLS,
+     R2_train_df_OLS,
+     R2_test_df_OLS,
+     beta_parameters_df_OLS,
+     summary_df_OLS) = run_experiment_a_c(regression_method = 'OLS',
+                                          scaling_method='StandardScaling',
+                                          polynomal_orders=polynomal_orders,
+                                          x=x_mesh.ravel(), 
+                                          y=y_mesh.ravel(),
+                                          z=z)
+    
+    plots_task_1g_OLS = Plotting(polynomal_orders, MSE_test_df_OLS, 
+                             R2_test_df_OLS, beta_parameters_df_OLS)
+    plots_task_1g_OLS.plot_MSE_scores()
+    plots_task_1g_OLS.plot_R2_scores()
+    plots_task_1g_OLS.plot_betaparams_polynomial_order()
+    
+    # Doing ridge
+    nlambdas = 100
+    lambdas = np.logspace(-5, 1, nlambdas)
+    
+    num_lambdas_to_plot = 6
+    idx_to_plot = np.round(np.linspace(0, len(lambdas) - 1,
+                                       num_lambdas_to_plot)).astype(int)
+    
+
+    (MSE_train_df_ridge,
+     MSE_test_df_ridge,
+     R2_train_df_ridge,
+     R2_test_df_ridge,
+     beta_parameters_df_ridge,
+     summary_df_ridge) = run_experiment_a_c(regression_method='Ridge',
+                                            scaling_method='StandardScaling',
+                                            polynomal_orders=polynomal_orders,
+                                            lambda_values=lambdas,
+                                            x=x,
+                                            y=y,
+                                            z=z)
+    print(summary_df_ridge)
+    
+    plots_task_1g_ridge = Plotting(polynomal_orders, MSE_test_df_ridge, 
+                             R2_test_df_ridge, beta_parameters_df_ridge)
+    plots_task_1g_ridge.plot_MSE_for_all_lambdas(5)
+    plots_task_1g_ridge.plot_MSE_some_lambdas(lambdas_to_plot=lambdas[idx_to_plot])
+    plots_task_1g_ridge.plot_betaparams_polynomial_order()
+    
+    # Doing lasso
+    (MSE_train_df_lasso,
+     MSE_test_df_lasso,
+     R2_train_df_lasso,
+     R2_test_df_lasso,
+     beta_parameters_df_lasso,
+     summary_df_lasso) = run_experiment_a_c(regression_method='Lasso',
+                                            scaling_method='StandardScaling',
+                                            polynomal_orders=polynomal_orders,
+                                            lambda_values=lambdas,
+                                            x=x,
+                                            y=y,
+                                            z=z)
+    print(summary_df_lasso)
+    
+    plots_task_1g_lasso = Plotting(polynomal_orders, MSE_test_df_lasso, 
+                             R2_test_df_lasso, beta_parameters_df_lasso)
+    plots_task_1g_lasso.plot_MSE_for_all_lambdas(5)    
+    plots_task_1g_lasso.plot_MSE_some_lambdas(lambdas_to_plot=lambdas[idx_to_plot])
+    plots_task_1g_lasso.plot_betaparams_polynomial_order()
+    
+    
+    # Plotting all the results together
+    
+    plt.figure()
+    
+    plt.plot(MSE_test_df_OLS.index, MSE_test_df_OLS.OLS, label="OLS")
+    plt.plot(summary_df_ridge.index, summary_df_ridge["Min test MSE"],
+             "--", label="Ridge")
+    plt.plot(summary_df_lasso.index, summary_df_lasso["Min test MSE"],
+             "-.", label="Lasso")
+    
+    plt.xticks(summary_df_ridge.index)
+    
+    plt.ylabel("Mean Squared Error")
+    plt.xlabel("Polynomial degree")
+    plt.legend()
+    
+    plt.show()
+    
+    plt.figure()
+    
+    plt.plot(R2_test_df_OLS.index, R2_test_df_OLS.OLS, label="OLS")
+    plt.plot(summary_df_ridge.index, summary_df_ridge["Max test R2"],
+             "--", label="Ridge")
+    plt.plot(summary_df_lasso.index, summary_df_lasso["Max test R2"],
+             "-.", label="Lasso")
+    
+    plt.xticks(summary_df_ridge.index)
+    
+    plt.ylabel(r"R$^2$")
+    plt.xlabel("Polynomial degree")
+    plt.legend()
+    
+    plt.show()
+
