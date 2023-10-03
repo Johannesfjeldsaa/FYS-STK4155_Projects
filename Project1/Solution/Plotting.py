@@ -180,8 +180,8 @@ class Plotting:
         num_plot_rows = int(np.ceil(len(lambdas_to_plot)/num_plot_columns))
         
         fig, axes = plt.subplots(num_plot_rows, num_plot_columns,
-                                 figsize=(12, 7), sharey=True, sharex=True,
-                                 layout="constrained")
+                                 figsize=(12, 7), sharey=True, sharex=True)
+                                 #layout="constrained")
         
 
         for la, ax in zip(lambdas_to_plot, axes.ravel()):
