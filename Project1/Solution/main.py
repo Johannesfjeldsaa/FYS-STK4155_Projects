@@ -17,7 +17,6 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
  
 
-
 if __name__ == '__main__':
 
     def run_experiment_a_c(regression_method, scaling_method, polynomal_orders, x, y, z=None, lambda_values=None):
@@ -95,7 +94,110 @@ if __name__ == '__main__':
                 # legg til i beta_parameters_df
         return MSE_train_df, MSE_test_df, R2_train_df, R2_test_df, beta_parameters_df, summary_df
 
-
+    def run_task_e_f(regression_method, polynomal_orders, x, y, z, n_boostraps=None, k_folds=None,
+                     lambda_values=None):
+    
+        if n_boostraps is not None:
+    
+            # Make dataframe with results
+            bootstrap_df = pd.DataFrame(index=polynomal_orders)
+    
+            # lists to store plotting data
+            error_liste = np.zeros(len(polynomal_orders))
+            bias_liste = np.zeros(len(polynomal_orders))
+            variance_liste = np.zeros(len(polynomal_orders))
+            polydegree_liste = np.zeros(len(polynomal_orders))
+    
+            for polyorder in polynomal_orders:
+                bootstrap_class = LinRegression(polyorder, x, y, z)  # create class
+                bootstrap_class.split_data(1 / 5)  # perform split of data
+    
+                y_pred, error, bias, variance = bootstrap_class.bootstrapping_train_model(n_boostraps)
+    
+                bootstrap_df.loc[polyorder, 'Bias'] = bias
+                bootstrap_df.loc[polyorder, 'Variance'] = variance
+                bootstrap_df.loc[polyorder, 'Error'] = error
+                bootstrap_df.loc[polyorder, 'Bias + variance'] = bias + variance
+                if error >= bias + variance:
+                    bootstrap_df.loc[polyorder, 'Error >= Bias+Variance'] = True
+                else:
+                    bootstrap_df.loc[polyorder, 'Error >= Bias+Variance'] = False
+    
+                polydegree_liste[polyorder-1] = polyorder
+                error_liste[polyorder-1] = error
+                bias_liste[polyorder-1] = bias
+                variance_liste[polyorder-1] = variance
+    
+            return bootstrap_df, polydegree_liste, error_liste, bias_liste, variance_liste
+    
+        # cross validation
+        elif k_folds is not None:
+    
+            # Dataframes to store in own code
+            MSE_test_df = pd.DataFrame(index=polynomal_orders)
+            R2_test_df = pd.DataFrame(index=polynomal_orders)
+            #optimal_beta_df = pd.DataFrame(index=polynomal_orders)
+    
+            #Scikit own dataframes to store inf
+            scikit_MSE_test_df = pd.DataFrame(index=polynomal_orders)
+            scikit_r2_test_df = pd.DataFrame(index=polynomal_orders)
+    
+            # need to find optimal beta for ridge and lasso
+            summary_df = pd.DataFrame(index=polynomal_orders)
+    
+            l = int((max(polynomal_orders) + 1) * (max(polynomal_orders) + 2) / 2)
+    
+    
+            for polyorder in polynomal_orders:
+    
+                cross_validation_class = LinRegression(polyorder, x, y, z)
+    
+                if lambda_values is None:  # OLS
+    
+                    mean_B_parameters, mean_MSE_test, mean_MSE_train, mean_R2_test, mean_R2_train \
+                        = cross_validation_class.cross_validation_train_model(k, regression_method)
+    
+                    #optimal_beta_df.loc[polyorder] = list(itertools.chain(mean_B_parameters,
+                     #                                                     [np.nan for _ in range(l - len(mean_B_parameters))]))
+    
+                    MSE_test_df.loc[polyorder, 'OLS'] = mean_MSE_test
+                    R2_test_df.loc[polyorder, 'OLS'] = mean_R2_test
+    
+                    scikit_MSE_test_df.loc[polyorder, 'OLS'] = cross_validation_class.scikit_cross_validation_train_model(k, regression_method=regression_method)[0]
+                    scikit_r2_test_df.loc[polyorder, 'OLS'] = cross_validation_class.scikit_cross_validation_train_model(k, regression_method=regression_method)[1]
+    
+    
+                else: # Ridge and Lasso
+    
+                    for la in lambda_values:
+                        mean_B_parameters, mean_MSE_test, mean_MSE_train, mean_R2_test, mean_R2_train \
+                            = cross_validation_class.cross_validation_train_model(k, regression_method, lmb=la)
+    
+                        #optimal_beta_df.loc[polyorder, la] = list(itertools.chain(mean_B_parameters,[np.nan for _ in range(l - len(mean_B_parameters))]))
+    
+                        MSE_test_df.loc[polyorder, la] = mean_MSE_test
+                        R2_test_df.loc[polyorder, la] = mean_R2_test
+    
+                        scikit_MSE_test_df.loc[polyorder, la] = \
+                        cross_validation_class.scikit_cross_validation_train_model(k,
+                                                                                   regression_method=regression_method, lmb=la)[0]
+                        scikit_r2_test_df.loc[polyorder, la] = \
+                        cross_validation_class.scikit_cross_validation_train_model(k,
+                                                                                   regression_method=regression_method, lmb=la)[1]
+    
+    
+                    # lag summary
+                    optimal_la_MSE = MSE_test_df.loc[polyorder].idxmin()
+                    summary_df.loc[polyorder, 'Optimal lambda MSE'] = optimal_la_MSE
+                    summary_df.loc[polyorder, 'Min test MSE'] = MSE_test_df.loc[polyorder, optimal_la_MSE]
+                    optimal_la_R2 = R2_test_df.loc[polyorder].idxmax()
+                    summary_df.loc[polyorder, 'Optimal lambda R2'] = optimal_la_R2
+                    summary_df.loc[polyorder, 'Max test R2'] = R2_test_df.loc[polyorder, optimal_la_R2]
+    
+            return MSE_test_df, R2_test_df, scikit_MSE_test_df , scikit_r2_test_df, summary_df
+    
+        else:
+            raise ValueError('Valid resampling method not entered')
 #%%
     # Set seed and generate random data used for a)-c)
     np.random.seed(2500)
@@ -254,15 +356,17 @@ if __name__ == '__main__':
 
     np.random.seed(2500)
     
-    N = 500
+    N = 1000
     x = np.sort(np.random.uniform(0, 1, N))
     y = np.sort(np.random.uniform(0, 1, N))
     
     # With noise:
-    z = FrankeFunction(x, y) + np.random.normal(0, 0.2, x.shape)
+    z = FrankeFunction(x, y) + np.random.normal(0, 0.1, x.shape)
 
     # First reproduce figure similar figure 2.11 in hastie
-    polynomal_orders = [i for i in range(1, 5)]
+    max_polydegree = 40
+    polynomal_orders = [degree for degree in range(1, max_polydegree)]
+    
     (MSE_train_df_OLS,
      MSE_test_df_OLS,
      R2_train_df_OLS,
@@ -285,126 +389,7 @@ if __name__ == '__main__':
     # bootstrapping and cross validation
 
     n_boostraps = 100
-    k = 5
-    max_polydegree = 11
-    polynomal_orders = [degree for degree in range(1,max_polydegree)]
-
-    def run_task_e_f(regression_method, polynomal_orders, x, y, z, n_boostraps=None, k_folds=None,
-                     lambda_values=None):
-
-        if n_boostraps is not None:
-
-            # Make dataframe with results
-            bootstrap_df = pd.DataFrame(index=polynomal_orders)
-
-            # lists to store plotting data
-            error_liste = np.zeros(len(polynomal_orders))
-            bias_liste = np.zeros(len(polynomal_orders))
-            variance_liste = np.zeros(len(polynomal_orders))
-            polydegree_liste = np.zeros(len(polynomal_orders))
-
-            for polyorder in polynomal_orders:
-                bootstrap_class = LinRegression(polyorder, x, y, z)  # create class
-                bootstrap_class.split_data(1 / 5)  # perform split of data
-
-                y_pred, error, bias, variance = bootstrap_class.bootstrapping_train_model(n_boostraps)
-
-                bootstrap_df.loc[polyorder, 'Bias'] = bias
-                bootstrap_df.loc[polyorder, 'Variance'] = variance
-                bootstrap_df.loc[polyorder, 'Error'] = error
-                bootstrap_df.loc[polyorder, 'Bias + variance'] = bias + variance
-                if error >= bias + variance:
-                    bootstrap_df.loc[polyorder, 'Error >= Bias+Variance'] = True
-                else:
-                    bootstrap_df.loc[polyorder, 'Error >= Bias+Variance'] = False
-
-                polydegree_liste[polyorder-1] = polyorder
-                error_liste[polyorder-1] = error
-                bias_liste[polyorder-1] = bias
-                variance_liste[polyorder-1] = variance
-
-            return bootstrap_df, polydegree_liste, error_liste, bias_liste, variance_liste
-
-        # cross validation
-        elif k_folds and regression_method is not None:
-
-            # Dataframes to store in own code
-            MSE_test_df = pd.DataFrame(index=polynomal_orders)
-            R2_test_df = pd.DataFrame(index=polynomal_orders)
-            #optimal_beta_df = pd.DataFrame(index=polynomal_orders)
-
-            #Scikit own dataframes to store inf
-            scikit_MSE_test_df = pd.DataFrame(index=polynomal_orders)
-            scikit_r2_test_df = pd.DataFrame(index=polynomal_orders)
-
-            # need to find optimal beta for ridge and lasso
-            summary_df = pd.DataFrame(index=polynomal_orders)
-
-            l = int((max(polynomal_orders) + 1) * (max(polynomal_orders) + 2) / 2)
-
-
-            for polyorder in polynomal_orders:
-
-                cross_validation_class = LinRegression(polyorder, x, y, z)
-
-                if lambda_values is None:  # OLS
-
-                    mean_B_parameters, mean_MSE_test, mean_MSE_train, mean_R2_test, mean_R2_train \
-                        = cross_validation_class.cross_validation_train_model(k, regression_method)
-
-                    #optimal_beta_df.loc[polyorder] = list(itertools.chain(mean_B_parameters,
-                     #                                                     [np.nan for _ in range(l - len(mean_B_parameters))]))
-
-                    MSE_test_df.loc[polyorder, 'OLS'] = mean_MSE_test
-                    R2_test_df.loc[polyorder, 'OLS'] = mean_R2_test
-
-                    scikit_MSE_test_df.loc[polyorder, 'OLS'] = cross_validation_class.scikit_cross_validation_train_model(k, regression_method=regression_method)[0]
-                    scikit_r2_test_df.loc[polyorder, 'OLS'] = cross_validation_class.scikit_cross_validation_train_model(k, regression_method=regression_method)[1]
-
-
-                else: # Ridge and Lasso
-
-                    for la in lambda_values:
-                        mean_B_parameters, mean_MSE_test, mean_MSE_train, mean_R2_test, mean_R2_train \
-                            = cross_validation_class.cross_validation_train_model(k, regression_method, lmb=la)
-
-                        #optimal_beta_df.loc[polyorder, la] = list(itertools.chain(mean_B_parameters,[np.nan for _ in range(l - len(mean_B_parameters))]))
-
-                        MSE_test_df.loc[polyorder, la] = mean_MSE_test
-                        R2_test_df.loc[polyorder, la] = mean_R2_test
-
-                        scikit_MSE_test_df.loc[polyorder, la] = \
-                        cross_validation_class.scikit_cross_validation_train_model(k,
-                                                                                   regression_method=regression_method, lmb=la)[
-                            0]
-                        scikit_r2_test_df.loc[polyorder, la] = \
-                        cross_validation_class.scikit_cross_validation_train_model(k,
-                                                                                   regression_method=regression_method, lmb=la)[
-                            1]
-
-
-                    # lag summary
-                    optimal_la_MSE = MSE_test_df.loc[polyorder].idxmin()
-                    summary_df.loc[polyorder, 'Optimal lambda MSE'] = optimal_la_MSE
-                    summary_df.loc[polyorder, 'Min test MSE'] = MSE_test_df.loc[polyorder, optimal_la_MSE]
-                    optimal_la_R2 = R2_test_df.loc[polyorder].idxmax()
-                    summary_df.loc[polyorder, 'Optimal lambda R2'] = optimal_la_R2
-                    summary_df.loc[polyorder, 'Max test R2'] = R2_test_df.loc[polyorder, optimal_la_R2]
-
-            return MSE_test_df, R2_test_df, scikit_MSE_test_df , scikit_r2_test_df, summary_df
-
-        else:
-            raise ValueError('Valid resampling method not entered')
-
-
-    np.random.seed(2500)
-
-    N = 500
-    x = np.sort(np.random.uniform(0, 1, N))
-    y = np.sort(np.random.uniform(0, 1, N))
-
-    # With noise:
-    z = FrankeFunction(x, y) + np.random.normal(0, 0.2, x.shape)
+    
     bootstrap_df,polydegree_liste, error_liste, bias_liste, variance_liste  = \
         run_task_e_f(regression_method='OLS', polynomal_orders=polynomal_orders, x=x, y=y, z=z, n_boostraps=n_boostraps)
 
@@ -423,7 +408,11 @@ if __name__ == '__main__':
 
 # %%
     print('\n #### Task f) #### \n')
-
+    
+    #k = 5
+    max_polydegree = 5
+    polynomal_orders = [degree for degree in range(1, max_polydegree+1)]
+    
     # Lambdas for run through with ridge and lasso
     nlambdas = 100
     lambdas = np.logspace(-5, 1, nlambdas)
@@ -616,8 +605,8 @@ if __name__ == '__main__':
                                             scaling_method='StandardScaling',
                                             polynomal_orders=polynomal_orders,
                                             lambda_values=lambdas,
-                                            x=x,
-                                            y=y,
+                                            x=x_mesh.ravel(),
+                                            y=y_mesh.ravel(),
                                             z=z)
     print(summary_df_ridge)
     
@@ -626,6 +615,10 @@ if __name__ == '__main__':
     plots_task_1g_ridge.plot_MSE_for_all_lambdas(5)
     plots_task_1g_ridge.plot_MSE_some_lambdas(lambdas_to_plot=lambdas[idx_to_plot])
     plots_task_1g_ridge.plot_betaparams_polynomial_order()
+    
+    # Lasso takes a long time for higher polynomial orders. Must either reduce
+    # polynomial orders or amount of data to use.
+    polynomal_orders = [1, 2, 3] 
     
     # Doing lasso
     (MSE_train_df_lasso,
@@ -637,8 +630,8 @@ if __name__ == '__main__':
                                             scaling_method='StandardScaling',
                                             polynomal_orders=polynomal_orders,
                                             lambda_values=lambdas,
-                                            x=x,
-                                            y=y,
+                                            x=x_mesh.ravel(),
+                                            y=y_mesh.ravel(),
                                             z=z)
     print(summary_df_lasso)
     
@@ -649,15 +642,15 @@ if __name__ == '__main__':
     plots_task_1g_lasso.plot_betaparams_polynomial_order()
     
     
-    # Plotting all the results together
+    #%% Plotting all the results together
     
     plt.figure()
     
     plt.plot(MSE_test_df_OLS.index, MSE_test_df_OLS.OLS, label="OLS")
     plt.plot(summary_df_ridge.index, summary_df_ridge["Min test MSE"],
              "--", label="Ridge")
-    plt.plot(summary_df_lasso.index, summary_df_lasso["Min test MSE"],
-             "-.", label="Lasso")
+    #plt.plot(summary_df_lasso.index, summary_df_lasso["Min test MSE"],
+    #         "-.", label="Lasso")
     
     plt.xticks(summary_df_ridge.index)
     
@@ -672,8 +665,8 @@ if __name__ == '__main__':
     plt.plot(R2_test_df_OLS.index, R2_test_df_OLS.OLS, label="OLS")
     plt.plot(summary_df_ridge.index, summary_df_ridge["Max test R2"],
              "--", label="Ridge")
-    plt.plot(summary_df_lasso.index, summary_df_lasso["Max test R2"],
-             "-.", label="Lasso")
+    #plt.plot(summary_df_lasso.index, summary_df_lasso["Max test R2"],
+    #         "-.", label="Lasso")
     
     plt.xticks(summary_df_ridge.index)
     

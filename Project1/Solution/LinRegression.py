@@ -401,16 +401,6 @@ class LinRegression:
             else:
                 raise ValueError(f'train_on_scaled takes arguments True or False, not {train_on_scaled}')
 
-        #if self.resampling is True:
-        #    if cv_X is not None:
-        #        X_train = cv_X
-        #    else:
-        #        raise ValueError('Must pass in training matrices for finding beta in cross validation')
-        #    if cv_y is not None:
-        #        y_train = cv_y
-        #    else:
-        #        raise ValueError('Must pass in belonging y_train for finding beta in cross validation')
-
         if self.regression_method == 'OLS':
             self.beta = np.linalg.pinv(X_train.T @ X_train) @ X_train.T @ y_train
         elif self.regression_method == 'Ridge':
@@ -474,7 +464,7 @@ class LinRegression:
         self.check_vectors_same_length(true_y, predicted_y)
 
         n = len(true_y)
-        predicted_y = predicted_y.reshape(true_y.shape)
+        #predicted_y = predicted_y.reshape(true_y.shape)
         SSR = np.sum((true_y - predicted_y) ** 2) # Residual som of squares, measures the unexplained variability ("errors")
         MSE = (1 / n) * SSR
         return MSE
@@ -491,7 +481,7 @@ class LinRegression:
 
         self.check_vectors_same_length(true_y, predicted_y)
         
-        predicted_y = predicted_y.reshape(true_y.shape)
+        #predicted_y = predicted_y.reshape(true_y.shape)
         mean_true_y = np.mean(true_y)
         SSR = np.sum((true_y - predicted_y) ** 2)  # Residual som of squares, measures the unexplained variability ("errors")
         TSS = np.sum((true_y - mean_true_y) ** 2)  # Total sum of squares, measures the total variability
