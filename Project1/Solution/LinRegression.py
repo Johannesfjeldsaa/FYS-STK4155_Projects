@@ -303,8 +303,9 @@ class LinRegression:
             estimated_r2_folds = cross_val_score(ridge, self.X, self.y, scoring='r2', cv=kfold)
     
         elif regression_method == 'Lasso':
-            lasso = Lasso(lmb, fit_intercept=False)
-    
+
+            lasso = Lasso(lmb, fit_intercept=False, normalize=True, tol=1e-2)
+
             # loop over trials in order to estimate the expectation value of the MSE
             estimated_mse_folds = cross_val_score(lasso, self.X, self.y,
                                                   scoring='neg_mean_squared_error', cv=kfold)
@@ -489,7 +490,9 @@ class LinRegression:
             I = np.eye(cols, cols)
             self.beta = np.linalg.pinv(X_train.T @ X_train + la*I) @ X_train.T @ y_train
         elif self.regression_method == "Lasso":
-            RegLasso = linear_model.Lasso(la, fit_intercept=False, max_iter=int(10e4), tol=1e-2)
+
+            RegLasso = linear_model.Lasso(la, fit_intercept=False, max_iter=int(10e4), normalize=True, tol=1e-2)
+
             RegLasso.fit(X_train, y_train)
             self.beta = RegLasso.coef_
             
