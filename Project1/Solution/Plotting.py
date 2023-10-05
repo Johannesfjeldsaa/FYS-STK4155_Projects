@@ -63,22 +63,26 @@ class Plotting:
         Return: plot
         """
         fig, ax = plt.subplots()
-
+        plt.text(5, 0.035, 'High bias \nLow variance \n <-----', weight='bold',fontsize=10)
+        plt.text(30, 0.035, 'Low bias \nHigh variance \n ----->',weight='bold', fontsize=10)
         ax.set_xlabel('Polynomial degree')
         ax.set_ylabel('Mean Square Error (MSE)')
 
         ax.xaxis.set_major_formatter(FormatStrFormatter('%g'))
         ax.xaxis.set_ticks(self.poly_degrees[::4])
-        
+
+
         if la is None:
             ax.plot(self.poly_degrees, self.MSE_scores,
                     alpha=0.7, lw=2, color='r',label='Test')
             ax.plot(self.poly_degrees, self.MSE_training,
                     alpha=0.7, lw=2, color='b',label='Training')
+
+
         else:
             ax.plot(self.poly_degrees, self.MSE_scores.loc[:, la],
                     alpha=0.7, lw=2, color='r',label='MSE score')
-        plt.legend()
+        plt.legend(loc='center right')
         plt.show()
 
     def plot_R2_scores(self, la=None):
