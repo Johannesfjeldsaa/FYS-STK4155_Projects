@@ -68,7 +68,7 @@ class Plotting:
         ax.set_ylabel('Mean Square Error (MSE)')
 
         ax.xaxis.set_major_formatter(FormatStrFormatter('%g'))
-        ax.xaxis.set_ticks(self.poly_degrees)
+        ax.xaxis.set_ticks(self.poly_degrees[::4])
         
         if la is None:
             ax.plot(self.poly_degrees, self.MSE_scores,
