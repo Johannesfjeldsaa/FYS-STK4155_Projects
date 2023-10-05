@@ -6,6 +6,7 @@ from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 from sklearn.linear_model import LinearRegression, Ridge, Lasso
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.utils import resample
+from sklearn.pipeline import Pipeline
 
 from sklearn import linear_model
 
@@ -142,10 +143,10 @@ class LinRegression:
         return self.X_train, self.X_test, self.y_train, self.y_test
 
 
-    def cross_validation_train_model(self, k_folds, regression_method=None, lmb=None):
+    def cross_validation_train_model(self, k_folds, regression_method=None, lmb=None, scale_data=False):
         """
         Method to perform cross validation resampling and then train the model.
-        This method have not considered scaling, and doesnt take any scaling inputs for now.
+        This method only has one scaling method - subtracting the mean.
         Should be able to perform training on OLS, Ridge and Lasso.
 
         :param k: k folds to decide how large the resampling groups should be.
@@ -199,22 +200,52 @@ class LinRegression:
             y_train_cv = np.concatenate(self.y_groups[:i] + self.y_groups[i + 1:], axis=0)
 
             # perform training after which training method has been passed
-
-            self.train_model(regression_method=regression_method, la=self.lmb,
-                             X_train=train_matrix, y_train=y_train_cv)
-
             
-            opt_beta.append(self.beta)   # store optimal betas for each cross validation set
+            if scale_data is True:
+                train_X_mean = np.mean(train_matrix)
+                train_matrix_scaled = (train_matrix - train_X_mean)
+                test_matrix_scaled = (test_matrix - train_X_mean)
+                #train_X_std = np.std(train_matrix)
+                #train_matrix_scaled = (train_matrix - train_X_mean)/train_X_std
+                #test_matrix_scaled = (test_matrix - train_X_mean)/train_X_std
+                
+                
+                train_y_mean = np.mean(y_train_cv)
+                y_train_scaled = (y_train_cv - train_y_mean)
+                #train_y_std = np.std(y_train_cv)
+                #y_train_scaled = (y_train_cv - train_y_mean)/train_y_std
+                
+                self.train_model(regression_method=regression_method, la=self.lmb,
+                                 X_train=train_matrix_scaled, y_train=y_train_scaled)
 
-            # find for training set: X_training @ beta
-            y_train_pred = train_matrix @ self.beta
-            MSE_train.append(self.MSE(y_train_cv, y_train_pred))
-            R2_train.append(self.R_squared(y_train_cv, y_train_pred))
+                opt_beta.append(self.beta)   # store optimal betas for each cross validation set
 
-            # find for test set: test_matrix @ beta
-            y_test_pred = test_matrix @ self.beta
-            MSE_test.append(self.MSE(y_test_cv, y_test_pred))
-            R2_test.append(self.R_squared(y_test_cv, y_test_pred))
+                # find for training set: X_training @ beta
+                y_train_pred = (train_matrix_scaled @ self.beta) + train_y_mean 
+                MSE_train.append(self.MSE(y_train_cv, y_train_pred))
+                R2_train.append(self.R_squared(y_train_cv, y_train_pred))
+
+                # find for test set: test_matrix @ beta
+                y_test_pred = (test_matrix_scaled @ self.beta) + train_y_mean 
+                MSE_test.append(self.MSE(y_test_cv, y_test_pred))
+                R2_test.append(self.R_squared(y_test_cv, y_test_pred))
+                
+            else:
+                self.train_model(regression_method=regression_method, la=self.lmb,
+                                 X_train=train_matrix, y_train=y_train_cv)
+    
+                
+                opt_beta.append(self.beta)   # store optimal betas for each cross validation set
+    
+                # find for training set: X_training @ beta
+                y_train_pred = train_matrix @ self.beta
+                MSE_train.append(self.MSE(y_train_cv, y_train_pred))
+                R2_train.append(self.R_squared(y_train_cv, y_train_pred))
+    
+                # find for test set: test_matrix @ beta
+                y_test_pred = test_matrix @ self.beta
+                MSE_test.append(self.MSE(y_test_cv, y_test_pred))
+                R2_test.append(self.R_squared(y_test_cv, y_test_pred))
 
         B_matrix = np.array(opt_beta)
         opt_beta_model = []
@@ -227,39 +258,89 @@ class LinRegression:
                np.mean(R2_test), np.mean(R2_train)
 
     def scikit_cross_validation_train_model(self, k, regression_method=None, lmb=None):
+        """
+        Method to perform cross validation resampling and then train the model
+        using scikit-learn functionality.
+
+        Parameters
+        ----------
+        k : int
+            The number of cross-validation groups.
+        regression_method : String, optional
+            Regression method to use. The default is None.
+        lmb : float, optional
+            Lambda value to use for ridge and lasso regression. Should be none
+            for OLS. The default is None.
+
+        Raises
+        ------
+        ValueError
+            If a valid regression method is not given.
+
+        Returns
+        -------
+        The mean of the MSE and R squared values for all the runs.
+
+        """
 
         # make k groups
         kfold = KFold(n_splits=k, shuffle=True)
-
+        
         if regression_method == 'OLS':
             OLS = LinearRegression(fit_intercept=False)
-
+    
             # loop over trials in order to estimate the expectation value of the MSE
             estimated_mse_folds = cross_val_score(OLS, self.X, self.y,
-                                                  scoring='neg_mean_squared_error', cv=kfold)
+                                                     scoring='neg_mean_squared_error', cv=kfold)
             estimated_r2_folds = cross_val_score(OLS, self.X, self.y, scoring='r2', cv=kfold)
-
+    
         elif regression_method == 'Ridge':
             ridge = Ridge(lmb, fit_intercept=False)
-
+    
             # loop over trials in order to estimate the expectation value of the MSE
             estimated_mse_folds = cross_val_score(ridge, self.X, self.y,
                                                   scoring='neg_mean_squared_error', cv=kfold)
             estimated_r2_folds = cross_val_score(ridge, self.X, self.y, scoring='r2', cv=kfold)
-
+    
         elif regression_method == 'Lasso':
-            lasso = Lasso(fit_intercept=False)
-
+            lasso = Lasso(lmb, fit_intercept=False)
+    
             # loop over trials in order to estimate the expectation value of the MSE
             estimated_mse_folds = cross_val_score(lasso, self.X, self.y,
                                                   scoring='neg_mean_squared_error', cv=kfold)
             estimated_r2_folds = cross_val_score(lasso, self.X, self.y, scoring='r2', cv=kfold)
         else:
             raise ValueError('A valid regression model is not given')
-
+                
         return np.mean(-estimated_mse_folds), np.mean(estimated_r2_folds)
 
-    def bootstrapping_train_model(self,n_bootstraps):
+    def bootstrapping_train_model(self, n_bootstraps):
+        """
+        Method for performing bootstrapping when training the model.
+
+        Parameters
+        ----------
+        n_bootstraps : int
+            Number of bootstraps to use (?)
+
+        Raises
+        ------
+        ValueError
+            If splitting of data is not performed before bootstrapping.
+        
+        Returns
+        -------
+        y_pred : array-like (?)
+            The predicted output values
+        error : float
+            
+        bias : float
+            
+        variance : float
+            
+
+        """
+        
         self.resampling = True
 
         if self.splitted is not True:
@@ -408,7 +489,7 @@ class LinRegression:
             I = np.eye(cols, cols)
             self.beta = np.linalg.pinv(X_train.T @ X_train + la*I) @ X_train.T @ y_train
         elif self.regression_method == "Lasso":
-            RegLasso = linear_model.Lasso(la, fit_intercept=False, max_iter=int(10e4))
+            RegLasso = linear_model.Lasso(la, fit_intercept=False, max_iter=int(10e4), tol=1e-2)
             RegLasso.fit(X_train, y_train)
             self.beta = RegLasso.coef_
             

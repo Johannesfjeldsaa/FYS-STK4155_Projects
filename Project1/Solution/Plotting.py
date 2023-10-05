@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.ticker import FormatStrFormatter
 
+from setup import save_fig
+
 
 def signif(x, p):
     """
@@ -36,7 +38,7 @@ class Plotting:
         self.beta_parameters = beta_parameters
         #self.number_of_degrees = len(range(self.poly_degree))
 
-    def plot_MSE_scores(self, la=None):
+    def plot_MSE_scores(self, la=None, save_filename=None):
         """
         Function plotting MSE_scores against polynomial order
         Return: plot
@@ -55,9 +57,13 @@ class Plotting:
         else:
             ax.plot(self.poly_degrees, self.MSE_scores.loc[:, la],
                     alpha=0.7, lw=2, color='r',label='MSE score')
+        
+        if save_filename is not None:
+            save_fig(save_filename)
+        
         plt.show()
         
-    def plot_MSE_test_and_training(self, la=None):
+    def plot_MSE_test_and_training(self, la=None, save_filename=None):
         """
         Function plotting MSE_scores against polynomial order
         Return: plot
@@ -79,9 +85,14 @@ class Plotting:
             ax.plot(self.poly_degrees, self.MSE_scores.loc[:, la],
                     alpha=0.7, lw=2, color='r',label='MSE score')
         plt.legend()
+        
+        if save_filename is not None:
+            save_fig(save_filename)
+        
+        
         plt.show()
 
-    def plot_R2_scores(self, la=None):
+    def plot_R2_scores(self, la=None, save_filename=None):
         """
         Function for plotting R2 scores against polynomial order
         :return: plot
@@ -100,10 +111,13 @@ class Plotting:
         else:
             ax.plot(self.poly_degrees, self.R2_scores.loc[:, la], 
                     alpha=0.7, lw=2, color='b', label='R2 score')
-
+            
+        if save_filename is not None:
+            save_fig(save_filename)
+            
         plt.show()
 
-    def plot_betaparams_polynomial_order(self):
+    def plot_betaparams_polynomial_order(self, save_filename=None):
         """
         Function for plotting betaparams of the different polynomial orders
         :return: plot
@@ -121,9 +135,13 @@ class Plotting:
 
         plt.legend()
         plt.tight_layout()
+        
+        if save_filename is not None:
+            save_fig(save_filename)
+        
         plt.show()
         
-    def plot_MSE_for_all_lambdas(self, poly_degree):
+    def plot_MSE_for_all_lambdas(self, poly_degree, save_filename=None):
         """
         Function for plotting MSE scores for all lambdas for one
         chosen polynomial degree, for either ridge or lasso regression results.
@@ -145,9 +163,14 @@ class Plotting:
         ax.set_xscale('log')
         
         plt.tight_layout()
+        
+        if save_filename is not None:
+            save_fig(save_filename)
+        
+        
         plt.show()
     
-    def plot_R2_for_all_lambdas(self, poly_degree):
+    def plot_R2_for_all_lambdas(self, poly_degree, save_filename=None):
         """
         Function for plotting R2 scores for all lambdas for one
         chosen polynomial degree, for either ridge or lasso regression results.
@@ -169,9 +192,14 @@ class Plotting:
         ax.set_xscale('log')
         
         plt.tight_layout()
+        
+        if save_filename is not None:
+            save_fig(save_filename)
+        
+        
         plt.show()
         
-    def plot_MSE_some_lambdas(self, lambdas_to_plot, num_plot_columns=3):
+    def plot_MSE_some_lambdas(self, lambdas_to_plot, num_plot_columns=3, save_filename=None):
         """
         Function for plotting the Mean Squared Error as a function of polynomial
         degree for specified lambda values.
@@ -197,7 +225,12 @@ class Plotting:
         fig.supxlabel("Polynomial degree")
         fig.supylabel("Mean Squared Error (MSE)")
         
-    def plot_R2_some_lambdas(self, lambdas_to_plot, num_plot_columns=3):
+        if save_filename is not None:
+            save_fig(save_filename)
+        
+        
+        
+    def plot_R2_some_lambdas(self, lambdas_to_plot, num_plot_columns=3, save_filename=None):
         """
         Function for plotting the R squared as a function of polynomial
         degree for specified lambda values.
@@ -215,12 +248,17 @@ class Plotting:
             title = fr"$\lambda$ = {signif(la, 3)}"
             ax.set_title(title)
 
-            ax.plot(self.MSE_scores.index, self.MSE_scores.loc[:, la], 
+            ax.plot(self.R2_scores.index, self.R2_scores.loc[:, la], 
                     alpha=0.7, lw=2, color='r', label='MSE')
             
             plt.xticks(self.poly_degrees)
             
         fig.supxlabel("Polynomial degree")
         fig.supylabel("Mean Squared Error (MSE)")
+        
+        if save_filename is not None:
+            save_fig(save_filename)
+        
+        
     
     
