@@ -382,7 +382,7 @@ if __name__ == '__main__':
     nlambdas = 100
     lambdas = np.logspace(-5, 1, nlambdas)
 
-    polynomal_orders = [1, 2, 3] #, 4, 5]
+    polynomal_orders = [1, 2, 3, 4, 5]
 
     (MSE_train_df_lasso,
      MSE_test_df_lasso,
@@ -401,7 +401,7 @@ if __name__ == '__main__':
     print(beta_parameters_df_lasso)
     print(summary_df_lasso)
     
-    polydegree_to_plot = 3
+    polydegree_to_plot = 5
     plots_task_1c = Plotting(polynomal_orders, MSE_test_df_lasso, 
                              R2_test_df_lasso, beta_parameters_df_lasso)
     
