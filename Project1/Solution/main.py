@@ -484,9 +484,9 @@ if __name__ == '__main__':
 
         MSE_test_df_Lasso, R2_test_df_Lasso, summary_df, optimal_beta_df = run_own_crossval(
             regression_method='Lasso', polynomal_orders=[poly_order], x=x, y=y, z=z, k_folds=k,
-            lambda_values=[0.000040])  # hadde ikke tid til å kjøre for lasso, så fant ikke optimal lambda
+            lambda_values=[0.000010])  #fant denne ved å søke gjennom optimal lambda
 
-        MSE_Lasso.append(MSE_test_df_Lasso[0.000040].to_list())
+        MSE_Lasso.append(MSE_test_df_Lasso[0.000010].to_list())
 
     plt.figure()
     plt.title('Cross validation for polynomial order 10')
@@ -494,7 +494,7 @@ if __name__ == '__main__':
     plt.ylabel('MSE score')
     plt.plot(range(5,11), MSE_OLS, 'r', label='OLS')
     plt.plot(range(5,11), MSE_Ridge, 'b', label='Ridge, lmb = 0.00004')
-    plt.plot(range(5,11), MSE_Lasso, 'g', label='Lasso, lmb = 0.00004')  #finnes kanskje mer opt lambda, hadde ikke tid til å finne den
+    plt.plot(range(5,11), MSE_Lasso, 'g', label='Lasso, lmb = 0.00001')
     plt.legend()
     save_fig(f"task_f_crossval_kfold_comparison_{data_used}")
     plt.show()
@@ -668,7 +668,7 @@ if __name__ == '__main__':
     plt.plot(polynomal_orders, scikit_MSE_test_df, 'g',
              label='Scikit cross validation')  # mse scikit was run on k = 5
     plt.legend()
-    save_fig(f"task_f_bootstrap_crossval_comparison_kfold5_{data_used}")
+    save_fig(f"task_f_bootstrap_crossval_comparison_kfold8_{data_used}")
     plt.show()
 
     # Hente ut data for å plotte OLS
@@ -685,6 +685,6 @@ if __name__ == '__main__':
     plt.plot(polynomal_orders, scikit_MSE_test_df, 'g',
              label='Scikit cross validation')  # mse scikit was run on k = 5
     plt.legend()
-    save_fig(f"task_f_bootstrap_crossval_comparison_kfold5_{data_used}")
+    save_fig(f"task_f_bootstrap_crossval_comparison_kfold10_{data_used}")
     plt.show()
 
