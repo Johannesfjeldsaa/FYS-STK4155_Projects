@@ -10,11 +10,13 @@ import pandas as pd
 import itertools
 import matplotlib.pyplot as plt
 plt.style.use('Solarize_Light2')
+plt.rcParams["figure.dpi"] = 200
 
 from imageio.v2 import imread
 import matplotlib.pyplot as plt
 
 from tqdm import tqdm
+
  
 
 if __name__ == '__main__':
@@ -181,12 +183,11 @@ if __name__ == '__main__':
                     MSE_test_df.loc[polyorder, la] = mean_MSE_test
                     R2_test_df.loc[polyorder, la] = mean_R2_test
     
-                    #scikit_MSE_test_df.loc[polyorder, la], scikit_r2_test_df.loc[polyorder, la] = \
-                    #cross_validation_class.scikit_cross_validation_train_model(k, regression_method=regression_method, lmb=la)
+                    scikit_MSE_test_df.loc[polyorder, la] = \
+                    cross_validation_class.scikit_cross_validation_train_model(k, regression_method=regression_method, lmb=la)[0]
                     
-
-                    #scikit_r2_test_df.loc[polyorder, la] = \
-                    #cross_validation_class.scikit_cross_validation_train_model(k, regression_method=regression_method, lmb=la)[1]
+                    scikit_r2_test_df.loc[polyorder, la] = \
+                    cross_validation_class.scikit_cross_validation_train_model(k, regression_method=regression_method, lmb=la)[1]
     
     
                 # lag summary
@@ -273,9 +274,7 @@ if __name__ == '__main__':
         z = FrankeFunction(x, y) + np.random.normal(0, 0.1, x.shape)
     
     else:
-        
-        N = 1000 # Number of datapoints to use in each direction
-        
+
         if data_used == "Terrain_1":
             # Load the terrain
             terrain = imread(r'DataFiles\SRTM_data_Norway_1.tif')
@@ -284,6 +283,8 @@ if __name__ == '__main__':
             # Load the terrain
             terrain = imread(r'DataFiles\SRTM_data_Norway_2.tif')
         
+        N = 1000 # Number of datapoints to use in each direction
+        #N = 10000
         
         # Creating the data set
         x = np.linspace(0, 1, N)
@@ -293,7 +294,13 @@ if __name__ == '__main__':
         y = y_mesh.ravel()
         
         z = terrain[:N, :N].ravel() #.reshape(-1, 1)  # Changing z from matrix to vector
-    
+        
+        # x = np.random.randint(0, 1000, N)
+        # y = np.random.randint(0, 1000, N)
+        # z = terrain[x, y]
+        # x = x/1000
+        # y = y/1000
+        
         # Show the terrain
         plt.figure()
         #plt.title('Terrain over Norway')
@@ -330,7 +337,7 @@ if __name__ == '__main__':
                              R2_test_df_OLS, beta_parameters_df_OLS)
     plots_task_1a.plot_MSE_scores(save_filename=f"task_a_MSE_OLS_{data_used}")
     plots_task_1a.plot_R2_scores(save_filename=f"task_a_R2_OLS_{data_used}")
-    plots_task_1a.plot_betaparams_polynomial_order(save_filename=f"task_a_betas_OLS_{data_used}")
+    plots_task_1a.plot_betaparams_polynomial_order(save_filename=f"task_a_betas_OLS_{data_used}_N{N}")
 
 # %%
     print('\n #### Task b) #### \n')
@@ -361,19 +368,19 @@ if __name__ == '__main__':
     
     polydegree_to_plot = 5
     plots_task_1b.plot_MSE_for_all_lambdas(poly_degree=polydegree_to_plot,
-                                           save_filename=f"task_b_MSE_all_lambdas_poly_{polydegree_to_plot}_ridge_{data_used}")
+                                           save_filename=f"task_b_MSE_all_lambdas_poly_{polydegree_to_plot}_ridge_{data_used}_N{N}")
     
     num_lambdas_to_plot = 6
     idx_to_plot = np.round(np.linspace(0, len(lambdas) - 1,
                                        num_lambdas_to_plot)).astype(int)
     
     plots_task_1b.plot_MSE_some_lambdas(lambdas_to_plot=lambdas[idx_to_plot], 
-                                        save_filename=f"task_b_MSE_some_lambdas_ridge_{data_used}")
+                                        save_filename=f"task_b_MSE_some_lambdas_ridge_{data_used}_N{N}")
     
     plots_task_1b.plot_R2_some_lambdas(lambdas_to_plot=lambdas[idx_to_plot], 
-                                        save_filename=f"task_b_R2_some_lambdas_ridge_{data_used}")
+                                        save_filename=f"task_b_R2_some_lambdas_ridge_{data_used}_N{N}")
     
-    plots_task_1b.plot_betaparams_polynomial_order(save_filename=f"task_b_optimal_betas_ridge_{data_used}")
+    plots_task_1b.plot_betaparams_polynomial_order(save_filename=f"task_b_optimal_betas_ridge_{data_used}_N{N}")
 
     
     #%%
@@ -406,19 +413,27 @@ if __name__ == '__main__':
                              R2_test_df_lasso, beta_parameters_df_lasso)
     
     plots_task_1c.plot_MSE_for_all_lambdas(poly_degree=polydegree_to_plot,
-                                           save_filename=f"task_c_MSE_all_lambdas_poly_{polydegree_to_plot}_lasso_{data_used}")
+                                           save_filename=f"task_c_MSE_all_lambdas_poly_{polydegree_to_plot}_lasso_{data_used}_N{N}")
     
     num_lambdas_to_plot = 6
     idx_to_plot = np.round(np.linspace(0, len(lambdas) - 1,
                                        num_lambdas_to_plot)).astype(int)
     
     plots_task_1c.plot_MSE_some_lambdas(lambdas_to_plot=lambdas[idx_to_plot],
-                                        save_filename=f"task_c_MSE_some_lambdas_lasso_{data_used}")
+                                        save_filename=f"task_c_MSE_some_lambdas_lasso_{data_used}_N{N}")
     
-    plots_task_1c.plot_betaparams_polynomial_order(save_filename=f"task_b_optimal_betas_lasso_{data_used}")
+    plots_task_1c.plot_betaparams_polynomial_order(save_filename=f"task_b_optimal_betas_lasso_{data_used}_N{N}")
     
     
 #%% Making summary plots for task a) through c)
+
+    # Saving the dataframes
+    MSE_test_df_OLS.to_csv(rf"Results\MSE_test_df_OLS_taska_{data_used}_N{N}.csv")
+    R2_test_df_OLS.to_csv(rf"Results\R2_test_df_OLS_taska_{data_used}_N{N}.csv")
+    
+    summary_df_ridge.to_csv(rf"Results\summary_df_ridge_taskb_{data_used}_N{N}.csv")
+    
+    summary_df_lasso.to_csv(rf"Results\summary_df_lasso_taskc_{data_used}_N{N}.csv")
 
     plt.figure()
     
@@ -433,7 +448,7 @@ if __name__ == '__main__':
     plt.ylabel("Mean Squared Error")
     plt.xlabel("Polynomial degree")
     plt.legend()
-    save_fig(f"MSE_all_methods_{data_used}")
+    save_fig(f"MSE_all_methods_{data_used}_N{N}")
     plt.show()
     
     
@@ -450,7 +465,7 @@ if __name__ == '__main__':
     plt.ylabel(r"R$^2$")
     plt.xlabel("Polynomial degree")
     plt.legend()
-    save_fig(f"R2_all_methods_{data_used}")
+    save_fig(f"R2_all_methods_{data_used}_N{N}")
     plt.show()
 
 
@@ -464,6 +479,9 @@ if __name__ == '__main__':
     """
     poly_order = 5
     # For polynomial order of 10, k fold = 5-10
+    
+    lambda_ridge = 1e-5
+    lambda_lasso = 1e-5
 
     MSE_OLS = []
     MSE_Ridge = []
@@ -478,25 +496,25 @@ if __name__ == '__main__':
 
         MSE_test_df_Ridge, R2_test_df_Ridge, summary_df, optimal_beta_df = run_own_crossval(
             regression_method='Ridge', polynomal_orders=[poly_order], x=x, y=y, z=z, k_folds=k,
-            lambda_values=[0.000040])  # fant denne gjennom å søke etter optimal lambda
+            lambda_values=[lambda_ridge])  # fant denne gjennom å søke etter optimal lambda
 
-        MSE_Ridge.append(MSE_test_df_Ridge[0.000040].to_list())
+        MSE_Ridge.append(MSE_test_df_Ridge[lambda_ridge].to_list())
 
         MSE_test_df_Lasso, R2_test_df_Lasso, summary_df, optimal_beta_df = run_own_crossval(
             regression_method='Lasso', polynomal_orders=[poly_order], x=x, y=y, z=z, k_folds=k,
-            lambda_values=[0.000040])  # hadde ikke tid til å kjøre for lasso, så fant ikke optimal lambda
+            lambda_values=[lambda_lasso])  # hadde ikke tid til å kjøre for lasso, så fant ikke optimal lambda
 
-        MSE_Lasso.append(MSE_test_df_Lasso[0.000040].to_list())
+        MSE_Lasso.append(MSE_test_df_Lasso[lambda_lasso].to_list())
 
     plt.figure()
-    plt.title('Cross validation for polynomial order 10')
+    #plt.title('Cross validation for polynomial order 10')
     plt.xlabel('number of k folds')
     plt.ylabel('MSE score')
     plt.plot(range(5,11), MSE_OLS, 'r', label='OLS')
-    plt.plot(range(5,11), MSE_Ridge, 'b', label='Ridge, lmb = 0.00004')
-    plt.plot(range(5,11), MSE_Lasso, 'g', label='Lasso, lmb = 0.00004')  #finnes kanskje mer opt lambda, hadde ikke tid til å finne den
+    plt.plot(range(5,11), MSE_Ridge, 'b', label=f'Ridge, lmb = {lambda_ridge}')
+    plt.plot(range(5,11), MSE_Lasso, 'g', label=f'Lasso, lmb = {lambda_lasso}')  #finnes kanskje mer opt lambda, hadde ikke tid til å finne den
     plt.legend()
-    save_fig(f"task_f_crossval_kfold_comparison_{data_used}")
+    save_fig(f"task_f_crossval_kfold_comparison_{data_used}_N{N}")
     plt.show()
 
 
@@ -550,7 +568,7 @@ if __name__ == '__main__':
     plt.ylabel("Mean Squared Error")
     plt.xlabel("Polynomial degree")
     plt.legend()
-    save_fig(f"MSE_all_methods_with_crossval_{data_used}")
+    save_fig(f"MSE_all_methods_with_crossval_{data_used}_N{N}")
     plt.show()
     
     
@@ -567,7 +585,7 @@ if __name__ == '__main__':
     plt.ylabel(r"R$^2$")
     plt.xlabel("Polynomial degree")
     plt.legend()
-    save_fig(f"R2_all_methods_with_crossval_{data_used}")
+    save_fig(f"R2_all_methods_with_crossval_{data_used}_N{N}")
     plt.show()
 
 
@@ -604,7 +622,7 @@ if __name__ == '__main__':
                              R2_test_df_OLS, beta_parameters_df_OLS, 
                              MSE_train_df_OLS)
     
-    plots_task_1e.plot_MSE_test_and_training(save_filename=f"task_e_MSE_test_and_training_{data_used}")
+    plots_task_1e.plot_MSE_test_and_training(save_filename=f"task_e_MSE_test_and_training_{data_used}_N{N}")
 
     # Make plot to show bias variance analysis of only OLS regression, making own function for
     # bootstrapping and cross validation
@@ -625,7 +643,7 @@ if __name__ == '__main__':
     plt.plot(polynomal_orders, bias_liste, label='bias')
     plt.plot(polynomal_orders, variance_liste, label='Variance')
     plt.legend()
-    save_fig(f"task_e_bias_variance_{data_used}")
+    save_fig(f"task_e_bias_variance_{data_used}_N{N}")
     plt.show()
 
 
@@ -651,7 +669,7 @@ if __name__ == '__main__':
     plt.plot(polynomal_orders, MSE_test_df, 'b', label='Own code cross validation')  # mse test was run on k = 5
     plt.plot(polynomal_orders, scikit_MSE_test_df, 'g', label='Scikit cross validation')  # mse scikit was run on k = 5
     plt.legend()
-    save_fig(f"task_f_bootstrap_crossval_comparison_kfold5_{data_used}")
+    save_fig(f"task_f_bootstrap_crossval_comparison_kfold5_{data_used}_N{N}")
     plt.show()
 
     # Hente ut data for å plotte OLS
@@ -668,7 +686,7 @@ if __name__ == '__main__':
     plt.plot(polynomal_orders, scikit_MSE_test_df, 'g',
              label='Scikit cross validation')  # mse scikit was run on k = 5
     plt.legend()
-    save_fig(f"task_f_bootstrap_crossval_comparison_kfold5_{data_used}")
+    save_fig(f"task_f_bootstrap_crossval_comparison_kfold5_{data_used}_N{N}")
     plt.show()
 
     # Hente ut data for å plotte OLS
@@ -685,6 +703,6 @@ if __name__ == '__main__':
     plt.plot(polynomal_orders, scikit_MSE_test_df, 'g',
              label='Scikit cross validation')  # mse scikit was run on k = 5
     plt.legend()
-    save_fig(f"task_f_bootstrap_crossval_comparison_kfold5_{data_used}")
+    save_fig(f"task_f_bootstrap_crossval_comparison_kfold5_{data_used}_N{N}")
     plt.show()
 

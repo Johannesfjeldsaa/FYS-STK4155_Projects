@@ -6,10 +6,11 @@ from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 from sklearn.linear_model import LinearRegression, Ridge, Lasso
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.utils import resample
-from sklearn.pipeline import Pipeline
+from sklearn.pipeline import make_pipeline
 
 from sklearn import linear_model
 
+from numba import jit
 
 class LinRegression:
     supported_methods = {'regression_method': ['OLS', 'Ridge', 'Lasso'],
@@ -257,7 +258,7 @@ class LinRegression:
         return opt_beta_model, np.mean(MSE_test), np.mean(MSE_train), \
                np.mean(R2_test), np.mean(R2_train)
 
-    def scikit_cross_validation_train_model(self, k, regression_method=None, lmb=None):
+    def scikit_cross_validation_train_model(self, k, regression_method=None, lmb=None, scaling=False):
         """
         Method to perform cross validation resampling and then train the model
         using scikit-learn functionality.
@@ -310,8 +311,11 @@ class LinRegression:
             estimated_mse_folds = cross_val_score(lasso, self.X, self.y,
                                                   scoring='neg_mean_squared_error', cv=kfold)
             estimated_r2_folds = cross_val_score(lasso, self.X, self.y, scoring='r2', cv=kfold)
+            
+
         else:
             raise ValueError('A valid regression model is not given')
+        
                 
         return np.mean(-estimated_mse_folds), np.mean(estimated_r2_folds)
 
@@ -416,7 +420,6 @@ class LinRegression:
 
         self.scaled = True # Marks that the data are now scaled
 
-
     def train_model(self, regression_method=None, train_on_scaled=False, la=None,
                     X_train=None, y_train=None):
         """
@@ -490,11 +493,12 @@ class LinRegression:
             I = np.eye(cols, cols)
             self.beta = np.linalg.pinv(X_train.T @ X_train + la*I) @ X_train.T @ y_train
         elif self.regression_method == "Lasso":
-
-            RegLasso = linear_model.Lasso(la, fit_intercept=False, max_iter=int(10e4), tol=1e-2)
+            
+            RegLasso = linear_model.Lasso(la, fit_intercept=False, max_iter=int(10e3), tol=1e-2)
 
             RegLasso.fit(X_train, y_train)
             self.beta = RegLasso.coef_
+            
             
         return self.beta
 
