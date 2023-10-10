@@ -280,7 +280,7 @@ if __name__ == '__main__':
 #%% Loading data
 
     # Choose wich data to use, Franke, Terrain_1 or Terrain_2
-    data_used = "Franke" 
+    data_used = "Terrain_1"
     
     if data_used == "Franke":
         # Set seed and generate random data used for a)-c)
@@ -305,7 +305,7 @@ if __name__ == '__main__':
             # Load the terrain
             terrain = imread(r'DataFiles\SRTM_data_Norway_2.tif')
         
-        N = 100 # Number of datapoints to use in each direction
+        N = 500 # Number of datapoints to use in each direction
         #N = 10000
         
         # Creating the data set
