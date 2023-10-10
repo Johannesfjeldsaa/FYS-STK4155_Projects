@@ -10,7 +10,6 @@ from sklearn.pipeline import make_pipeline
 
 from sklearn import linear_model
 
-from numba import jit
 
 class LinRegression:
     supported_methods = {'regression_method': ['OLS', 'Ridge', 'Lasso'],
