@@ -10,16 +10,17 @@ from sklearn.pipeline import make_pipeline
 
 from sklearn import linear_model
 
-from numba import jit
 
 class LinRegression:
     supported_methods = {'regression_method': ['OLS', 'Ridge', 'Lasso'],
                          'scaling_method': ['StandardScaling', 'StandardScaling_scikit']}
 
-    def __init__(self, poly_degree, x, y, z=None):
+    def __init__(self, poly_degree, x, y, z=None, remove_intercept=False):
 
         self.poly_degree = poly_degree
-
+        
+        self.remove_intercept = remove_intercept
+        
         if z is None:
             self.X = PolynomialFeatures(degree=self.poly_degree).fit_transform(x.reshape(-1, 1))
             self.y = y
@@ -56,6 +57,8 @@ class LinRegression:
         self.scaling_method = None
 
         self.scaled = False
+        
+        
 
 
     def create_design_matrix(self, x, y, n):
@@ -83,6 +86,12 @@ class LinRegression:
             q = int(i * (i + 1) / 2)
             for k in range(i+1):
                 X[:,q+k] = (x**(i-k))*(y**k)
+        
+        if self.remove_intercept:
+            X = X[:,1:]
+            
+        #print(X.shape)
+        #print(X)
 
         return X
 
@@ -296,7 +305,7 @@ class LinRegression:
             estimated_r2_folds = cross_val_score(OLS, self.X, self.y, scoring='r2', cv=kfold)
     
         elif regression_method == 'Ridge':
-            ridge = Ridge(lmb, fit_intercept=False)
+            ridge = Ridge(lmb, fit_intercept=True)
     
             # loop over trials in order to estimate the expectation value of the MSE
             estimated_mse_folds = cross_val_score(ridge, self.X, self.y,
@@ -305,7 +314,7 @@ class LinRegression:
     
         elif regression_method == 'Lasso':
 
-            lasso = Lasso(lmb, fit_intercept=False, tol=1e-2)
+            lasso = Lasso(lmb, fit_intercept=True, tol=1e-3)
 
             # loop over trials in order to estimate the expectation value of the MSE
             estimated_mse_folds = cross_val_score(lasso, self.X, self.y,
@@ -494,7 +503,7 @@ class LinRegression:
             self.beta = np.linalg.pinv(X_train.T @ X_train + la*I) @ X_train.T @ y_train
         elif self.regression_method == "Lasso":
             
-            RegLasso = linear_model.Lasso(la, fit_intercept=False, max_iter=int(10e3), tol=1e-2)
+            RegLasso = linear_model.Lasso(la, fit_intercept=False, max_iter=int(10e4), tol=1e-3)
 
             RegLasso.fit(X_train, y_train)
             self.beta = RegLasso.coef_
@@ -507,7 +516,12 @@ class LinRegression:
         Function for predicting the output using the trained model
 
         """
-        self.y_pred = self.X @ self.beta
+        if self.scaled is True:
+            if self.scaling_method == "StandardScaling":
+                self.y_pred = self.X @ self.beta + self.y_scaler
+        else:
+            self.y_pred = self.X @ self.beta
+            
 
     def predict_training(self):
         """

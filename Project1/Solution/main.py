@@ -21,7 +21,7 @@ from tqdm import tqdm
 
 if __name__ == '__main__':
 
-    def run_experiment_a_c(regression_method, scaling_method, polynomal_orders, x, y, z=None, lambda_values=None):
+    def run_experiment_a_c(regression_method, scaling_method, polynomal_orders, x, y, remove_intercept, z=None, lambda_values=None):
         """
 
         :param regression_method:
@@ -47,7 +47,7 @@ if __name__ == '__main__':
         summary_df = pd.DataFrame(index=polynomal_orders)
 
         for polyorder in tqdm(polynomal_orders):
-            LinReg = LinRegression(polyorder, x, y, z)  # create class
+            LinReg = LinRegression(polyorder, x, y, z, remove_intercept)  # create class
             LinReg.split_data(1 / 5)  # perform split of data
 
             LinReg.scale(scaling_method=scaling_method)  # Scaling data
@@ -131,9 +131,7 @@ if __name__ == '__main__':
         return bootstrap_df, error_liste, bias_liste, variance_liste
 
     def run_crossval_comparison(regression_method, polynomal_orders, x, y, z, 
-                                k_folds, lambda_values=None):
-    
-        # cross validation
+                                k_folds, lambda_values=None, remove_intercept=False):
     
         # Dataframes to store in own code
         MSE_test_df = pd.DataFrame(index=polynomal_orders)
@@ -156,39 +154,33 @@ if __name__ == '__main__':
             if lambda_values is None:  # OLS
     
                 mean_B_parameters, mean_MSE_test, mean_MSE_train, mean_R2_test, mean_R2_train \
-                    = cross_validation_class.cross_validation_train_model(k, regression_method)
+                    = cross_validation_class.cross_validation_train_model(k_folds, regression_method)
     
                 #optimal_beta_df.loc[polyorder] = list(itertools.chain(mean_B_parameters,
                 #                                                     [np.nan for _ in range(l - len(mean_B_parameters))]))
     
                 MSE_test_df.loc[polyorder, 'OLS'] = mean_MSE_test
                 R2_test_df.loc[polyorder, 'OLS'] = mean_R2_test
-    
-                #scikit_MSE_test_df.loc[polyorder, 'OLS'],  scikit_r2_test_df.loc[polyorder, 'OLS'] \
-                #    = cross_validation_class.scikit_cross_validation_train_model(k, regression_method=regression_method)
-                    
-                scikit_MSE_test_df.loc[polyorder, 'OLS'] = \
-                cross_validation_class.scikit_cross_validation_train_model(k, regression_method=regression_method)[0]
-                scikit_r2_test_df.loc[polyorder, 'OLS'] = cross_validation_class.scikit_cross_validation_train_model(k, regression_method=regression_method)[1]
+
+                MSE, R2 = cross_validation_class.scikit_cross_validation_train_model(k_folds, regression_method=regression_method)
+                scikit_MSE_test_df.loc[polyorder, 'OLS'] = MSE
+                scikit_r2_test_df.loc[polyorder, 'OLS'] = R2
     
     
             else: # Ridge and Lasso
     
                 for la in lambda_values:
                     mean_B_parameters, mean_MSE_test, mean_MSE_train, mean_R2_test, mean_R2_train \
-                        = cross_validation_class.cross_validation_train_model(k, regression_method, lmb=la)
+                        = cross_validation_class.cross_validation_train_model(k_folds, regression_method, lmb=la)
     
                     #optimal_beta_df.loc[polyorder, la] = list(itertools.chain(mean_B_parameters,[np.nan for _ in range(l - len(mean_B_parameters))]))
     
                     MSE_test_df.loc[polyorder, la] = mean_MSE_test
                     R2_test_df.loc[polyorder, la] = mean_R2_test
-    
-                    scikit_MSE_test_df.loc[polyorder, la] = \
-                    cross_validation_class.scikit_cross_validation_train_model(k, regression_method=regression_method, lmb=la)[0]
                     
-                    scikit_r2_test_df.loc[polyorder, la] = \
-                    cross_validation_class.scikit_cross_validation_train_model(k, regression_method=regression_method, lmb=la)[1]
-    
+                    MSE, R2 = cross_validation_class.scikit_cross_validation_train_model(k_folds, regression_method=regression_method, lmb=la)
+                    scikit_MSE_test_df.loc[polyorder, la] = MSE
+                    scikit_r2_test_df.loc[polyorder, la] = R2
     
                 # lag summary
                 optimal_la_MSE = MSE_test_df.loc[polyorder].idxmin()
@@ -200,8 +192,37 @@ if __name__ == '__main__':
     
         return MSE_test_df, R2_test_df, scikit_MSE_test_df , scikit_r2_test_df, summary_df
     
+    
+    def run_crossval_scikit(regression_method, polynomal_orders, x, y, z, 
+                            k_folds, lambda_values=None, remove_intercept=False):
+
+        #Scikit own dataframes to store
+        scikit_MSE_test_df = pd.DataFrame(index=polynomal_orders)
+        scikit_r2_test_df = pd.DataFrame(index=polynomal_orders)
+    
+        for polyorder in polynomal_orders:
+    
+            cross_validation_class = LinRegression(polyorder, x, y, z, remove_intercept)
+    
+            if lambda_values is None:  # OLS
+    
+                MSE, R2 = cross_validation_class.scikit_cross_validation_train_model(k_folds, regression_method=regression_method)
+                scikit_MSE_test_df.loc[polyorder, 'OLS'] = MSE
+                scikit_r2_test_df.loc[polyorder, 'OLS'] = R2
+    
+            else: # Ridge and Lasso
+    
+                for la in lambda_values:
+
+                    MSE, R2 = cross_validation_class.scikit_cross_validation_train_model(k_folds, regression_method=regression_method, lmb=la)
+                    scikit_MSE_test_df.loc[polyorder, la] = MSE
+                    scikit_r2_test_df.loc[polyorder, la] = R2
+    
+        return scikit_MSE_test_df , scikit_r2_test_df
+ 
+    
     def run_own_crossval(regression_method, polynomal_orders, x, y, z, 
-                         k_folds, lambda_values=None):
+                         k_folds, lambda_values=None, remove_intercept=False):
     
         # cross validation
     
@@ -222,7 +243,7 @@ if __name__ == '__main__':
             if lambda_values is None:  # OLS
     
                 mean_B_parameters, mean_MSE_test, mean_MSE_train, mean_R2_test, mean_R2_train \
-                    = cross_validation_class.cross_validation_train_model(k, regression_method, scale_data=True)
+                    = cross_validation_class.cross_validation_train_model(k_folds, regression_method, scale_data=True)
 
                 MSE_test_df.loc[polyorder, 'OLS'] = mean_MSE_test
                 R2_test_df.loc[polyorder, 'OLS'] = mean_R2_test
@@ -234,7 +255,7 @@ if __name__ == '__main__':
                 beta_parameters_list = []
                 for la in lambda_values:
                     mean_B_parameters, mean_MSE_test, mean_MSE_train, mean_R2_test, mean_R2_train \
-                        = cross_validation_class.cross_validation_train_model(k, regression_method, lmb=la, scale_data=True)
+                        = cross_validation_class.cross_validation_train_model(k_folds, regression_method, lmb=la, scale_data=True)
     
                     MSE_test_df.loc[polyorder, la] = mean_MSE_test
                     R2_test_df.loc[polyorder, la] = mean_R2_test
@@ -256,9 +277,10 @@ if __name__ == '__main__':
         return MSE_test_df, R2_test_df, summary_df, optimal_beta_df
 
 
-#%%
-    
-    data_used = "Terrain_2"
+#%% Loading data
+
+    # Choose wich data to use, Franke, Terrain_1 or Terrain_2
+    data_used = "Terrain_1" 
     
     if data_used == "Franke":
         # Set seed and generate random data used for a)-c)
@@ -283,7 +305,7 @@ if __name__ == '__main__':
             # Load the terrain
             terrain = imread(r'DataFiles\SRTM_data_Norway_2.tif')
         
-        N = 1000 # Number of datapoints to use in each direction
+        N = 100 # Number of datapoints to use in each direction
         #N = 10000
         
         # Creating the data set
@@ -295,6 +317,7 @@ if __name__ == '__main__':
         
         z = terrain[:N, :N].ravel() #.reshape(-1, 1)  # Changing z from matrix to vector
         
+        # Choosing random points
         # x = np.random.randint(0, 1000, N)
         # y = np.random.randint(0, 1000, N)
         # z = terrain[x, y]
@@ -304,18 +327,32 @@ if __name__ == '__main__':
         # Show the terrain
         plt.figure()
         #plt.title('Terrain over Norway')
-        plt.imshow(terrain, cmap='gray')
-        #plt.imshow(terrain[:N, :N], cmap='gray')
+        #plt.imshow(terrain, cmap='gray')
+        plt.imshow(terrain[:N, :N], cmap='gray')
         plt.xlabel('X')
         plt.ylabel('Y')
         plt.savefig("Showing_terrain_{data_used}")
         plt.show()
+        
+        z2 = z.reshape(terrain[:N, :N].shape)
+        
+        plt.figure()
+        #plt.title('Terrain over Norway')
+        #plt.imshow(terrain, cmap='gray')
+        plt.imshow(z2, cmap='gray')
+        plt.xlabel('X')
+        plt.ylabel('Y')
+        plt.savefig("Showing_terrain_{data_used}")
+        plt.show()
+        
+    nlambdas = 5
+    lambdas = np.logspace(-5, 1, nlambdas)
+
+    polynomal_orders = [4, 5]
       
 #%%
     # Solution to exercise a)
-
     print('\n ###### Task A) \n')
-    polynomal_orders = [1, 2, 3, 4, 5]
 
     (MSE_train_df_OLS,
      MSE_test_df_OLS,
@@ -327,6 +364,7 @@ if __name__ == '__main__':
                                           polynomal_orders=polynomal_orders,
                                           x=x,
                                           y=y,
+                                          remove_intercept=False,
                                           z=z)
 
     print(MSE_test_df_OLS)
@@ -339,12 +377,62 @@ if __name__ == '__main__':
     plots_task_1a.plot_R2_scores(save_filename=f"task_a_R2_OLS_{data_used}")
     plots_task_1a.plot_betaparams_polynomial_order(save_filename=f"task_a_betas_OLS_{data_used}_N{N}")
 
+#%%  Making example plot of original terrain data and predicted terrain data
+
+    LinReg = LinRegression(5, x, y, z, False)  # create class
+    LinReg.split_data(1 / 5)  # perform split of data
+
+    LinReg.scale(scaling_method="StandardScaling")  # Scaling data
+    LinReg.train_model(train_on_scaled=True,
+                       regression_method="OLS")
+
+    LinReg.predict()
+    
+    z_predicted = LinReg.y_pred
+    z_predicted_matrix = z_predicted.reshape(terrain[:N, :N].shape)
+    z_diff = z_predicted_matrix - terrain[:N, :N]
+    
+    # Finding the minimum and maximum values for both predicted and original data
+    vmin = min([z_predicted_matrix.min(), terrain[:N, :N].min()])
+    vmax = max([z_predicted_matrix.max(), terrain[:N, :N].max()])
+
+    colormap = 'viridis'
+    
+    # Plot of original data
+    plt.figure()
+    # Use this if you want the same colorbar for both plots:
+    #plt.imshow(terrain[:N, :N], cmap=colormap, vmin=vmin, vmax=vmax)
+    # Use this is you want different colorbar for both plots:
+    plt.imshow(terrain[:N, :N], cmap=colormap)
+    plt.colorbar()
+    plt.xlabel('X')
+    plt.ylabel('Y')
+    #plt.savefig("Showing_terrain_{data_used}")
+    plt.show()
+    
+    # Plot of predicted data
+    plt.figure()
+    #plt.imshow(z_predicted_matrix, cmap=colormap, vmin=vmin, vmax=vmax) 
+    plt.imshow(z_predicted_matrix, cmap=colormap)
+    plt.colorbar()
+    plt.xlabel('X')
+    plt.ylabel('Y')
+    #plt.savefig("Showing_terrain_{data_used}")
+    plt.show()
+    
+    # Plot of difference
+    plt.figure()
+    plt.imshow(z_diff, cmap=colormap)
+    plt.colorbar()
+    plt.xlabel('X')
+    plt.ylabel('Y')
+    #plt.savefig("Showing_terrain_{data_used}")
+    plt.show()
+
+    
+
 # %%
     print('\n #### Task b) #### \n')
-    nlambdas = 100
-    lambdas = np.logspace(-5, 1, nlambdas)
-
-    polynomal_orders = [1, 2, 3, 4, 5]
 
     (MSE_train_df_ridge,
      MSE_test_df_ridge,
@@ -357,6 +445,7 @@ if __name__ == '__main__':
                                             lambda_values=lambdas,
                                             x=x,
                                             y=y,
+                                            remove_intercept=True,
                                             z=z)
     print(MSE_test_df_ridge)
     print(R2_test_df_ridge)
@@ -386,11 +475,6 @@ if __name__ == '__main__':
     #%%
     print('\n #### Task c) #### \n')
 
-    nlambdas = 100
-    lambdas = np.logspace(-5, 1, nlambdas)
-
-    polynomal_orders = [1, 2, 3, 4, 5]
-
     (MSE_train_df_lasso,
      MSE_test_df_lasso,
      R2_train_df_lasso,
@@ -402,6 +486,7 @@ if __name__ == '__main__':
                                             lambda_values=lambdas,
                                             x=x,
                                             y=y,
+                                            remove_intercept=True,
                                             z=z)
     print(MSE_test_df_lasso)
     print(R2_test_df_lasso)
@@ -490,19 +575,20 @@ if __name__ == '__main__':
     for k in range(5, 11):
 
         MSE_test_df, R2_test_df, summary_df, optimal_beta_df = run_own_crossval(
-            regression_method='OLS', polynomal_orders=[poly_order], x=x, y=y, z=z, k_folds=k)
+            regression_method='OLS', polynomal_orders=[poly_order], x=x, y=y, z=z, k_folds=k,
+            remove_intercept=False)
 
         MSE_OLS.append(MSE_test_df['OLS'].to_list())
 
         MSE_test_df_Ridge, R2_test_df_Ridge, summary_df, optimal_beta_df = run_own_crossval(
             regression_method='Ridge', polynomal_orders=[poly_order], x=x, y=y, z=z, k_folds=k,
-            lambda_values=[lambda_ridge])  # fant denne gjennom å søke etter optimal lambda
+            lambda_values=[lambda_ridge], remove_intercept=True)  
 
         MSE_Ridge.append(MSE_test_df_Ridge[lambda_ridge].to_list())
 
         MSE_test_df_Lasso, R2_test_df_Lasso, summary_df, optimal_beta_df = run_own_crossval(
             regression_method='Lasso', polynomal_orders=[poly_order], x=x, y=y, z=z, k_folds=k,
-            lambda_values=[lambda_lasso])  # hadde ikke tid til å kjøre for lasso, så fant ikke optimal lambda
+            lambda_values=[lambda_lasso], remove_intercept=True)  
 
         MSE_Lasso.append(MSE_test_df_Lasso[lambda_lasso].to_list())
 
@@ -522,20 +608,16 @@ if __name__ == '__main__':
     print('\n #### Task f) part three - using cross validation to find best model #### \n')
     
     k = 5  # Number of k-folds to use
-    max_polydegree = 5  # Maximum polynomial degree
-    polynomal_orders = [degree for degree in range(1, max_polydegree+1)]
-    
+
     # OLS
     MSE_test_df_OLS, R2_test_df_OLS, summary_df_OLS, betas_OLS = run_own_crossval(
-        regression_method='OLS', polynomal_orders=polynomal_orders, x=x, y=y, z=z, k_folds=k)
+        regression_method='OLS', polynomal_orders=polynomal_orders, x=x, y=y, z=z, k_folds=k,
+        remove_intercept=False)
     
-    # Lambdas for run through with ridge and lasso
-    nlambdas = 100
-    lambdas = np.logspace(-5, 1, nlambdas)
-
     # Hente ut data for å plotte Ridge
     MSE_test_df_Ridge, R2_test_df_Ridge, summary_df_Ridge, betas_ridge = run_own_crossval(
-        regression_method='Ridge', polynomal_orders=polynomal_orders, x=x, y=y, z=z, k_folds=k, lambda_values=lambdas)
+        regression_method='Ridge', polynomal_orders=polynomal_orders, x=x, y=y, z=z, k_folds=k, 
+        lambda_values=lambdas, remove_intercept=True)
 
     print('-----------   Ridge --------------')
     print(MSE_test_df_Ridge)
@@ -546,7 +628,8 @@ if __name__ == '__main__':
 
 
     MSE_test_df_Lasso, R2_test_df_Lasso, summary_df_Lasso, betas_Lasso = run_own_crossval(
-        regression_method='Lasso', polynomal_orders=polynomal_orders, x=x, y=y, z=z, k_folds=k, lambda_values=lambdas)
+        regression_method='Lasso', polynomal_orders=polynomal_orders, x=x, y=y, z=z, k_folds=k, 
+        lambda_values=lambdas, remove_intercept=True)
 
     print('-----------   Lasso --------------')
     print(MSE_test_df_Lasso)
@@ -589,7 +672,8 @@ if __name__ == '__main__':
     plt.show()
 
 
-# %%
+# %% Looking at bias/variance tradeoff using bootstrap
+
     print('\n #### Task e) #### \n')
     
     if data_used == "Franke":
@@ -603,7 +687,7 @@ if __name__ == '__main__':
         z = FrankeFunction(x, y) + np.random.normal(0, 0.1, x.shape)
 
     # First reproduce figure similar figure 2.11 in hastie
-    max_polydegree = 15
+    max_polydegree = 10
     polynomal_orders = [degree for degree in range(1, max_polydegree+1)]
     
     (MSE_train_df_OLS,
@@ -616,6 +700,7 @@ if __name__ == '__main__':
                                           polynomal_orders=polynomal_orders,
                                           x=x,
                                           y=y,
+                                          remove_intercept=False,
                                           z=z)
     
     plots_task_1e = Plotting(polynomal_orders, MSE_test_df_OLS, 
@@ -646,7 +731,7 @@ if __name__ == '__main__':
     save_fig(f"task_e_bias_variance_{data_used}_N{N}")
     plt.show()
 
-
+#%%
 
     print('\n #### Task f) part one - comparison of cross validation and bootstrap #### \n')
     """
