@@ -280,7 +280,7 @@ if __name__ == '__main__':
 #%% Loading data
 
     # Choose wich data to use, Franke, Terrain_1 or Terrain_2
-    data_used = "Terrain_1" 
+    data_used = "Franke" 
     
     if data_used == "Franke":
         # Set seed and generate random data used for a)-c)
@@ -348,7 +348,7 @@ if __name__ == '__main__':
     nlambdas = 5
     lambdas = np.logspace(-5, 1, nlambdas)
 
-    polynomal_orders = [4, 5]
+    polynomal_orders = [1, 2, 3, 4, 5]
       
 #%%
     # Solution to exercise a)
@@ -732,15 +732,11 @@ if __name__ == '__main__':
     plt.show()
 
 #%%
-
     print('\n #### Task f) part one - comparison of cross validation and bootstrap #### \n')
     """
     Plot for model complexity on x axis, MSE on y_axis. bootstrap, cross validation
-    and own code is included as lines. FIrst for OLS and k = 5,8 and 10
+    and own code is included as lines. FIrst for OLS and k = 5 and 10
     """
-    
-    #max_polydegree_cv = 10
-    #polynomal_orders = [degree for degree in range(1, max_polydegree_cv+1)]
 
     # Hente ut data for å plotte OLS
     MSE_test_df, R2_test_df, scikit_MSE_test_df, scikit_r2_test_df, summary_df = run_crossval_comparison(
@@ -759,23 +755,6 @@ if __name__ == '__main__':
 
     # Hente ut data for å plotte OLS
     MSE_test_df, R2_test_df, scikit_MSE_test_df, scikit_r2_test_df, summary_df = run_crossval_comparison(
-        regression_method='OLS', polynomal_orders=polynomal_orders, x=x, y=y, z=z, k_folds=8)
-
-    plt.figure()
-    plt.title('kfold of 8, OLS')
-    plt.xlabel('Model complexity')
-    plt.ylabel('Mean Square Error (MSE)')
-    plt.plot(polynomal_orders, error_liste, 'r', label='Bootstrapping')
-    plt.plot(polynomal_orders, MSE_test_df, 'b',
-             label='Own code cross validation')  # mse test was run on k = 5
-    plt.plot(polynomal_orders, scikit_MSE_test_df, 'g',
-             label='Scikit cross validation')  # mse scikit was run on k = 5
-    plt.legend()
-    save_fig(f"task_f_bootstrap_crossval_comparison_kfold5_{data_used}_N{N}")
-    plt.show()
-
-    # Hente ut data for å plotte OLS
-    MSE_test_df, R2_test_df, scikit_MSE_test_df, scikit_r2_test_df, summary_df = run_crossval_comparison(
         regression_method='OLS', polynomal_orders=polynomal_orders, x=x, y=y, z=z, k_folds=10)
 
     plt.figure()
@@ -788,6 +767,6 @@ if __name__ == '__main__':
     plt.plot(polynomal_orders, scikit_MSE_test_df, 'g',
              label='Scikit cross validation')  # mse scikit was run on k = 5
     plt.legend()
-    save_fig(f"task_f_bootstrap_crossval_comparison_kfold5_{data_used}_N{N}")
+    save_fig(f"task_f_bootstrap_crossval_comparison_kfold10_{data_used}_N{N}")
     plt.show()
 

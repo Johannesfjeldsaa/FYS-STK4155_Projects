@@ -314,7 +314,7 @@ class LinRegression:
     
         elif regression_method == 'Lasso':
 
-            lasso = Lasso(lmb, fit_intercept=True, tol=1e-3)
+            lasso = Lasso(lmb, fit_intercept=True, max_iter=int(10e4), tol=1e-3)
 
             # loop over trials in order to estimate the expectation value of the MSE
             estimated_mse_folds = cross_val_score(lasso, self.X, self.y,
