@@ -345,7 +345,7 @@ if __name__ == '__main__':
         plt.savefig("Showing_terrain_{data_used}")
         plt.show()
         
-    nlambdas = 5
+    nlambdas = 6
     lambdas = np.logspace(-5, 1, nlambdas)
 
     polynomal_orders = [1, 2, 3, 4, 5]
@@ -378,6 +378,7 @@ if __name__ == '__main__':
     plots_task_1a.plot_betaparams_polynomial_order(save_filename=f"task_a_betas_OLS_{data_used}_N{N}")
 
 #%%  Making example plot of original terrain data and predicted terrain data
+# Only run for terrain data
 
     LinReg = LinRegression(5, x, y, z, False)  # create class
     LinReg.split_data(1 / 5)  # perform split of data
@@ -507,7 +508,7 @@ if __name__ == '__main__':
     plots_task_1c.plot_MSE_some_lambdas(lambdas_to_plot=lambdas[idx_to_plot],
                                         save_filename=f"task_c_MSE_some_lambdas_lasso_{data_used}_N{N}")
     
-    plots_task_1c.plot_betaparams_polynomial_order(save_filename=f"task_b_optimal_betas_lasso_{data_used}_N{N}")
+    plots_task_1c.plot_betaparams_polynomial_order(save_filename=f"task_c_optimal_betas_lasso_{data_used}_N{N}")
     
     
 #%% Making summary plots for task a) through c)
@@ -533,7 +534,7 @@ if __name__ == '__main__':
     plt.ylabel("Mean Squared Error")
     plt.xlabel("Polynomial degree")
     plt.legend()
-    save_fig(f"MSE_all_methods_{data_used}_N{N}")
+    save_fig(f"task_a_to_c_MSE_all_methods_{data_used}_N{N}")
     plt.show()
     
     
@@ -550,7 +551,7 @@ if __name__ == '__main__':
     plt.ylabel(r"R$^2$")
     plt.xlabel("Polynomial degree")
     plt.legend()
-    save_fig(f"R2_all_methods_{data_used}_N{N}")
+    save_fig(f"task_a_to_c_R2_all_methods_{data_used}_N{N}")
     plt.show()
 
 
@@ -565,6 +566,7 @@ if __name__ == '__main__':
     poly_order = 5
     # For polynomial order of 10, k fold = 5-10
     
+    # Using the optimal found in b) and c)
     lambda_ridge = 1e-5
     lambda_lasso = 1e-5
 
@@ -651,7 +653,7 @@ if __name__ == '__main__':
     plt.ylabel("Mean Squared Error")
     plt.xlabel("Polynomial degree")
     plt.legend()
-    save_fig(f"MSE_all_methods_with_crossval_{data_used}_N{N}")
+    save_fig(f"task_f_MSE_all_methods_with_crossval_{data_used}_N{N}")
     plt.show()
     
     
@@ -668,7 +670,7 @@ if __name__ == '__main__':
     plt.ylabel(r"R$^2$")
     plt.xlabel("Polynomial degree")
     plt.legend()
-    save_fig(f"R2_all_methods_with_crossval_{data_used}_N{N}")
+    save_fig(f"task_f_R2_all_methods_with_crossval_{data_used}_N{N}")
     plt.show()
 
 
@@ -676,18 +678,8 @@ if __name__ == '__main__':
 
     print('\n #### Task e) #### \n')
     
-    if data_used == "Franke":
-        
-        # Lowering amount of datapoints to better see bias/variance tradeoff
-        N = 500
-        x = np.sort(np.random.uniform(0, 1, N))
-        y = np.sort(np.random.uniform(0, 1, N))
-        
-        # With noise:
-        z = FrankeFunction(x, y) + np.random.normal(0, 0.1, x.shape)
-
     # First reproduce figure similar figure 2.11 in hastie
-    max_polydegree = 10
+    max_polydegree = 50
     polynomal_orders = [degree for degree in range(1, max_polydegree+1)]
     
     (MSE_train_df_OLS,
@@ -711,14 +703,15 @@ if __name__ == '__main__':
 
     # Make plot to show bias variance analysis of only OLS regression, making own function for
     # bootstrapping and cross validation
-
+    
     n_boostraps = 100
     
     bootstrap_df, error_liste, bias_liste, variance_liste  = \
         run_bootstrap(regression_method='OLS', polynomal_orders=polynomal_orders, x=x, y=y, z=z, n_boostraps=n_boostraps)
 
     print(bootstrap_df)
-
+    bootstrap_df.to_csv(rf"Results\task_e_bootstrap_results{data_used}_N{N}.csv")
+    
     # Plot the bias variance analysis (e)
 
     plt.figure()
@@ -737,6 +730,14 @@ if __name__ == '__main__':
     Plot for model complexity on x axis, MSE on y_axis. bootstrap, cross validation
     and own code is included as lines. FIrst for OLS and k = 5 and 10
     """
+    
+    max_polydegree = 10
+    polynomal_orders = [degree for degree in range(1, max_polydegree+1)]
+
+    n_boostraps = 100
+    
+    bootstrap_df, error_liste, bias_liste, variance_liste  = \
+        run_bootstrap(regression_method='OLS', polynomal_orders=polynomal_orders, x=x, y=y, z=z, n_boostraps=n_boostraps)
 
     # Hente ut data for å plotte OLS
     MSE_test_df, R2_test_df, scikit_MSE_test_df, scikit_r2_test_df, summary_df = run_crossval_comparison(
