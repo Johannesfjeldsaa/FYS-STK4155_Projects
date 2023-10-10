@@ -258,7 +258,7 @@ if __name__ == '__main__':
 
 #%%
     
-    data_used = "Terrain_1"
+    data_used = "Terrain_2"
     
     if data_used == "Franke":
         # Set seed and generate random data used for a)-c)
