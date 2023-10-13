@@ -280,7 +280,7 @@ if __name__ == '__main__':
 #%% Loading data
 
     # Choose wich data to use, Franke, Terrain_1 or Terrain_2
-    data_used = "Terrain_1"
+    data_used = "Franke"
     
     if data_used == "Franke":
         # Set seed and generate random data used for a)-c)
@@ -329,17 +329,6 @@ if __name__ == '__main__':
         #plt.title('Terrain over Norway')
         #plt.imshow(terrain, cmap='gray')
         plt.imshow(terrain[:N, :N], cmap='gray')
-        plt.xlabel('X')
-        plt.ylabel('Y')
-        plt.savefig("Showing_terrain_{data_used}")
-        plt.show()
-        
-        z2 = z.reshape(terrain[:N, :N].shape)
-        
-        plt.figure()
-        #plt.title('Terrain over Norway')
-        #plt.imshow(terrain, cmap='gray')
-        plt.imshow(z2, cmap='gray')
         plt.xlabel('X')
         plt.ylabel('Y')
         plt.savefig("Showing_terrain_{data_used}")
