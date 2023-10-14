@@ -280,7 +280,7 @@ if __name__ == '__main__':
 #%% Loading data
 
     # Choose wich data to use, Franke, Terrain_1 or Terrain_2
-    data_used = "Franke"
+    data_used = "Terrain_1"
     
     if data_used == "Franke":
         # Set seed and generate random data used for a)-c)
@@ -397,7 +397,7 @@ if __name__ == '__main__':
     plt.colorbar()
     plt.xlabel('X')
     plt.ylabel('Y')
-    #plt.savefig("Showing_terrain_{data_used}")
+    plt.savefig("Showing_terrain_true_{data_used}")
     plt.show()
     
     # Plot of predicted data
@@ -407,7 +407,7 @@ if __name__ == '__main__':
     plt.colorbar()
     plt.xlabel('X')
     plt.ylabel('Y')
-    #plt.savefig("Showing_terrain_{data_used}")
+    plt.savefig("Showing_terrain_predicted_{data_used}")
     plt.show()
     
     # Plot of difference
