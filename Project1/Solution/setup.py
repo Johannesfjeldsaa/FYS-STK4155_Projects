@@ -1,4 +1,5 @@
 import os
+import matplotlib.pyplot as plt
 
 ### Where to save the figures and data files ###
 

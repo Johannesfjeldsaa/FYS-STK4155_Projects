@@ -21,13 +21,16 @@ if __name__ == '__main__':
     ax = fig.add_subplot(111, projection='3d')
 
     # Make data.
-    x = np.arange(0, 1, 0.05)
-    y = np.arange(0, 1, 0.05)
+    np.random.seed(2500)
+
+    N = 1000
+    x = np.sort(np.random.uniform(0, 1, N))
+    y = np.sort(np.random.uniform(0, 1, N))
     x, y = np.meshgrid(x,y)
+    # With noise:
+    z = FrankeFunction(x, y) + np.random.normal(0, 0.1, x.shape)
 
 
-
-    z = FrankeFunction(x, y)
     # Plot the surface.
     surf = ax.plot_surface(x, y, z, cmap=cm.coolwarm,
                            linewidth=0, antialiased=False)
@@ -38,5 +41,6 @@ if __name__ == '__main__':
 
     # Add a color bar which maps values to colors.
     fig.colorbar(surf, shrink=0.5, aspect=5)
+    plt.savefig("Frankefunction with noise.png")
     plt.show()
     
