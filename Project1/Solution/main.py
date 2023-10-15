@@ -18,9 +18,9 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 
  
-
+#%%
 if __name__ == '__main__':
-
+#%%
     def run_experiment_a_c(regression_method, scaling_method, polynomal_orders, x, y, remove_intercept, z=None, lambda_values=None):
         """
 
@@ -681,7 +681,7 @@ if __name__ == '__main__':
     # First reproduce figure similar figure 2.11 in hastie
     max_polydegree = 50
     polynomal_orders = [degree for degree in range(1, max_polydegree+1)]
-    
+    d
     (MSE_train_df_OLS,
      MSE_test_df_OLS,
      R2_train_df_OLS,
