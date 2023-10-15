@@ -334,17 +334,6 @@ if __name__ == '__main__':
         plt.savefig("Showing_terrain_{data_used}")
         plt.show()
         
-        z2 = z.reshape(terrain[:N, :N].shape)
-        
-        plt.figure()
-        #plt.title('Terrain over Norway')
-        #plt.imshow(terrain, cmap='gray')
-        plt.imshow(z2, cmap='gray')
-        plt.xlabel('X')
-        plt.ylabel('Y')
-        plt.savefig("Showing_terrain_{data_used}")
-        plt.show()
-        
     nlambdas = 6
     lambdas = np.logspace(-5, 1, nlambdas)
 
@@ -408,7 +397,7 @@ if __name__ == '__main__':
     plt.colorbar()
     plt.xlabel('X')
     plt.ylabel('Y')
-    #plt.savefig("Showing_terrain_{data_used}")
+    plt.savefig("Showing_terrain_true_{data_used}")
     plt.show()
     
     # Plot of predicted data
@@ -418,7 +407,7 @@ if __name__ == '__main__':
     plt.colorbar()
     plt.xlabel('X')
     plt.ylabel('Y')
-    #plt.savefig("Showing_terrain_{data_used}")
+    plt.savefig("Showing_terrain_predicted_{data_used}")
     plt.show()
     
     # Plot of difference
