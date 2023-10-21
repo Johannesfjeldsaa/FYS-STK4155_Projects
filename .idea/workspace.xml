@@ -4,55 +4,50 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4639979f-4ba4-4aa2-93b7-de8989866feb" name="Changes" comment="Ines forsøk på oppg 1a.">
-      <change beforePath="$PROJECT_DIR$/.idea/FYS-STK4155_Projects.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/FYS-STK4155_Projects.iml" afterDir="false" />
+    <list default="true" id="42a9051a-3109-457c-b14a-9878631735af" name="Changes" comment="fixing learning rate placement, so that it is only if no optimization given that the learning rate follow a linearly decaying rate.">
+      <change afterPath="$PROJECT_DIR$/Project 2/GD_plain_momentum.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project1/oppg_a_Ine.py" beforeDir="false" afterPath="$PROJECT_DIR$/Project1/oppg_a_Ine.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project 2/SGD_with_momentum.py" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/GD_and_SGD.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project 2/setup_run_SGD.py" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/setup_run_SGD.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="Jupyter Notebook" />
-      </list>
-    </option>
-  </component>
   <component name="Git.Settings">
-    <option name="RECENT_BRANCH_BY_REPOSITORY">
-      <map>
-        <entry key="$PROJECT_DIR$" value="Ine" />
-      </map>
-    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectId" id="2VE2w8CyGOzG1PCThdPXqJnpt8r" />
-  <component name="ProjectViewState">
-    <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showLibraryContents" value="true" />
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
   </component>
-  <component name="PropertiesComponent">
-    <property name="WebServerToolWindowFactoryState" value="false" />
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "last_opened_file_path": "C:/Users/inepr/Desktop/FYS-STK4155_Projects/Project 2",
+    "node.js.selected.package.tslint": "(autodetect)"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\inepr\Desktop\FYS-STK4155_Projects\Project 2" />
+    </key>
   </component>
   <component name="RunManager">
-    <configuration name="oppg_a_Ine" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="setup_run_SGD" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="FYS-STK4155_Projects" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="C:\Users\inepr\miniconda3\envs\inf200\python.exe" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Project1" />
-      <option name="IS_MODULE_SDK" value="false" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Project 2" />
+      <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Project1/oppg_a_Ine.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Project 2/setup_run_SGD.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -63,87 +58,54 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.oppg_a_Ine" />
+        <item itemvalue="Python.setup_run_SGD" />
       </list>
     </recent_temporary>
   </component>
-  <component name="ShelveChangesManager" show_recycled="true" />
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
-    <task active="true" id="Default" summary="Default task">
-      <changelist id="4639979f-4ba4-4aa2-93b7-de8989866feb" name="Changes" comment="" />
-      <created>1694387161602</created>
-      <option name="number" value="Default" />
-      <option name="presentableId" value="Default" />
-      <updated>1694387161602</updated>
-      <workItem from="1694387166341" duration="186000" />
-      <workItem from="1694387406950" duration="1074000" />
-      <workItem from="1694435330312" duration="419000" />
-      <workItem from="1694436734882" duration="687000" />
-      <workItem from="1694499263346" duration="519000" />
-      <workItem from="1694504019446" duration="190000" />
-      <workItem from="1695037809119" duration="613000" />
-    </task>
-    <task id="LOCAL−00001" summary="Ines forsøk på oppg 1a.">
-      <created>1695028037438</created>
+    <task id="LOCAL−00001" summary="python file for running trhough the class">
+      <option name="closed" value="true" />
+      <created>1697886055165</created>
       <option name="number" value="LOCAL−00001" />
       <option name="presentableId" value="LOCAL−00001" />
-      <updated>1695028037438</updated>
+      <updated>1697886055165</updated>
     </task>
-    <task id="LOCAL−00002" summary="Ines forsøk på oppg 1a.">
-      <created>1695038472644</created>
+    <task id="LOCAL−00002" summary="updating">
+      <option name="closed" value="true" />
+      <created>1697886200046</created>
       <option name="number" value="LOCAL−00002" />
       <option name="presentableId" value="LOCAL−00002" />
-      <updated>1695038472644</updated>
+      <updated>1697886200046</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL−00003" summary="fixing learning rate placement, so that it is only if no optimization given that the learning rate follow a linearly decaying rate.">
+      <option name="closed" value="true" />
+      <created>1697886655899</created>
+      <option name="number" value="LOCAL−00003" />
+      <option name="presentableId" value="LOCAL−00003" />
+      <updated>1697886655899</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
-  <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="3" />
-  </component>
-  <component name="Vcs.Log.Tabs.Properties">
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State>
-              <option name="FILTERS">
-                <map>
-                  <entry key="branch">
-                    <value>
-                      <list>
-                        <option value="Ine" />
-                      </list>
-                    </value>
-                  </entry>
-                </map>
-              </option>
-            </State>
-          </value>
-        </entry>
-      </map>
-    </option>
-    <option name="oldMeFiltersMigrated" value="true" />
-  </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Ines forsøk på oppg 1a." />
-    <option name="LAST_COMMIT_MESSAGE" value="Ines forsøk på oppg 1a." />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Project1/oppg_a_Ine.py</url>
-          <line>197</line>
-          <option name="timeStamp" value="9" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <MESSAGE value="suggestion for code to be made into a SGD class ( have all the momentum mehtods)" />
+    <MESSAGE value="python file for running trhough the class" />
+    <MESSAGE value="updating" />
+    <MESSAGE value="fixing learning rate placement, so that it is only if no optimization given that the learning rate follow a linearly decaying rate." />
+    <option name="LAST_COMMIT_MESSAGE" value="fixing learning rate placement, so that it is only if no optimization given that the learning rate follow a linearly decaying rate." />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$oppg_a_Ine.coverage" NAME="oppg_a_Ine Coverage Results" MODIFIED="1695031791373" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1" />
+    <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$Task_a.coverage" NAME="Task a Coverage Results" MODIFIED="1695126851409" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
+    <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$.coverage" NAME=" Coverage Results" MODIFIED="1695536375181" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
+    <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$setup_run_SGD.coverage" NAME="setup_run_SGD Coverage Results" MODIFIED="1697886587681" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project 2" />
+    <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$oppg_e_test.coverage" NAME="oppg_e_test Coverage Results" MODIFIED="1696243330976" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
+    <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$main.coverage" NAME="main Coverage Results" MODIFIED="1696920058399" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$Franke_function.coverage" NAME="Franke_function Coverage Results" MODIFIED="1694978769837" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
-    <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$Task_a.coverage" NAME="Task a Coverage Results" MODIFIED="1695024978476" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
+    <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$test_in_1D.coverage" NAME="test_in_1D Coverage Results" MODIFIED="1695054533157" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
+    <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$test.coverage" NAME="test Coverage Results" MODIFIED="1695054050471" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
+    <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$oppg_e_f.coverage" NAME="oppg_e_f Coverage Results" MODIFIED="1696942381523" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
+    <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$oppg_f.coverage" NAME="oppg_f Coverage Results" MODIFIED="1695995427966" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
+    <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$oppg_f_test__1_.coverage" NAME="oppg_f_test (1) Coverage Results" MODIFIED="1696941980713" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
+    <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$oppg_a_Ine.coverage" NAME="oppg_a_Ine Coverage Results" MODIFIED="1695031791373" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1" />
   </component>
 </project>

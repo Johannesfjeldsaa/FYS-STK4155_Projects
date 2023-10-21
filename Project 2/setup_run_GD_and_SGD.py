@@ -1,8 +1,8 @@
 import numpy as np
 from LinRegression import LinRegression
-from SGD_with_momentum import SGD
+from GD_and_SGD import GD, SGD
 
-## Want to try setup with Ridge and "Normal momentum"
+## set up data
 
 np.random.seed(1997)
 n = 1000
@@ -31,11 +31,23 @@ H_ols = (2.0/n) * linreg.X.T @ linreg.X
 EigValues_ols, _ = np.linalg.eig(H_ols)
 EigValues_ridge, _ = np.linalg.eig(H_ridge)
 
-
-beta = SGD(linreg.X, linreg.y, batch_size, n_epochs, initial_step, momentum, regression_method='OLS')
+#orig beta values for comparison
 XT_X = linreg.X.T @ linreg.X
 Id = n*lambd* np.eye(XT_X.shape[0])  #identitetsmatrise
 beta_ridge = np.linalg.inv(XT_X+Id) @ linreg.X.T @ y
 beta_ols = np.linalg.inv(linreg.X.T @ linreg.X) @ linreg.X.T @ y
+
+
+## Want to try GD setup without momentum
+
+beta_GD = GD(linreg.X, linreg.y, initial_step, n_epochs, tol, regression_method='OLS')
+print(beta_GD)
+print(beta_ridge)
+
+
+
+## Want to try SGD setup with Ridge and "Normal momentum"
+beta = SGD(linreg.X, linreg.y, batch_size, n_epochs, initial_step, momentum, tol, regression_method='OLS')
+
 print(beta)
-print(beta_ols)
+
