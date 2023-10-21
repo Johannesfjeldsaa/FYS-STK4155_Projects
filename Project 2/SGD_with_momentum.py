@@ -34,6 +34,7 @@ def SGD(X, y, batch_size, n_epochs, initial_step, momentum, regression_method=No
         new_learning_rate = (1-alpha)*initial_step+ alpha*initial_step*0.01  # E_t should be set to 1 % of initial guess
         return new_learning_rate
 
+    step_size = initial_step #for adam, adagrad and RMSprop where they are tuning learning rate inside optimization
     change_vector = np.zeros((p, 1))  # initiate vector used for computing change in beta
 
     # step_size = initial_step_guess no in use
@@ -61,9 +62,8 @@ def SGD(X, y, batch_size, n_epochs, initial_step, momentum, regression_method=No
             else:
                 raise Exception('no valid regression_method given!')
 
-            step_size = learning_schedule(k=epoch * num_batch + i)  # linearly decaying learning rate (as described in Goodfellow)
-
             if optimization is None:
+                step_size = learning_schedule(k=epoch * num_batch + i)  # linearly decaying learning rate (as described in Goodfellow)
                 change_vector = -step_size * gradient + momentum * change_vector
 
             elif optimization == "adagrad":

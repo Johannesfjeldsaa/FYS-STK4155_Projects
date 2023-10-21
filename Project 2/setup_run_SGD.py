@@ -32,7 +32,7 @@ EigValues_ols, _ = np.linalg.eig(H_ols)
 EigValues_ridge, _ = np.linalg.eig(H_ridge)
 
 
-beta = SGD(linreg.X, linreg.y, batch_size, n_epochs, initial_step, momentum, regression_method='OLS', optimization='adam', rho1=0.1, rho2=0.2)
+beta = SGD(linreg.X, linreg.y, batch_size, n_epochs, initial_step, momentum, regression_method='OLS')
 XT_X = linreg.X.T @ linreg.X
 Id = n*lambd* np.eye(XT_X.shape[0])  #identitetsmatrise
 beta_ridge = np.linalg.inv(XT_X+Id) @ linreg.X.T @ y
