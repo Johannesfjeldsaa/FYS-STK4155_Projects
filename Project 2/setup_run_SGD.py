@@ -1,3 +1,7 @@
+import numpy as np
+from LinRegression import LinRegression
+from SGD_with_momentum import SGD
+
 ## Want to try setup with Ridge and "Normal momentum"
 
 np.random.seed(1997)
