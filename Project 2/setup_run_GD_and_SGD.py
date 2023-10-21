@@ -1,6 +1,7 @@
 import numpy as np
 from LinRegression import LinRegression
-from GD_and_SGD import GD, SGD
+from GD_and_SGD_analytical import GD, SGD
+from GD_and_SGD_AD import AD_GD, AD_SGD
 
 ## set up data
 
@@ -41,13 +42,24 @@ beta_ols = np.linalg.inv(linreg.X.T @ linreg.X) @ linreg.X.T @ y
 ## Want to try GD setup without momentum
 
 beta_GD = GD(linreg.X, linreg.y, initial_step, n_epochs, tol, regression_method='OLS')
-print(beta_GD)
-print(beta_ridge)
 
 
 
 ## Want to try SGD setup with Ridge and "Normal momentum"
 beta = SGD(linreg.X, linreg.y, batch_size, n_epochs, initial_step, momentum, tol, regression_method='OLS')
 
-print(beta)
 
+
+# trying AD with GD momentum ols
+
+beta_AD_mom = AD_GD(linreg.X, linreg.y, initial_step, max_iter, tol, regression_method='OLS', momentum=momentum, optimization='momentum')
+beta_AD_no_mom = AD_GD(linreg.X, linreg.y, initial_step, max_iter, tol, regression_method='OLS')
+
+print(beta_AD_mom)
+
+# SGD ols momentum
+beta_AD_SGD = AD_SGD(linreg.X, linreg.y, batch_size, n_epochs, initial_step, momentum, tol, regression_method='OLS', optimization='momentum')
+print(beta_AD_SGD)
+
+
+print(beta_ols)
