@@ -4,14 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="42a9051a-3109-457c-b14a-9878631735af" name="Changes" comment="adding momentum and improving codegrid serach class, now contains 1 function">
-      <change afterPath="$PROJECT_DIR$/Project 2/dataframes.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Project 2/set_run_gridsearch.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/FYS-STK4155_Projects.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/FYS-STK4155_Projects.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="42a9051a-3109-457c-b14a-9878631735af" name="Changes" comment="adding mse scores as output">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project 2/Gridsearch.py" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/Gridsearch.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project 2/LinRegression.py" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/LinRegression.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project 2/GD_and_SGD_AD.py" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/GD_and_SGD_AD.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project 2/GD_and_SGD_analytical.py" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/GD_and_SGD_analytical.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_MSE_epoch_batchsize_solOLS_optRMSprop_mom0.3_eta_00.1_approachanalytical_lmbda0.png" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_MSE_epoch_batchsize_solOLS_optRMSprop_mom0.3_eta_00.1_approachanalytical_lmbda0.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_MSE_epoch_batchsize_solOLS_optadagrad_mom0.3_eta_00.1_approachanalytical_lmbda0.png" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_MSE_epoch_batchsize_solOLS_optadagrad_mom0.3_eta_00.1_approachanalytical_lmbda0.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_MSE_epoch_batchsize_solOLS_optadam_mom0.3_eta_00.1_approachanalytical_lmbda0.png" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_MSE_epoch_batchsize_solOLS_optadam_mom0.3_eta_00.1_approachanalytical_lmbda0.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_MSE_epoch_batchsize_solOLS_optmomentum_mom0.3_eta_00.1_approachanalytical_lmbda0.png" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_MSE_epoch_batchsize_solOLS_optmomentum_mom0.3_eta_00.1_approachanalytical_lmbda0.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_R2_epoch_batchsize_solOLS_optRMSprop_mom0.3_eta_00.1_approachanalytical_lmbda0.png" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_R2_epoch_batchsize_solOLS_optRMSprop_mom0.3_eta_00.1_approachanalytical_lmbda0.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_R2_epoch_batchsize_solOLS_optadagrad_mom0.3_eta_00.1_approachanalytical_lmbda0.png" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_R2_epoch_batchsize_solOLS_optadagrad_mom0.3_eta_00.1_approachanalytical_lmbda0.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_R2_epoch_batchsize_solOLS_optadam_mom0.3_eta_00.1_approachanalytical_lmbda0.png" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_R2_epoch_batchsize_solOLS_optadam_mom0.3_eta_00.1_approachanalytical_lmbda0.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_R2_epoch_batchsize_solOLS_optmomentum_mom0.3_eta_00.1_approachanalytical_lmbda0.png" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_R2_epoch_batchsize_solOLS_optmomentum_mom0.3_eta_00.1_approachanalytical_lmbda0.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Project 2/setup_run_GD_and_SGD.py" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/setup_run_GD_and_SGD.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -57,7 +61,7 @@
       <recent name="C:\Users\inepr\Desktop\FYS-STK4155_Projects\Project 2" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.GD_and_SGD_AD">
+  <component name="RunManager" selected="Python.setup_run_GD_and_SGD (1)">
     <configuration name="GD_and_SGD_AD (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="FYS-STK4155_Projects" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -102,6 +106,28 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="dataframes" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="FYS-STK4155_Projects" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Project 2" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Project 2/dataframes.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="set_run_gridsearch" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="FYS-STK4155_Projects" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -115,7 +141,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="C:\Users\inepr\Desktop\FYS-STK4155_Projects\Project 2\set_run_gridsearch.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Project 2/set_run_gridsearch.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -146,34 +172,13 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="setup_run_GD_and_SGD" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="FYS-STK4155_Projects" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Project 2" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="C:\Users\inepr\Desktop\FYS-STK4155_Projects\Project 2\setup_run_GD_and_SGD.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Python.setup_run_GD_and_SGD (1)" />
-        <item itemvalue="Python.GD_and_SGD_AD (1)" />
+        <item itemvalue="Python.set_run_gridsearch" />
+        <item itemvalue="Python.dataframes" />
         <item itemvalue="Python.GD_and_SGD_AD" />
-        <item itemvalue="Python.setup_run_GD_and_SGD" />
+        <item itemvalue="Python.GD_and_SGD_AD (1)" />
       </list>
     </recent_temporary>
   </component>
@@ -271,7 +276,28 @@
       <option name="presentableId" value="LOCAL−00012" />
       <updated>1697968796018</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL−00013" summary="now works for making a dataframe of dictionary">
+      <option name="closed" value="true" />
+      <created>1697980292244</created>
+      <option name="number" value="LOCAL−00013" />
+      <option name="presentableId" value="LOCAL−00013" />
+      <updated>1697980292244</updated>
+    </task>
+    <task id="LOCAL−00014" summary="optimized with dictionary method">
+      <option name="closed" value="true" />
+      <created>1697980303415</created>
+      <option name="number" value="LOCAL−00014" />
+      <option name="presentableId" value="LOCAL−00014" />
+      <updated>1697980303415</updated>
+    </task>
+    <task id="LOCAL−00015" summary="adding mse scores as output">
+      <option name="closed" value="true" />
+      <created>1697980733645</created>
+      <option name="number" value="LOCAL−00015" />
+      <option name="presentableId" value="LOCAL−00015" />
+      <updated>1697980733645</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -289,14 +315,35 @@
     <MESSAGE value="running testst" />
     <MESSAGE value="adding momentum and improving code" />
     <MESSAGE value="adding momentum and improving codegrid serach class, now contains 1 function" />
-    <option name="LAST_COMMIT_MESSAGE" value="adding momentum and improving codegrid serach class, now contains 1 function" />
+    <MESSAGE value="now works for making a dataframe of dictionary" />
+    <MESSAGE value="optimized with dictionary method" />
+    <MESSAGE value="adding mse scores as output" />
+    <option name="LAST_COMMIT_MESSAGE" value="adding mse scores as output" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Project 2/set_run_gridsearch.py</url>
+          <line>59</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="random_ind" />
+      </configuration>
+    </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$GD_and_SGD.coverage" NAME="GD_and_SGD Coverage Results" MODIFIED="1697888878122" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project 2" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$GD_and_SGD_AD__1_.coverage" NAME="GD_and_SGD_AD (1) Coverage Results" MODIFIED="1697894987830" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project 2" />
+    <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$GD_and_SGD_AD.coverage" NAME="GD_and_SGD_AD Coverage Results" MODIFIED="1697975074258" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project 2" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$oppg_e_test.coverage" NAME="oppg_e_test Coverage Results" MODIFIED="1696243330976" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$main.coverage" NAME="main Coverage Results" MODIFIED="1696920058399" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$test_in_1D.coverage" NAME="test_in_1D Coverage Results" MODIFIED="1695054533157" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
+    <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$dataframes.coverage" NAME="dataframes Coverage Results" MODIFIED="1697978512986" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project 2" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$oppg_f.coverage" NAME="oppg_f Coverage Results" MODIFIED="1695995427966" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$oppg_f_test__1_.coverage" NAME="oppg_f_test (1) Coverage Results" MODIFIED="1696941980713" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$oppg_a_Ine.coverage" NAME="oppg_a_Ine Coverage Results" MODIFIED="1695031791373" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1" />
@@ -306,7 +353,8 @@
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$Franke_function.coverage" NAME="Franke_function Coverage Results" MODIFIED="1694978769837" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$Automatic_differentiation.coverage" NAME="Automatic_differentiation Coverage Results" MODIFIED="1697892427244" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project 2" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$set_run_gridsearch_plotting_dataframes.coverage" NAME="set_run_gridsearch Coverage Results" MODIFIED="1697973943750" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project 2" />
-    <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$setup_run_GD_and_SGD__1_.coverage" NAME="setup_run_GD_and_SGD (1) Coverage Results" MODIFIED="1697897329065" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project 2" />
+    <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$set_run_gridsearch.coverage" NAME="set_run_gridsearch Coverage Results" MODIFIED="1697980190270" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project 2" />
+    <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$setup_run_GD_and_SGD__1_.coverage" NAME="setup_run_GD_and_SGD (1) Coverage Results" MODIFIED="1697983915855" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project 2" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$test.coverage" NAME="test Coverage Results" MODIFIED="1695054050471" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$oppg_e_f.coverage" NAME="oppg_e_f Coverage Results" MODIFIED="1696942381523" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
   </component>
