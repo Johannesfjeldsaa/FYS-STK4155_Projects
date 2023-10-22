@@ -4,11 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="42a9051a-3109-457c-b14a-9878631735af" name="Changes" comment="happy with my funcitions for the task, now will start automatic differentiation." />
+    <list default="true" id="42a9051a-3109-457c-b14a-9878631735af" name="Changes" comment="running testst" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -27,8 +34,8 @@
       <recent name="C:\Users\inepr\Desktop\FYS-STK4155_Projects\Project 2" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.setup_run_GD_and_SGD">
-    <configuration name="GD_and_SGD" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Python.setup_run_GD_and_SGD (1)">
+    <configuration name="GD_and_SGD_AD (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="FYS-STK4155_Projects" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -41,7 +48,73 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Project 2/GD_and_SGD.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Project 2/GD_and_SGD_AD.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="GD_and_SGD_AD" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="FYS-STK4155_Projects" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Project 2" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="C:\Users\inepr\Desktop\FYS-STK4155_Projects\Project 2\GD_and_SGD_AD.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="GD_and_SGD_analytical" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="FYS-STK4155_Projects" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Project 2" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="C:\Users\inepr\Desktop\FYS-STK4155_Projects\Project 2\GD_and_SGD_analytical.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="setup_run_GD_and_SGD (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="FYS-STK4155_Projects" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Project 2" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Project 2/setup_run_GD_and_SGD.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -74,8 +147,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.setup_run_GD_and_SGD (1)" />
+        <item itemvalue="Python.GD_and_SGD_AD (1)" />
+        <item itemvalue="Python.GD_and_SGD_AD" />
         <item itemvalue="Python.setup_run_GD_and_SGD" />
-        <item itemvalue="Python.GD_and_SGD" />
+        <item itemvalue="Python.GD_and_SGD_analytical" />
       </list>
     </recent_temporary>
   </component>
@@ -108,7 +184,49 @@
       <option name="presentableId" value="LOCAL−00004" />
       <updated>1697889037984</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL−00005" summary="deleting overflødig file">
+      <option name="closed" value="true" />
+      <created>1697889093055</created>
+      <option name="number" value="LOCAL−00005" />
+      <option name="presentableId" value="LOCAL−00005" />
+      <updated>1697889093055</updated>
+    </task>
+    <task id="LOCAL−00006" summary="start of and just init for a plotting class">
+      <option name="closed" value="true" />
+      <created>1697896869524</created>
+      <option name="number" value="LOCAL−00006" />
+      <option name="presentableId" value="LOCAL−00006" />
+      <updated>1697896869524</updated>
+    </task>
+    <task id="LOCAL−00007" summary="now happy with functions to turn into class for GD and SGD, analytical and automatic diferentiation separated.">
+      <option name="closed" value="true" />
+      <created>1697896893641</created>
+      <option name="number" value="LOCAL−00007" />
+      <option name="presentableId" value="LOCAL−00007" />
+      <updated>1697896893641</updated>
+    </task>
+    <task id="LOCAL−00008" summary="running testst">
+      <option name="closed" value="true" />
+      <created>1697896903776</created>
+      <option name="number" value="LOCAL−00008" />
+      <option name="presentableId" value="LOCAL−00008" />
+      <updated>1697896903776</updated>
+    </task>
+    <task id="LOCAL−00009" summary="running testst">
+      <option name="closed" value="true" />
+      <created>1697897246257</created>
+      <option name="number" value="LOCAL−00009" />
+      <option name="presentableId" value="LOCAL−00009" />
+      <updated>1697897246257</updated>
+    </task>
+    <task id="LOCAL−00010" summary="running testst">
+      <option name="closed" value="true" />
+      <created>1697897380404</created>
+      <option name="number" value="LOCAL−00010" />
+      <option name="presentableId" value="LOCAL−00010" />
+      <updated>1697897380404</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -117,10 +235,15 @@
     <MESSAGE value="updating" />
     <MESSAGE value="fixing learning rate placement, so that it is only if no optimization given that the learning rate follow a linearly decaying rate." />
     <MESSAGE value="happy with my funcitions for the task, now will start automatic differentiation." />
-    <option name="LAST_COMMIT_MESSAGE" value="happy with my funcitions for the task, now will start automatic differentiation." />
+    <MESSAGE value="deleting overflødig file" />
+    <MESSAGE value="start of and just init for a plotting class" />
+    <MESSAGE value="now happy with functions to turn into class for GD and SGD, analytical and automatic diferentiation separated." />
+    <MESSAGE value="running testst" />
+    <option name="LAST_COMMIT_MESSAGE" value="running testst" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$GD_and_SGD.coverage" NAME="GD_and_SGD Coverage Results" MODIFIED="1697888878122" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project 2" />
+    <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$GD_and_SGD_AD__1_.coverage" NAME="GD_and_SGD_AD (1) Coverage Results" MODIFIED="1697894987830" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project 2" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$oppg_e_test.coverage" NAME="oppg_e_test Coverage Results" MODIFIED="1696243330976" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$main.coverage" NAME="main Coverage Results" MODIFIED="1696920058399" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$test_in_1D.coverage" NAME="test_in_1D Coverage Results" MODIFIED="1695054533157" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
@@ -131,6 +254,8 @@
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$.coverage" NAME=" Coverage Results" MODIFIED="1695536375181" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$setup_run_SGD.coverage" NAME="setup_run_SGD Coverage Results" MODIFIED="1697888945404" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project 2" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$Franke_function.coverage" NAME="Franke_function Coverage Results" MODIFIED="1694978769837" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
+    <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$Automatic_differentiation.coverage" NAME="Automatic_differentiation Coverage Results" MODIFIED="1697892427244" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project 2" />
+    <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$setup_run_GD_and_SGD__1_.coverage" NAME="setup_run_GD_and_SGD (1) Coverage Results" MODIFIED="1697897329065" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project 2" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$test.coverage" NAME="test Coverage Results" MODIFIED="1695054050471" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$oppg_e_f.coverage" NAME="oppg_e_f Coverage Results" MODIFIED="1696942381523" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
   </component>
