@@ -4,20 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="42a9051a-3109-457c-b14a-9878631735af" name="Changes" comment="adding mse scores as output">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project 2/GD_and_SGD_AD.py" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/GD_and_SGD_AD.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project 2/GD_and_SGD_analytical.py" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/GD_and_SGD_analytical.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_MSE_epoch_batchsize_solOLS_optRMSprop_mom0.3_eta_00.1_approachanalytical_lmbda0.png" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_MSE_epoch_batchsize_solOLS_optRMSprop_mom0.3_eta_00.1_approachanalytical_lmbda0.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_MSE_epoch_batchsize_solOLS_optadagrad_mom0.3_eta_00.1_approachanalytical_lmbda0.png" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_MSE_epoch_batchsize_solOLS_optadagrad_mom0.3_eta_00.1_approachanalytical_lmbda0.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_MSE_epoch_batchsize_solOLS_optadam_mom0.3_eta_00.1_approachanalytical_lmbda0.png" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_MSE_epoch_batchsize_solOLS_optadam_mom0.3_eta_00.1_approachanalytical_lmbda0.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_MSE_epoch_batchsize_solOLS_optmomentum_mom0.3_eta_00.1_approachanalytical_lmbda0.png" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_MSE_epoch_batchsize_solOLS_optmomentum_mom0.3_eta_00.1_approachanalytical_lmbda0.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_R2_epoch_batchsize_solOLS_optRMSprop_mom0.3_eta_00.1_approachanalytical_lmbda0.png" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_R2_epoch_batchsize_solOLS_optRMSprop_mom0.3_eta_00.1_approachanalytical_lmbda0.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_R2_epoch_batchsize_solOLS_optadagrad_mom0.3_eta_00.1_approachanalytical_lmbda0.png" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_R2_epoch_batchsize_solOLS_optadagrad_mom0.3_eta_00.1_approachanalytical_lmbda0.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_R2_epoch_batchsize_solOLS_optadam_mom0.3_eta_00.1_approachanalytical_lmbda0.png" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_R2_epoch_batchsize_solOLS_optadam_mom0.3_eta_00.1_approachanalytical_lmbda0.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_R2_epoch_batchsize_solOLS_optmomentum_mom0.3_eta_00.1_approachanalytical_lmbda0.png" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/figures/gridsearch_linreg_R2_epoch_batchsize_solOLS_optmomentum_mom0.3_eta_00.1_approachanalytical_lmbda0.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project 2/setup_run_GD_and_SGD.py" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/setup_run_GD_and_SGD.py" afterDir="false" />
-    </list>
+    <list default="true" id="42a9051a-3109-457c-b14a-9878631735af" name="Changes" comment="updated gitignore" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -297,7 +284,49 @@
       <option name="presentableId" value="LOCAL−00015" />
       <updated>1697980733645</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL−00016" summary="updated a bit.">
+      <option name="closed" value="true" />
+      <created>1697984765249</created>
+      <option name="number" value="LOCAL−00016" />
+      <option name="presentableId" value="LOCAL−00016" />
+      <updated>1697984765249</updated>
+    </task>
+    <task id="LOCAL−00017" summary="figures developed under gridsearch">
+      <option name="closed" value="true" />
+      <created>1697984786503</created>
+      <option name="number" value="LOCAL−00017" />
+      <option name="presentableId" value="LOCAL−00017" />
+      <updated>1697984786503</updated>
+    </task>
+    <task id="LOCAL−00018" summary="performing some plotting, that must be transferred to the plotting class">
+      <option name="closed" value="true" />
+      <created>1697984807909</created>
+      <option name="number" value="LOCAL−00018" />
+      <option name="presentableId" value="LOCAL−00018" />
+      <updated>1697984807909</updated>
+    </task>
+    <task id="LOCAL−00019" summary="adding a draft for plotting class">
+      <option name="closed" value="true" />
+      <created>1697984895756</created>
+      <option name="number" value="LOCAL−00019" />
+      <option name="presentableId" value="LOCAL−00019" />
+      <updated>1697984895756</updated>
+    </task>
+    <task id="LOCAL−00020" summary="editing">
+      <option name="closed" value="true" />
+      <created>1697984909261</created>
+      <option name="number" value="LOCAL−00020" />
+      <option name="presentableId" value="LOCAL−00020" />
+      <updated>1697984909261</updated>
+    </task>
+    <task id="LOCAL−00021" summary="updated gitignore">
+      <option name="closed" value="true" />
+      <created>1697984933753</created>
+      <option name="number" value="LOCAL−00021" />
+      <option name="presentableId" value="LOCAL−00021" />
+      <updated>1697984933753</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -318,7 +347,13 @@
     <MESSAGE value="now works for making a dataframe of dictionary" />
     <MESSAGE value="optimized with dictionary method" />
     <MESSAGE value="adding mse scores as output" />
-    <option name="LAST_COMMIT_MESSAGE" value="adding mse scores as output" />
+    <MESSAGE value="updated a bit." />
+    <MESSAGE value="figures developed under gridsearch" />
+    <MESSAGE value="performing some plotting, that must be transferred to the plotting class" />
+    <MESSAGE value="adding a draft for plotting class" />
+    <MESSAGE value="editing" />
+    <MESSAGE value="updated gitignore" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated gitignore" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
