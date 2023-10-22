@@ -53,11 +53,11 @@ for key, value in analysis_dict.items():
 
 
 
-    #plt.plot(sorted(x), sorted(y_pred), label=key)
+    plt.plot(sorted(x), sorted(y_pred), label=key)
 
-    plt.plot(range(len(MSE))[::1000], MSE[::1000], label=key)  # prøvde på en konvergensgraf
+    #plt.plot(range(len(MSE))[::1000], MSE[::1000], label=key)  # prøvde på en konvergensgraf
 
-#plt.plot(x[::15],y[::15],'ro')
+plt.plot(x[::15],y[::15],'ro')
 plt.title('Convergencegraph: analytical SGD analysis for OLS')
 plt.xlabel('x value')
 plt.ylabel('y value')
