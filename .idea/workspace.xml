@@ -4,7 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="42a9051a-3109-457c-b14a-9878631735af" name="Changes" comment="running testst" />
+    <list default="true" id="42a9051a-3109-457c-b14a-9878631735af" name="Changes" comment="adding momentum and improving codegrid serach class, now contains 1 function">
+      <change afterPath="$PROJECT_DIR$/Project 2/dataframes.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Project 2/set_run_gridsearch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/FYS-STK4155_Projects.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/FYS-STK4155_Projects.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project 2/Gridsearch.py" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/Gridsearch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project 2/LinRegression.py" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/LinRegression.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project 2/setup_run_GD_and_SGD.py" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/setup_run_GD_and_SGD.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -23,10 +32,24 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 2
+}]]></component>
+  <component name="ProjectId" id="2X6sZNWDVikFqj75fO7UZ126vDi" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
     "last_opened_file_path": "C:/Users/inepr/Desktop/FYS-STK4155_Projects/Project 2",
-    "node.js.selected.package.tslint": "(autodetect)"
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -34,7 +57,7 @@
       <recent name="C:\Users\inepr\Desktop\FYS-STK4155_Projects\Project 2" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.setup_run_GD_and_SGD (1)">
+  <component name="RunManager" selected="Python.set_run_gridsearch.plotting.dataframes">
     <configuration name="GD_and_SGD_AD (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="FYS-STK4155_Projects" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -79,7 +102,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="GD_and_SGD_analytical" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="set_run_gridsearch" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="FYS-STK4155_Projects" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -92,7 +115,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="C:\Users\inepr\Desktop\FYS-STK4155_Projects\Project 2\GD_and_SGD_analytical.py" />
+      <option name="SCRIPT_NAME" value="C:\Users\inepr\Desktop\FYS-STK4155_Projects\Project 2\set_run_gridsearch.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -147,14 +170,15 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.set_run_gridsearch.plotting.dataframes" />
         <item itemvalue="Python.setup_run_GD_and_SGD (1)" />
         <item itemvalue="Python.GD_and_SGD_AD (1)" />
         <item itemvalue="Python.GD_and_SGD_AD" />
         <item itemvalue="Python.setup_run_GD_and_SGD" />
-        <item itemvalue="Python.GD_and_SGD_analytical" />
       </list>
     </recent_temporary>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task id="LOCAL−00001" summary="python file for running trhough the class">
       <option name="closed" value="true" />
@@ -226,8 +250,33 @@
       <option name="presentableId" value="LOCAL−00010" />
       <updated>1697897380404</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="42a9051a-3109-457c-b14a-9878631735af" name="Changes" comment="running testst" />
+      <created>1697960921463</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1697960921463</updated>
+      <workItem from="1697960924321" duration="12349000" />
+    </task>
+    <task id="LOCAL−00011" summary="starting a">
+      <option name="closed" value="true" />
+      <created>1697968780433</created>
+      <option name="number" value="LOCAL−00011" />
+      <option name="presentableId" value="LOCAL−00011" />
+      <updated>1697968780433</updated>
+    </task>
+    <task id="LOCAL−00012" summary="running">
+      <option name="closed" value="true" />
+      <created>1697968796018</created>
+      <option name="number" value="LOCAL−00012" />
+      <option name="presentableId" value="LOCAL−00012" />
+      <updated>1697968796018</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="suggestion for code to be made into a SGD class ( have all the momentum mehtods)" />
@@ -239,7 +288,9 @@
     <MESSAGE value="start of and just init for a plotting class" />
     <MESSAGE value="now happy with functions to turn into class for GD and SGD, analytical and automatic diferentiation separated." />
     <MESSAGE value="running testst" />
-    <option name="LAST_COMMIT_MESSAGE" value="running testst" />
+    <MESSAGE value="adding momentum and improving code" />
+    <MESSAGE value="adding momentum and improving codegrid serach class, now contains 1 function" />
+    <option name="LAST_COMMIT_MESSAGE" value="adding momentum and improving codegrid serach class, now contains 1 function" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$GD_and_SGD.coverage" NAME="GD_and_SGD Coverage Results" MODIFIED="1697888878122" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project 2" />
@@ -255,6 +306,7 @@
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$setup_run_SGD.coverage" NAME="setup_run_SGD Coverage Results" MODIFIED="1697888945404" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project 2" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$Franke_function.coverage" NAME="Franke_function Coverage Results" MODIFIED="1694978769837" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$Automatic_differentiation.coverage" NAME="Automatic_differentiation Coverage Results" MODIFIED="1697892427244" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project 2" />
+    <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$set_run_gridsearch_plotting_dataframes.coverage" NAME="set_run_gridsearch Coverage Results" MODIFIED="1697973943750" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project 2" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$setup_run_GD_and_SGD__1_.coverage" NAME="setup_run_GD_and_SGD (1) Coverage Results" MODIFIED="1697897329065" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project 2" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$test.coverage" NAME="test Coverage Results" MODIFIED="1695054050471" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$oppg_e_f.coverage" NAME="oppg_e_f Coverage Results" MODIFIED="1696942381523" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
