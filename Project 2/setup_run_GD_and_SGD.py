@@ -57,7 +57,7 @@ beta_AD_no_mom = AD_GD(linreg.X, linreg.y, initial_step, max_iter, tol, regressi
 
 print(beta_AD_mom)
 
-# SGD ols momentum adam  ( rho1 og rho vanligvis mellom 0.9 og 0.99? )
+# SGD ols momentum adam  ( rho1 og rho vanligvis mellom 0.9 og 0.99? ) # denne tar ekstremt mye lenger tid, og får annerledes resultat.
 beta_adam_AD_SGD = AD_SGD(linreg.X, linreg.y, batch_size, n_epochs, initial_step, momentum, tol, regression_method='OLS', optimization='adam', rho1 = 0.9, rho2 = 0.99)
 print(beta_adam_AD_SGD)
 
