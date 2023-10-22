@@ -234,12 +234,12 @@ def AD_SGD(X, y, batch_size, n_epochs, initial_step, momentum, tol, regression_m
             if optimization == 'no momentum':
                 step_size = learning_schedule(k=epoch * num_batch + i)
                 change_vector = -step_size * gradient_no_mom
-                MSE_scores.append(((y - X @ change_vector) ** 2) / batch_size)
+                MSE_scores.append(np.sum((y_batch - X_batch@change_vector)**2) / n)
 
             if optimization == 'momentum':
                 step_size = learning_schedule(k=epoch * num_batch + i)  # linearly decaying learning rate (as described in Goodfellow)
                 change_vector = -step_size * gradient_mom + momentum * change_vector
-                MSE_scores.append(((y - X @ change_vector) ** 2) / batch_size)
+                MSE_scores.append(np.sum((y_batch - X_batch@change_vector)**2) / n)
 
             elif optimization == "adagrad":
                 r = r + gradient_mom @ gradient_mom.T  # sum of squared gradients
@@ -247,7 +247,7 @@ def AD_SGD(X, y, batch_size, n_epochs, initial_step, momentum, tol, regression_m
                 scale = np.c_[1 / (delta + np.sqrt(rr))]
                 change_vector = -step_size * np.multiply(scale,
                                                          gradient_mom) + momentum * change_vector  # scale gradient element-wise
-                MSE_scores.append(((y - X @ change_vector) ** 2) / batch_size)
+                MSE_scores.append(np.sum((y_batch - X_batch@change_vector)**2) / n)
 
             elif optimization == "RMSprop":
                 r = rho1 * r + (1 - rho1) * gradient_mom @ gradient_mom.T
@@ -255,7 +255,7 @@ def AD_SGD(X, y, batch_size, n_epochs, initial_step, momentum, tol, regression_m
                 scale = np.c_[1.0 / (delta + np.sqrt(rr))]
                 change_vector = -step_size * np.multiply(scale,
                                                          gradient_mom)  # scale gradient element-wise
-                MSE_scores.append(((y - X @ change_vector) ** 2) / batch_size)
+                MSE_scores.append(np.sum((y_batch - X_batch@change_vector)**2) / n)
 
             elif optimization == "adam":
                 t = i + 1  # iteration number
@@ -268,7 +268,7 @@ def AD_SGD(X, y, batch_size, n_epochs, initial_step, momentum, tol, regression_m
 
                 change_vector = np.c_[
                     -step_size * ss / (delta + np.sqrt(rr))]  # scale gradient element-wise
-                MSE_scores.append(((y - X @ change_vector) ** 2) / batch_size)
+                MSE_scores.append(np.sum((y_batch - X_batch@change_vector)**2) / n)
 
             else:
                 raise Exception("Invalid optimization method.")

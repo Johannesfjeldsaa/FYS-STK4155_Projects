@@ -116,7 +116,7 @@ def GD(X, y, initial_step, max_iter, tol, lambd=None, regression_method=None, mo
 
 # inspired by daniel haas code, found in his repository for project 2. (spørr om ok?)
 def SGD(X, y, batch_size, n_epochs, initial_step, momentum, tol, regression_method=None,
-        lmbd=None, optimization=None, rho1=None, rho2=None):
+        lmbd=None, optimization=None, rho1=0.9, rho2=0.99):
 
     num_batch = int(len(y) / batch_size)  # num. batches
     p = X.shape[1]  # number of features
@@ -173,13 +173,13 @@ def SGD(X, y, batch_size, n_epochs, initial_step, momentum, tol, regression_meth
             if optimization == 'no momentum':
                 step_size = learning_schedule(k=epoch * num_batch + i)  # linearly decaying learning rate (as described in Goodfellow)
                 change_vector = -step_size * gradient
-                MSE_scores.append(((y - X @ change_vector)**2) / batch_size)
+                MSE_scores.append(np.sum((y_batch - X_batch@change_vector)**2) / batch_size)
 
 
             elif optimization == 'momentum':
                 step_size = learning_schedule(k=epoch * num_batch + i)  # linearly decaying learning rate (as described in Goodfellow)
                 change_vector = -step_size * gradient + momentum * change_vector
-                MSE_scores.append(((y - X @ change_vector) ** 2) / batch_size)
+                MSE_scores.append(np.sum((y_batch - X_batch@change_vector)**2) / batch_size)
 
 
             elif optimization == "adagrad":
@@ -188,14 +188,14 @@ def SGD(X, y, batch_size, n_epochs, initial_step, momentum, tol, regression_meth
                 scale = np.c_[1 / (delta + np.sqrt(rr))]
                 change_vector = -step_size * np.multiply(scale,
                                             gradient) + momentum * change_vector  # scale gradient element-wise
-                MSE_scores.append(((y - X @ change_vector) ** 2) / batch_size)
+                MSE_scores.append(np.sum((y_batch - X_batch@change_vector)**2) / batch_size)
 
             elif optimization == "RMSprop":
                 r = rho1 * r + (1 - rho1) * gradient @ gradient.T
                 rr = np.c_[np.diagonal(r)]
                 scale = np.c_[1.0 / (delta + np.sqrt(rr))]
                 change_vector = -step_size * np.multiply(scale, gradient)  # scale gradient element-wise
-                MSE_scores.append(((y - X @ change_vector) ** 2) / batch_size)
+                MSE_scores.append(np.sum((y_batch - X_batch@change_vector)**2) / batch_size)
 
             elif optimization == "adam":
                 t = i + 1  # iteration number
@@ -207,7 +207,7 @@ def SGD(X, y, batch_size, n_epochs, initial_step, momentum, tol, regression_meth
                 rr = np.c_[np.diagonal(r) / (1 - rho2 ** t)]
 
                 change_vector = np.c_[-step_size * ss / (delta + np.sqrt(rr))]   # scale gradient element-wise
-                MSE_scores.append(((y - X @ change_vector) ** 2) / batch_size)
+                MSE_scores.append(np.sum((y_batch - X_batch@change_vector)**2) / batch_size)
 
             else:
                 raise Exception("Invalid optimization method.")
