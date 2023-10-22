@@ -2,6 +2,7 @@ import numpy as np
 from LinRegression import LinRegression
 from GD_and_SGD_analytical import GD, SGD
 from GD_and_SGD_AD import AD_GD, AD_SGD
+import matplotlib.pyplot as plt
 
 ## set up data
 
@@ -39,27 +40,27 @@ beta_ridge = np.linalg.inv(XT_X+Id) @ linreg.X.T @ y
 beta_ols = np.linalg.inv(linreg.X.T @ linreg.X) @ linreg.X.T @ y
 
 
-## Want to try GD setup without momentum
-
-beta_GD = GD(linreg.X, linreg.y, initial_step, n_epochs, tol, regression_method='OLS')
-
-
-
-## Want to try SGD setup with Ridge and "Normal momentum"
-beta = SGD(linreg.X, linreg.y, batch_size, n_epochs, initial_step, momentum, tol, regression_method='OLS')
+# for run OLS, analytical, SGD, all methods . collect betas and MSE_scores
+optimization_methods = ['no momentum', 'momentum', 'RMSprop', 'adagrad', 'adam']
+analysis_dict = {'no momentum': [70, 700, 100, 300], 'momentum': [5, 200, 5, 300], 'RMSprop': [40, 700, 20, 100], 'adagrad': [40, 500, 100, 100], 'adam': [70, 1000, 70, 1000]}
 
 
 
-# trying AD with GD momentum ols
-
-beta_AD_mom = AD_GD(linreg.X, linreg.y, initial_step, max_iter, tol, regression_method='OLS', momentum=momentum, optimization='momentum')
-beta_AD_no_mom = AD_GD(linreg.X, linreg.y, initial_step, max_iter, tol, regression_method='OLS')
-
-print(beta_AD_mom)
-
-# SGD ols momentum adam  ( rho1 og rho vanligvis mellom 0.9 og 0.99? ) # denne tar ekstremt mye lenger tid, og får annerledes resultat.
-beta_adam_AD_SGD = AD_SGD(linreg.X, linreg.y, batch_size, n_epochs, initial_step, momentum, tol, regression_method='OLS', optimization='adam', rho1 = 0.9, rho2 = 0.99)
-print(beta_adam_AD_SGD)
+for key, value in analysis_dict.items():
+    beta, MSE = SGD(linreg.X, linreg.y, value[0], value[1], 0.1, 0.3,
+                    10**-8, regression_method='OLS', optimization=key)
+    y_pred = linreg.X@beta
 
 
-print(beta_ols)
+
+    #plt.plot(sorted(x), sorted(y_pred), label=key)
+
+    plt.plot(range(len(MSE))[::1000], MSE[::1000], label=key)  # prøvde på en konvergensgraf
+
+#plt.plot(x[::15],y[::15],'ro')
+plt.title('Convergencegraph: analytical SGD analysis for OLS')
+plt.xlabel('x value')
+plt.ylabel('y value')
+plt.legend()
+plt.show()
+
