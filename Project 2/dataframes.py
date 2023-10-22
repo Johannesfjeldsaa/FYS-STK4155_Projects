@@ -6,8 +6,18 @@ import numpy as np
 Class for making dataframes
 """
 
-methods = np.array(['METHOD', 'no momentum', 'momentum', 'RMSprop', 'adagrad', 'adam'])
-results_header = np.array(['batchsize MSE', 'epochs MSE', 'MSE score', 'batchsize R2', 'epochs R2', 'R2 score'])
+def df_analysis_method_is_index(dict, methods, headers):
+    """
 
-df = pd.DataFrame(results_header, methods.T)
-print(df)
+    :param dict: contain method with lists of results # important
+    :param methods: contain the methods that you want to add the results to
+    :param header: contains the results (have to be in correct order) that you want to obtain
+    :return: dataframe with your results
+    """
+    analysis_df = pd.DataFrame(index=methods, columns=headers)
+
+    for key, row in dict.items():  # key is the index, key contains list
+        for value, header in zip(row, headers):
+            analysis_df.loc[key, header] = value
+
+    return analysis_df
