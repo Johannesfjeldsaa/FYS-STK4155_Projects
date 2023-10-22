@@ -162,6 +162,10 @@ def SGD(X, y, batch_size, n_epochs, initial_step, momentum, tol, regression_meth
 
             if optimization is None:
                 step_size = learning_schedule(k=epoch * num_batch + i)  # linearly decaying learning rate (as described in Goodfellow)
+                change_vector = -step_size * gradient
+
+            elif optimization == 'momentum':
+                step_size = learning_schedule(k=epoch * num_batch + i)  # linearly decaying learning rate (as described in Goodfellow)
                 change_vector = -step_size * gradient + momentum * change_vector
 
             elif optimization == "adagrad":

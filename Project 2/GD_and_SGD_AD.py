@@ -223,7 +223,7 @@ def AD_SGD(X, y, batch_size, n_epochs, initial_step, momentum, tol, regression_m
 
             if optimization == None:
                 step_size = learning_schedule(k=epoch * num_batch + i)
-                beta -= step_size * gradient_no_mom
+                change_vector = -step_size * gradient_no_mom
 
             if optimization == 'momentum':
                 step_size = learning_schedule(k=epoch * num_batch + i)  # linearly decaying learning rate (as described in Goodfellow)
