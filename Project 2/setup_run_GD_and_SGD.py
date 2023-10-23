@@ -3,6 +3,7 @@ from LinRegression import LinRegression
 from GD_and_SGD_analytical import GD, SGD
 from GD_and_SGD_AD import AD_GD, AD_SGD
 import matplotlib.pyplot as plt
+from plotting import plot_SGD_MSE_convergence_epoch_batch, plot_SGD_pred_model_MSE_epoch_batch
 
 ## set up data
 
@@ -44,23 +45,5 @@ beta_ols = np.linalg.inv(linreg.X.T @ linreg.X) @ linreg.X.T @ y
 optimization_methods = ['no momentum', 'momentum', 'RMSprop', 'adagrad', 'adam']
 analysis_dict = {'no momentum': [70, 700, 100, 300], 'momentum': [5, 200, 5, 300], 'RMSprop': [40, 700, 20, 100], 'adagrad': [40, 500, 100, 100], 'adam': [70, 1000, 70, 1000]}
 
-
-
-for key, value in analysis_dict.items():
-    beta, MSE = SGD(linreg.X, linreg.y, value[0], value[1], 0.1, 0.3,
-                    10**-8, regression_method='OLS', optimization=key)
-    y_pred = linreg.X@beta
-
-
-
-    plt.plot(sorted(x), sorted(y_pred), label=key)
-
-    #plt.plot(range(len(MSE))[::1000], MSE[::1000], label=key)  # prøvde på en konvergensgraf
-
-plt.plot(x[::15],y[::15],'ro')
-plt.title('Convergencegraph: analytical SGD analysis for OLS')
-plt.xlabel('x value')
-plt.ylabel('y value')
-plt.legend()
-plt.show()
-
+plot_SGD_MSE_convergence_epoch_batch(linreg.X, linreg.y, analysis_dict, 'analytical', 'OLS')
+plot_SGD_pred_model_MSE_epoch_batch(linreg.X, x, linreg.y, analysis_dict, 'analytical', 'OLS')
