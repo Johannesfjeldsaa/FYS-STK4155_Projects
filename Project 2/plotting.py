@@ -35,8 +35,9 @@ def plot_SGD_MSE_convergence_epoch_batch(X, y, dict, approach, regression_method
     info = f'Convergencegraph for {approach} SGD analysis for {regression_method}'
 
     plt.title(info)
-    plt.xlabel('x value')
-    plt.ylabel('y value')
+    plt.xlabel('Iteration number')
+    plt.ylabel('MSE scores')
+    plt.axis([0,2000, 0, 50])
     plt.legend()
     plt.show()
 
