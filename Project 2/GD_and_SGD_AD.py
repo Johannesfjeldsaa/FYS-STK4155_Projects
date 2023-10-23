@@ -24,7 +24,6 @@ Before choosing optimization method, regression method has to be put in. Existin
 # kan sikkert helle legge GD inn i SGD? blir mye "to ganger". ellers så er det kanskje kjekt å
 # kunne kalle på GD eller SGD utenfr klassen, for oversikt
 
-
 def AD_GD(X, y, initial_step, max_iter, tol, lambd=None, regression_method=None, momentum=None,
        optimization=None, rho1=None, rho2=None):
     """
