@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="42a9051a-3109-457c-b14a-9878631735af" name="Changes" comment="updated gitignore">
+    <list default="true" id="42a9051a-3109-457c-b14a-9878631735af" name="Changes" comment="fiksing MSE fault">
+      <change afterPath="$PROJECT_DIR$/Project 2/oppgb INE.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project 2/plotting.py" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/plotting.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project 2/setup_run_GD_and_SGD.py" beforeDir="false" afterPath="$PROJECT_DIR$/Project 2/setup_run_GD_and_SGD.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,24 +34,25 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/inepr/Desktop/FYS-STK4155_Projects/Project 2&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "C:/Users/inepr/Desktop/FYS-STK4155_Projects/Project 2",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\inepr\Desktop\FYS-STK4155_Projects\Project 2" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.set_run_gridsearch">
+  <component name="RunManager" selected="Python.setup_run_GD_and_SGD (1)">
     <configuration name="GD_and_SGD_AD (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="FYS-STK4155_Projects" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -165,8 +165,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.set_run_gridsearch" />
         <item itemvalue="Python.setup_run_GD_and_SGD (1)" />
+        <item itemvalue="Python.set_run_gridsearch" />
         <item itemvalue="Python.dataframes" />
         <item itemvalue="Python.GD_and_SGD_AD" />
         <item itemvalue="Python.GD_and_SGD_AD (1)" />
@@ -331,11 +331,29 @@
       <option name="presentableId" value="LOCAL−00021" />
       <updated>1697984933753</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL−00022" summary="fiksing MSE fault">
+      <option name="closed" value="true" />
+      <created>1698052179964</created>
+      <option name="number" value="LOCAL−00022" />
+      <option name="presentableId" value="LOCAL−00022" />
+      <updated>1698052179964</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="suggestion for code to be made into a SGD class ( have all the momentum mehtods)" />
@@ -358,7 +376,9 @@
     <MESSAGE value="adding a draft for plotting class" />
     <MESSAGE value="editing" />
     <MESSAGE value="updated gitignore" />
-    <option name="LAST_COMMIT_MESSAGE" value="updated gitignore" />
+    <MESSAGE value="fixing plotting function" />
+    <MESSAGE value="fiksing MSE fault" />
+    <option name="LAST_COMMIT_MESSAGE" value="fiksing MSE fault" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -382,6 +402,7 @@
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$GD_and_SGD_AD.coverage" NAME="GD_and_SGD_AD Coverage Results" MODIFIED="1697975074258" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project 2" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$oppg_e_test.coverage" NAME="oppg_e_test Coverage Results" MODIFIED="1696243330976" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$main.coverage" NAME="main Coverage Results" MODIFIED="1696920058399" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
+    <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$oppgb_INE.coverage" NAME="oppgb INE Coverage Results" MODIFIED="1698045782276" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project 2" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$test_in_1D.coverage" NAME="test_in_1D Coverage Results" MODIFIED="1695054533157" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$dataframes.coverage" NAME="dataframes Coverage Results" MODIFIED="1697978512986" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project 2" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$oppg_f.coverage" NAME="oppg_f Coverage Results" MODIFIED="1695995427966" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
@@ -393,8 +414,8 @@
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$Franke_function.coverage" NAME="Franke_function Coverage Results" MODIFIED="1694978769837" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$Automatic_differentiation.coverage" NAME="Automatic_differentiation Coverage Results" MODIFIED="1697892427244" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project 2" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$set_run_gridsearch_plotting_dataframes.coverage" NAME="set_run_gridsearch Coverage Results" MODIFIED="1697973943750" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project 2" />
-    <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$set_run_gridsearch.coverage" NAME="set_run_gridsearch Coverage Results" MODIFIED="1698043107934" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project 2" />
-    <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$setup_run_GD_and_SGD__1_.coverage" NAME="setup_run_GD_and_SGD (1) Coverage Results" MODIFIED="1698042310750" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project 2" />
+    <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$set_run_gridsearch.coverage" NAME="set_run_gridsearch Coverage Results" MODIFIED="1698049453770" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project 2" />
+    <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$setup_run_GD_and_SGD__1_.coverage" NAME="setup_run_GD_and_SGD (1) Coverage Results" MODIFIED="1698051632170" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project 2" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$test.coverage" NAME="test Coverage Results" MODIFIED="1695054050471" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
     <SUITE FILE_PATH="coverage/FYS_STK4155_Projects$oppg_e_f.coverage" NAME="oppg_e_f Coverage Results" MODIFIED="1696942381523" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Project1/Solution" />
   </component>
