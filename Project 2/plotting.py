@@ -43,12 +43,14 @@ def plot_SGD_MSE_convergence_epoch_batch(X, y, dict, approach, regression_method
 class Plott_creator:
     def __init__(self):
         self.file_handler = Handle_Files()
-    def plot_path(self, x, y, beta, x_path, y_path, title):
+
+    def plot_path(self, x, y, beta, x_path, y_path, title, save_fig=False):
         plt.plot(x, y, 'ro')
-        plt.plot(x_path, y_path, 'b-')
-        plt.title(title)
         plt.xlabel('x value')
         plt.ylabel('y value')
         plt.show()
+
+        if save_fig:
+            self.file_handler.save_fig(title)
 
 
