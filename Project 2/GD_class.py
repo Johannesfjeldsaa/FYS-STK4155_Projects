@@ -14,6 +14,7 @@ class GradientDescent:
         self.X = X
         self.y = y
         self.learning_rate = learning_rate
+        self.initial_learning_rate = learning_rate
         self.tol = tol
         self.cost_function = cost_function
         self.iteration_method = iteration_method
@@ -28,6 +29,19 @@ class GradientDescent:
             # When defining the cost function, the third parameter must be 
             # the one to differentiate by
             self.calc_gradient = grad(self.cost_function, 2)
+    
+    def learning_schedule(self, method):
+        if method == "Fixed learning rate":
+            pass
+        elif method == "Linear decay":
+            alpha = self.iteration / (self.max_iter)
+            self.learning_rate = (1 - alpha) * self.initial_learning_rate \
+                + alpha * self.initial_learning_rate * 0.01 
+        elif method == "Exponential decay":
+            #Legg inn senere
+            pass
+        else:
+            raise ValueError("Not a valid learning schedule!")
             
         
     def check_convergence(self, gradient, iteration):
@@ -41,10 +55,11 @@ class GradientDescent:
         self.change = self.learning_rate * gradient
         return self.change
 
-    def iterate_full(self, max_iter):
+    def iterate_full(self, max_iter, schedule_method):
             
         beta = np.random.rand(np.shape(self.X)[1])
         self.iteration = 0
+        self.max_iter = max_iter
             
         for i in range(max_iter):
             gradient = self.calc_gradient(self.X, self.y, beta)
@@ -54,36 +69,48 @@ class GradientDescent:
             
             self.iteration += 1
             
+            self.learning_schedule(schedule_method)
+            
             change = self.calculate_change(gradient)
             beta = beta - change
                 
-        if self.iteration == max_iter:
+        if self.iteration == self.max_iter:
             print(f"Did not converge in {max_iter} iterations")
             
         return beta
     
     
-    def iterate_minibatch(self, max_epoch, num_batches):
-        # Hvordan introdusere learning schedule for å få denne til å konvergere
+    def iterate_minibatch(self, max_epoch, num_batches, schedule_method):
+
         beta = np.random.rand(np.shape(self.X)[1])
         self.epoch = 0
+        self.iteration = 0
+        self.max_iter = max_epoch*num_batches
         
         n = np.shape(self.X)[0]
-        batch_size = int(n/num_batches)
+        indices = np.arange(n)
+        
+        #batch_size = int(n/num_batches)
 
         for epoch in range(max_epoch):
+            np.random.shuffle(indices)
+            batches = np.array_split(indices, num_batches)
 
             for i in range(num_batches):
-                random_ind = batch_size*np.random.randint(num_batches)
-                # Pick out belonging design matrix and y values to the randomized batch
-                X_batch = X[random_ind:random_ind+batch_size]
-                y_batch = y[random_ind:random_ind+batch_size]
+                
+                X_batch = self.X[batches[i], :]
+                y_batch = self.y[batches[i]]
 
                 gradient = self.calc_gradient(X_batch, y_batch, beta)
                 
+                self.learning_schedule(schedule_method)
+                
                 change = self.calculate_change(gradient)
                 beta = beta - change
+                
+                self.iteration += 1
             
+            # Fiks riktig konvergenskriterie
             total_gradient = self.calc_gradient(self.X, self.y, beta)
             if self.check_convergence(total_gradient, self.epoch):
                 break
@@ -96,18 +123,19 @@ class GradientDescent:
         return beta
 
     
-    def iterate(self, iteration_method, max_iter=None, max_epoch=None, num_batches=None):
+    def iterate(self, iteration_method, max_iter=None, max_epoch=None, num_batches=None,
+                schedule_method="Fixed learning rate"):
         
         if iteration_method == "Full":
             max_iter = max_iter if not None else 10000
             
-            self.beta = self.iterate_full(max_iter)
+            self.beta = self.iterate_full(max_iter, schedule_method)
         
         elif iteration_method == "Stochastic":
             max_epoch = max_epoch if not None else 128
             num_batches = num_batches if not None else 10
             
-            self.beta = self.iterate_minibatch(max_epoch, num_batches)
+            self.beta = self.iterate_minibatch(max_epoch, num_batches, schedule_method)
             
         return self.beta
         
@@ -124,6 +152,7 @@ class GradientDescentMomentum(GradientDescent):
     def calculate_change(self, gradient):
         self.change = self.momentum*self.change + self.learning_rate*gradient
         return self.change
+    
     
 class GradientDescentAdagrad(GradientDescent):
     # Sjekk hvorfor så sakte konvergering
@@ -219,23 +248,26 @@ if __name__ == "__main__":
     degree = 2
     X = make_design_matrix(x, degree)
     
-    learning_rate = 0.1
+    learning_rate = 2
     tol=1e-3
     beta_guess = np.random.rand(3)
 
-    np.random.seed(1342)
+    np.random.seed(505)
+    momentum=0.5
     delta=1e-8
     rho1 = 0.9
     rho2 = 0.99
-    grad_descent_rms = GradientDescent(X=X, y=y, 
+    grad_descent_rms = GradientDescentMomentum(momentum, X=X, y=y, 
                                              learning_rate=learning_rate, tol=tol, 
                                              cost_function=cost_function_OLS,
                                              analytic_gradient=analytical_gradient)
     
     max_iter = 100000
-    max_epochs = 1000
-    beta_calculated = grad_descent_rms.iterate(iteration_method="Stochastic", max_epoch=max_epochs,
-                                               num_batches=5)
+    max_epochs = 500
+    beta_calculated = grad_descent_rms.iterate(iteration_method="Stochastic", 
+                                               max_epoch=max_epochs, 
+                                               num_batches=10, 
+                                               schedule_method="Linear decay")
     print(beta_calculated)
     
 
