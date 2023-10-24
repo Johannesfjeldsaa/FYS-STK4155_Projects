@@ -44,10 +44,12 @@ class Plott_creator:
     def __init__(self):
         self.file_handler = Handle_Files()
 
-    def plot_path(self, x, y, beta, x_path, y_path, title, save_fig=False):
-        plt.plot(x, y, 'ro')
+    def plot_regression(self, x, y, y_pred, title, save_fig=False):
+        plt.plot(x, y, 'bo', label='Data')
+        plt.plot(x, y_pred, 'r-', label='Prediction')
         plt.xlabel('x value')
         plt.ylabel('y value')
+        plt.title(title)
         plt.show()
 
         if save_fig:
