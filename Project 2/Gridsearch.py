@@ -2,8 +2,7 @@ import numpy as np
 from LinRegression import LinRegression
 import matplotlib.pyplot as plt
 import seaborn as sns
-from GD_and_SGD_analytical import GD, SGD
-from GD_and_SGD_AD import AD_GD, AD_SGD
+
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
@@ -11,6 +10,8 @@ from sklearn.model_selection import train_test_split
 Make a class that will find min MSE scores (+R2 scores) for wat you want
 
 inspired by Daniel Haas code
+
+må nå skrives om til å ta inn GD class
 """
 
 cm = 1/2.54

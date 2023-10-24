@@ -2,6 +2,7 @@ from Gridsearch import GridSearch_LinReg_epochs_batchsize
 import numpy as np
 from LinRegression import LinRegression
 from dataframes import df_analysis_method_is_index
+from plotting import plot_SGD_MSE_convergence_epoch_batch, plot_SGD_pred_model_MSE_epoch_batch
 
 ## set up data
 np.random.seed(1997)
@@ -60,3 +61,7 @@ print(batch_epoch_analysis_dict)
 df = df_analysis_method_is_index(batch_epoch_analysis_dict, optimization_methods, results_header)
 
 print(df)
+
+
+plot_SGD_MSE_convergence_epoch_batch(linreg.X, linreg.y, batch_epoch_analysis_dict, 'analytical', 'OLS')
+plot_SGD_pred_model_MSE_epoch_batch(linreg.X, x, linreg.y, batch_epoch_analysis_dict, 'analytical', 'OLS')
