@@ -4,7 +4,7 @@ Created on Mon Oct 23 11:14:44 2023
 
 @author: vildesn
 """
-#import autograd.numpy as np
+#import autograd.numpy as jnp
 #from autograd import grad
 
 
@@ -61,7 +61,7 @@ class GradientDescent:
             
         
     def check_convergence(self, gradient, iteration):
-        if np.linalg.norm(gradient) <= self.tol:
+        if jnp.linalg.norm(gradient) <= self.tol:
             print(f"Converged after {iteration} iterations")
             return True
         else:
@@ -81,7 +81,8 @@ class GradientDescent:
 
     def iterate_full(self, max_iter, schedule_method):
             
-        beta = np.random.rand(np.shape(self.X)[1])
+        beta = np.random.rand(jnp.shape(self.X)[1])
+        beta = jnp.array(beta)
         self.iteration = 0
         self.max_iter = max_iter
             
@@ -107,21 +108,22 @@ class GradientDescent:
     
     def iterate_minibatch(self, max_epoch, num_batches, schedule_method):
 
-        beta = np.random.rand(np.shape(self.X)[1])
+        beta = np.random.rand(jnp.shape(self.X)[1])
         self.epoch = 0
         self.iteration = 0
         self.max_iter = max_epoch*num_batches
         
-        n = np.shape(self.X)[0]
+        n = jnp.shape(self.X)[0]
         indices = np.arange(n)
-        
-        #batch_size = int(n/num_batches)
 
         for epoch in range(max_epoch):
             np.random.shuffle(indices)
-            batches = np.array_split(indices, num_batches)
+
+            batches = jnp.array_split(indices, num_batches)
 
             for i in range(num_batches):
+                
+                self.iteration += 1
                 
                 X_batch = self.X[batches[i], :]
                 y_batch = self.y[batches[i]]
@@ -133,7 +135,6 @@ class GradientDescent:
                 change = self.calculate_change(gradient)
                 beta = beta - change
                 
-                self.iteration += 1
             
             # Fiks riktig konvergenskriterie
             total_gradient = self.calc_gradient(self.X, self.y, beta)
@@ -192,7 +193,7 @@ class GradientDescentAdagrad(GradientDescent):
     def calculate_change(self, gradient):
         self.acc_squared_gradient = self.acc_squared_gradient + gradient*gradient
         
-        self.change = (self.learning_rate/(self.delta + np.sqrt(self.acc_squared_gradient)))*gradient \
+        self.change = (self.learning_rate/(self.delta + jnp.sqrt(self.acc_squared_gradient)))*gradient \
             + self.momentum*self.change
 
         return self.change
@@ -206,16 +207,16 @@ class GradientDescentRMSprop(GradientDescent):
         self.delta = delta
         self.rho = rho
         self.change = 0
-        p = np.shape(self.X)[1]
+        p = jnp.shape(self.X)[1]
         # This does not work yet
-        self.acc_squared_gradient = np.zeros(p)
+        self.acc_squared_gradient = jnp.zeros(p)
         
     def calculate_change(self, gradient):
         
         self.acc_squared_gradient = (self.rho*self.acc_squared_gradient + 
                                      (1-self.rho) * gradient**2)
         # Calculate the update
-        self.change = (gradient*self.learning_rate) / (self.delta + np.sqrt(self.acc_squared_gradient))
+        self.change = (gradient*self.learning_rate) / (self.delta + jnp.sqrt(self.acc_squared_gradient))
         
         return self.change
 
@@ -240,13 +241,13 @@ class GradientDescentADAM(GradientDescent):
         first_term = self.first_moment/(1.0 - self.rho1**self.iteration)
         second_term = self.second_moment/(1.0 - self.rho2**self.iteration)
 
-        self.change = self.learning_rate*first_term/(np.sqrt(second_term)+self.delta)
+        self.change = self.learning_rate*first_term/(jnp.sqrt(second_term)+self.delta)
         
         return self.change
 
 if __name__ == "__main__":
     def make_design_matrix(x, degree):
-        "Creates the design matrix for the given polynomial degree and input data"
+        "Creates the design matrix for the given polynomial degree and ijnput data"
         
         X = np.zeros((len(x), degree+1))
         
@@ -256,10 +257,15 @@ if __name__ == "__main__":
         return X
 
     def cost_function_OLS(X, y, beta):
-        return (1.0/n)*np.sum((y-X.dot(beta))**2)
+        n = len(y)  # Define the number of data points
+        return (1.0/n) * jnp.sum((y - jnp.dot(X, beta))**2)
+
+    # def cost_function_OLS(X, y, beta):
+    #     return (1.0/n)*jnp.sum((y-X.dot(beta))**2)
     
     def analytical_gradient(X, y, beta):
-        return (2.0/n)*np.dot(X.T, ((np.dot(X,beta))-y))
+        n = len(y)
+        return (2.0/n)*jnp.dot(X.T, ((jnp.dot(X, beta))-y))
     
     np.random.seed(1342)
     
@@ -267,8 +273,8 @@ if __name__ == "__main__":
     
     n = 100
     
-    x = np.linspace(0, 1, n)
-    y = np.sum(np.asarray([x ** p * b for p, b in enumerate(true_beta)]),
+    x = jnp.linspace(0, 1, n)
+    y = jnp.sum(jnp.asarray([x ** p * b for p, b in enumerate(true_beta)]),
                     axis=0) + 0.1 * np.random.normal(size=len(x))
     
     # Making a design matrix to use for linear regression part
@@ -278,23 +284,27 @@ if __name__ == "__main__":
     learning_rate = 0.1
     tol=1e-3
     beta_guess = np.random.rand(3)
-
+    
+    X = jnp.array(X)  # Convert X to a JAX array
+    y = jnp.array(y)  # Convert y to a JAX array
+    
     np.random.seed(505)
     momentum=0.5
     delta=1e-8
     rho1 = 0.9
     rho2 = 0.99
-    grad_descent_rms = GradientDescent(X=X, y=y, 
-                                             learning_rate=learning_rate, tol=tol, 
-                                             cost_function=cost_function_OLS)
+    grad_descent_rms = GradientDescentADAM(delta, rho1, rho2, X=X, y=y, 
+                                       learning_rate=learning_rate, tol=tol, 
+                                       cost_function=cost_function_OLS,
+                                       analytic_gradient=analytical_gradient)
     
     max_iter = 100000
     max_epochs = 500
-    beta_calculated = grad_descent_rms.iterate(iteration_method="Full", 
-                                                max_iter=max_iter)
-    # beta_calculated = grad_descent_rms.iterate(iteration_method="Stochastic", 
-    #                                            max_epoch=max_epochs,
-    #                                            num_batches=10)
+    # beta_calculated = grad_descent_rms.iterate(iteration_method="Full", 
+    #                                             max_iter=max_iter)
+    beta_calculated = grad_descent_rms.iterate(iteration_method="Stochastic", 
+                                                max_epoch=max_epochs,
+                                                num_batches=10)
     print(beta_calculated)
     
 
