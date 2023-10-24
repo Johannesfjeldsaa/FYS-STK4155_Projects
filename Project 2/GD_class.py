@@ -19,7 +19,7 @@ class GradientDescent:
     
     def __init__(self, X, y, learning_rate, tol, cost_function, 
                  analytic_gradient=None, iteration_method="Normal",
-                 record=False):
+                 record_history=False):
         
         self.X = X
         self.y = y
@@ -28,11 +28,10 @@ class GradientDescent:
         self.tol = tol
         self.cost_function = cost_function
         self.iteration_method = iteration_method
+        self.record_history = record_history
         
-        if record == "All":
+        if self.record_history is True:
             self.betas = []
-            self.cost_scores = []
-        elif record == "Cost scores":
             self.cost_scores = []
         
         if analytic_gradient is not None:
@@ -71,14 +70,11 @@ class GradientDescent:
         self.change = self.learning_rate * gradient
         return self.change
     
-    def record(self, beta):
-        try:
-            self.betas.append[beta]
-        except NameError:
-            pass
-
+    def record(self, beta, cost_score):
+        self.betas.append(beta)
+        self.cost_scores.append(cost_score)
+            
         
-
     def iterate_full(self, max_iter, schedule_method):
             
         beta = np.random.rand(jnp.shape(self.X)[1])
@@ -98,6 +94,11 @@ class GradientDescent:
             
             change = self.calculate_change(gradient)
             beta = beta - change
+            
+            if self.record_history is True:
+                cost_score = self.cost_function(self.X, self.y, beta)
+                
+                self.record(beta, cost_score)
 
                 
         if self.iteration == self.max_iter:
@@ -135,7 +136,10 @@ class GradientDescent:
                 change = self.calculate_change(gradient)
                 beta = beta - change
                 
-            
+                if self.record_history is True:
+                    cost_score = self.cost_function(X_batch, y_batch, beta)
+                    self.record(beta, cost_score)
+                
             # Fiks riktig konvergenskriterie
             total_gradient = self.calc_gradient(self.X, self.y, beta)
             if self.check_convergence(total_gradient, self.epoch):
@@ -296,7 +300,8 @@ if __name__ == "__main__":
     grad_descent_rms = GradientDescentADAM(delta, rho1, rho2, X=X, y=y, 
                                        learning_rate=learning_rate, tol=tol, 
                                        cost_function=cost_function_OLS,
-                                       analytic_gradient=analytical_gradient)
+                                       analytic_gradient=analytical_gradient,
+                                       record_history=True)
     
     max_iter = 100000
     max_epochs = 500
@@ -307,5 +312,6 @@ if __name__ == "__main__":
                                                 num_batches=10)
     print(beta_calculated)
     
+    print(grad_descent_rms.cost_scores)
 
     
