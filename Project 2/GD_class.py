@@ -4,12 +4,22 @@ Created on Mon Oct 23 11:14:44 2023
 
 @author: vildesn
 """
-import autograd.numpy as np
-from autograd import grad
+#import autograd.numpy as np
+#from autograd import grad
+
+
+# import jax
+import jax.numpy as jnp
+import numpy as np
+#import matplotlib.pyplot as plt
+
+from jax import grad as jax_grad
 
 class GradientDescent:
     
-    def __init__(self, X, y, learning_rate, tol, cost_function, analytic_gradient=None, iteration_method="Normal"):
+    def __init__(self, X, y, learning_rate, tol, cost_function, 
+                 analytic_gradient=None, iteration_method="Normal",
+                 record=False):
         
         self.X = X
         self.y = y
@@ -18,6 +28,12 @@ class GradientDescent:
         self.tol = tol
         self.cost_function = cost_function
         self.iteration_method = iteration_method
+        
+        if record == "All":
+            self.betas = []
+            self.cost_scores = []
+        elif record == "Cost scores":
+            self.cost_scores = []
         
         if analytic_gradient is not None:
             if callable(analytic_gradient):
@@ -28,7 +44,7 @@ class GradientDescent:
         else:
             # When defining the cost function, the third parameter must be 
             # the one to differentiate by
-            self.calc_gradient = grad(self.cost_function, 2)
+            self.calc_gradient = jax_grad(self.cost_function, 2)
     
     def learning_schedule(self, method):
         if method == "Fixed learning rate":
@@ -54,6 +70,14 @@ class GradientDescent:
     def calculate_change(self, gradient):
         self.change = self.learning_rate * gradient
         return self.change
+    
+    def record(self, beta):
+        try:
+            self.betas.append[beta]
+        except NameError:
+            pass
+
+        
 
     def iterate_full(self, max_iter, schedule_method):
             
@@ -73,6 +97,7 @@ class GradientDescent:
             
             change = self.calculate_change(gradient)
             beta = beta - change
+
                 
         if self.iteration == self.max_iter:
             print(f"Did not converge in {max_iter} iterations")
@@ -156,17 +181,19 @@ class GradientDescentMomentum(GradientDescent):
     
 class GradientDescentAdagrad(GradientDescent):
     # Sjekk hvorfor så sakte konvergering
-    def __init__(self, delta, **kwargs):
+    def __init__(self, delta, momentum, **kwargs):
         super().__init__(**kwargs)
         
         self.delta = delta
+        self.momentum = momentum
         self.change = 0
         self.acc_squared_gradient = 0
         
     def calculate_change(self, gradient):
         self.acc_squared_gradient = self.acc_squared_gradient + gradient*gradient
         
-        self.change = (self.learning_rate/(self.delta + np.sqrt(self.acc_squared_gradient)))*gradient
+        self.change = (self.learning_rate/(self.delta + np.sqrt(self.acc_squared_gradient)))*gradient \
+            + self.momentum*self.change
 
         return self.change
     
@@ -181,7 +208,7 @@ class GradientDescentRMSprop(GradientDescent):
         self.change = 0
         p = np.shape(self.X)[1]
         # This does not work yet
-        self.acc_squared_gradient = np.zeros(shape=(p, p))
+        self.acc_squared_gradient = np.zeros(p)
         
     def calculate_change(self, gradient):
         
@@ -194,7 +221,7 @@ class GradientDescentRMSprop(GradientDescent):
 
         
 class GradientDescentADAM(GradientDescent):
-    
+    # Fiks for stokastisk
     def __init__(self, delta, rho1, rho2, **kwargs):
         super().__init__(**kwargs)
         
@@ -248,7 +275,7 @@ if __name__ == "__main__":
     degree = 2
     X = make_design_matrix(x, degree)
     
-    learning_rate = 2
+    learning_rate = 0.1
     tol=1e-3
     beta_guess = np.random.rand(3)
 
@@ -257,17 +284,17 @@ if __name__ == "__main__":
     delta=1e-8
     rho1 = 0.9
     rho2 = 0.99
-    grad_descent_rms = GradientDescentMomentum(momentum, X=X, y=y, 
+    grad_descent_rms = GradientDescent(X=X, y=y, 
                                              learning_rate=learning_rate, tol=tol, 
-                                             cost_function=cost_function_OLS,
-                                             analytic_gradient=analytical_gradient)
+                                             cost_function=cost_function_OLS)
     
     max_iter = 100000
     max_epochs = 500
-    beta_calculated = grad_descent_rms.iterate(iteration_method="Stochastic", 
-                                               max_epoch=max_epochs, 
-                                               num_batches=10, 
-                                               schedule_method="Linear decay")
+    beta_calculated = grad_descent_rms.iterate(iteration_method="Full", 
+                                                max_iter=max_iter)
+    # beta_calculated = grad_descent_rms.iterate(iteration_method="Stochastic", 
+    #                                            max_epoch=max_epochs,
+    #                                            num_batches=10)
     print(beta_calculated)
     
 
