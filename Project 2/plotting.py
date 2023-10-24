@@ -1,6 +1,4 @@
-from GD_and_SGD_AD import AD_GD, AD_SGD
-from GD_and_SGD_analytical import GD, SGD
-from LinRegression import LinRegression
+from prepropeces import Handle_Files
 import matplotlib.pyplot as plt
 
 """"
@@ -40,5 +38,17 @@ def plot_SGD_MSE_convergence_epoch_batch(X, y, dict, approach, regression_method
     plt.axis([0,2000, 0, 50])
     plt.legend()
     plt.show()
+
+
+class Plott_creator:
+    def __init__(self):
+        self.file_handler = Handle_Files()
+    def plot_path(self, x, y, beta, x_path, y_path, title):
+        plt.plot(x, y, 'ro')
+        plt.plot(x_path, y_path, 'b-')
+        plt.title(title)
+        plt.xlabel('x value')
+        plt.ylabel('y value')
+        plt.show()
 
 

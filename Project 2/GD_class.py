@@ -4,11 +4,8 @@ Created on Mon Oct 23 11:14:44 2023
 
 @author: vildesn
 """
-#import autograd.numpy as jnp
-#from autograd import grad
 
-
-# import jax
+import jax
 import jax.numpy as jnp
 import numpy as np
 #import matplotlib.pyplot as plt
