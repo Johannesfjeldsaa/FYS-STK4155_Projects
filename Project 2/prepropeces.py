@@ -8,9 +8,9 @@ class Handle_Files:
         self.working_dir = os.getcwd()
 
         # Where to save the figures and data files
-        self.project_results_dir = self.working_dir+"Results"
-        self.results_figure_dir = self.working_dir+"Results/FigureFiles"
-        self.data_dir = self.working_dir+"DataFiles/"
+        self.project_results_dir = self.working_dir+" Results"
+        self.results_figure_dir = self.working_dir+" Results/FigureFiles"
+        self.data_dir = self.working_dir+" DataFiles/"
 
         if not os.path.exists(self.project_results_dir):
             os.mkdir(self.project_results_dir)
