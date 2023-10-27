@@ -257,7 +257,7 @@ class Plotting:
             plt.xticks(self.poly_degrees)
             
         fig.supxlabel("Polynomial degree")
-        fig.supylabel("R squared")
+        fig.supylabel("Mean Squared Error (MSE)")
         
         if save_filename is not None:
             save_fig(save_filename)

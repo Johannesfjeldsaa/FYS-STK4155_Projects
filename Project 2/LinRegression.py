@@ -288,7 +288,7 @@ class LinRegression:
         
         if regression_method == 'OLS':
             OLS = LinearRegression(fit_intercept=False)
-    
+
             # loop over trials in order to estimate the expectation value of the MSE
             estimated_mse_folds = cross_val_score(OLS, self.X, self.y,
                                                      scoring='neg_mean_squared_error', cv=kfold)
