@@ -130,9 +130,11 @@ if __name__ == '__main__':
         func = Activation_Functions(af)
         x = np.linspace(-10, 10, 100)
         y = [func.activation_function(x_i) for x_i in x]
+        y_grad = [func.grad_activation_function(x_i) for x_i in x]
 
         plt.hlines(0, -10, 10, color='black', linestyles='--')
         plt.plot(x, y, label=af)
+        plt.plot(x, y_grad, label='Gradient of {}'.format(af))
         plt.grid()
         plt.legend()
         plt.show()
