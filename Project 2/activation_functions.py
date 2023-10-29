@@ -4,6 +4,9 @@ class Activation_Functions:
         self.func_name = activation_function
         self.activation_function, self.grad_activation_function = self.set_activation_function()
 
+    def __str__(self):
+        return self.func_name
+
     def set_activation_function(self):
         if self.func_name == 'sigmoid':
             return self.sigmoid, self.grad_sigmoid
@@ -14,7 +17,7 @@ class Activation_Functions:
         elif self.func_name == 'Leaky ReLU':
             return self.Leaky_ReLU, self.grad_Leaky_ReLU
         else:
-            raise ValueError('Activation function is not implemeted. '
+            raise ValueError('Activation function is not available.' 
                              'Expected: sigmoid, relu, leaky_relu, not {}' .format(self.func_name))
 
     def sigmoid(self, x):
