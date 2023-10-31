@@ -16,7 +16,7 @@ class GradientDescent:
     
     def __init__(self, X, y, learning_rate, tol, cost_function, 
                  analytic_gradient=None, iteration_method="Normal",
-                 record_history=False):
+                 skip_convergence_check=False, record_history=False):
         
         self.X = X
         self.y = y
@@ -25,8 +25,9 @@ class GradientDescent:
         self.tol = tol
         self.cost_function = cost_function
         self.iteration_method = iteration_method
+        self.skip_convergence_check = skip_convergence_check
         self.record_history = record_history
-        
+
         if self.record_history is True:
             self.betas = []
             self.cost_scores = []
@@ -81,9 +82,10 @@ class GradientDescent:
             
         for i in range(max_iter):
             gradient = self.calc_gradient(self.X, self.y, beta)
-            
-            if self.check_convergence(gradient, self.iteration):
-                break
+
+            if self.skip_convergence_check is False:
+                if self.check_convergence and self.check_convergence(gradient, self.iteration):
+                    break
             
             self.iteration += 1
             
@@ -97,9 +99,9 @@ class GradientDescent:
                 
                 self.record(beta, cost_score)
 
-                
-        if self.iteration == self.max_iter:
-            print(f"Did not converge in {max_iter} iterations")
+        if self.skip_convergence_check is False:
+            if self.iteration == self.max_iter:
+                print(f"Did not converge in {max_iter} iterations")
             
         return beta
     
@@ -138,14 +140,15 @@ class GradientDescent:
                     self.record(beta, cost_score)
                 
             # Fiks riktig konvergenskriterie
-            total_gradient = self.calc_gradient(self.X, self.y, beta)
-            if self.check_convergence(total_gradient, self.epoch):
-                break
-            
+            if self.skip_convergence_check is False:
+                total_gradient = self.calc_gradient(self.X, self.y, beta)
+                if self.check_convergence(total_gradient, self.epoch):
+                    break
+
             self.epoch += 1
-            
-        if self.epoch == max_epoch:
-            print(f"Did not converge in {max_epoch} epochs")
+        if self.skip_convergence_check is False:
+            if self.epoch == max_epoch:
+                print(f"Did not converge in {max_epoch} epochs")
                 
         return beta
 
