@@ -35,7 +35,9 @@ class Dense_Layer:
         :param inputs: Input data
         :return: Output of the layer
         """
-        self.output = self.activation_function.activation_function(jnp.dot(inputs.T, self.weights) + self.biases)
+
+        self.output = self.activation_function.activation_function(jnp.dot(inputs, self.weights) + self.biases)
+        
         return self.output
 
 
@@ -89,7 +91,7 @@ class Neural_Network:
         hidden_layers = []
         for i in range(self.n_hidden_layers):
             if i == 0:
-                n_inputs = self.X.shape[0]
+                n_inputs = self.X.shape[1]
             else:
                 n_inputs = self.n_hidden_nodes[i - 1]
 
@@ -149,11 +151,14 @@ class Neural_Network:
 
     def feed_forward(self):
         for i in range(self.n_hidden_layers):
+            
             if i == 0:
                 self.hidden_layers[i].forward_propagation(self.X)
-                print(self.hidden_layers[i].output)
+                #print(self.hidden_layers[i].output)
             else:
                 self.hidden_layers[i].forward_propagation(self.hidden_layers[i-1].output)
+        
+        self.output_layer.forward_propagation(self.hidden_layers[-1].output)
 
         #self.output = self.activation_function(jnp.dot(self.X, self.weights) + self.biases)
         #pass
