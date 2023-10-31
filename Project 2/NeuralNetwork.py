@@ -28,6 +28,7 @@ class Dense_Layer:
             self.biases = biases
 
         self.output = None
+        self.output_pre_activation = None
 
     def forward_propagation(self, inputs):
         """
@@ -35,8 +36,8 @@ class Dense_Layer:
         :param inputs: Input data
         :return: Output of the layer
         """
-
-        self.output = self.activation_function.activation_function(jnp.dot(inputs, self.weights) + self.biases)
+        self.output_pre_activation = jnp.dot(inputs, self.weights) + self.biases
+        self.output = self.activation_function.activation_function(self.output_pre_activation)
         
         return self.output
 
@@ -162,3 +163,12 @@ class Neural_Network:
 
         #self.output = self.activation_function(jnp.dot(self.X, self.weights) + self.biases)
         #pass
+        
+    def backward_propagation(self):
+        
+        pass
+        # dz_dW = self.hidden_layers[-1].output
+        # da_dz = self.output_layer.grad_activation_function(x=self.output_layer.output_pre_activation)
+        # dC_da = (self.output_layer.output - self.target)/(self.output_layer.output(1 - self.output_layer.output))
+        
+        
