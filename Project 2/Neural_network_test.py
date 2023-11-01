@@ -65,3 +65,8 @@ print('Biases output layer:\n'
 
 print("Final prediction:\n"
       f"{ffnn.output_layer.output}")
+
+#%%
+
+
+
