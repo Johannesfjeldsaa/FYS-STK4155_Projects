@@ -4,7 +4,7 @@ from sklearn.model_selection import  train_test_split
 from sklearn.datasets import load_breast_cancer
 from sklearn.linear_model import LogisticRegression
 import pandas as pd
-from classification_cost_and_derivate_cost import *
+from cost_functions import *
 import jax
 import numpy as np
 import jax.numpy as jnp
