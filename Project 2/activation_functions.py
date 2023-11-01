@@ -32,7 +32,8 @@ class Activation_Functions:
         """
         return 1 / (1 + np.exp(-x))
 
-    def grad_sigmoid(self, x=None, y=None):
+    @staticmethod
+    def grad_sigmoid(x=None, y=None):
         """
         Calculate the gradient of the sigmoid function. y is the output of the sigmoid function and the preferred
         method of calculating the gradient. x is also possible, but slower.

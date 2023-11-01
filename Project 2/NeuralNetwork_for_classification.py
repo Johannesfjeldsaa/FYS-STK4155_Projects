@@ -173,13 +173,35 @@ class Neural_Network:
         
     def backward_propagation(self):
 
-        nabla_b = [np.zeros(b.shape) for b in self.hidden_layers[-1].weights]  # lagret vekter fremover?
-        nabla_w = [np.zeros(w.shape) for w in self.hidden_layers[-1].biases] # lagret biases fra forward propagation?
+        nabla_w = [np.zeros(b.shape) for b in self.hidden_layers[-1].weights]  # lagret vekter fremover?
+        nabla_b = [np.zeros(w.shape) for w in self.hidden_layers[-1].biases] # lagret biases fra forward propagation?
 
-        derivative_cost_func = jax.grad(self.cost_func(self.target))
-        print(f'derivate of the cost function at target is {derivative_cost_func}')
+        # calculate delta for output layer
+        #derivative_cost_func = jax.grad(self.cost_func(self.target))
+        #print(f'derivate of the cost function at target is {derivative_cost_func}')
 
 
+        # calculate delta for output layer
+        delta = (analytic_derivate_CostCross(self.output_layer.output.ravel(), self.target) *
+                   Activation_Functions.grad_sigmoid(y=self.output_layer.output.ravel()))
+
+        nabla_b[-1] = delta
+        entry = np.dot(delta.reshape(1, -1), self.hidden_layers[-1].output)
+        print(entry)
+        nabla_w[-1] = np.dot(delta.reshape(1, -1), self.hidden_layers[-1].output)
+
+
+        for l in range(2, self.n_hidden_layers + 1):
+
+            z = self.hidden_layers[-l].output_pre_activation
+
+            sigmoid_z = Activation_Functions.grad_sigmoid(z)
+
+            delta = np.dot(self.weights[-l + 1].transpose(), delta) * sigmoid_z
+            nabla_b[-l] = delta
+            nabla_w[-l] = np.dot(delta, self.hidden_layers[-l - 1].output_pre_activation.transpose())
+
+        return nabla_b, nabla_w
 
         # dz_dW = self.hidden_layers[-1].output
         # da_dz = self.output_layer.grad_activation_function(x=self.output_layer.output_pre_activation)
@@ -187,3 +209,11 @@ class Neural_Network:
         
     def compute_output_error_L(self):
         pass
+
+    def cost_derivative(self):
+
+        for i in range(self.n_hidden_layers):
+            if i == 0:
+                return (self.output_layer.output - self.target)
+            else:
+                return (self.hidden_layers[-i] - self.target)

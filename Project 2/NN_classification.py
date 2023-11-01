@@ -9,6 +9,10 @@ import jax
 import numpy as np
 import jax.numpy as jnp
 from sklearn.preprocessing import StandardScaler
+from NeuralNetwork_for_classification import Neural_Network
+import numpy as np
+import jax.numpy as jnp
+from cost_functions import *
 
 # Load the data
 cancer = load_breast_cancer()
@@ -45,10 +49,38 @@ starting to get out what i want
 input_nodes = X_train.shape[1]
 output_nodes = 1
 
-
-
 cross_entropy_func = CostCrossEntropy
 cross_entropy_derivative = jax.grad(cross_entropy_func(target))
 
+
+
 # både cost function og cross entry derivate må kunne sendes inn i backprop
 
+# Create design matrix
+X = jnp.array([[0, 0],
+               [0, 1],
+               [1, 0],
+               [1, 1]])
+# Since X is our input we need it to be a vector, hence we reshape it
+#X = X.reshape((X.shape[0]*X.shape[1], 1))
+
+# The XOR gate
+target_XOR = jnp.array( [ 0, 1 ,1, 0])
+# The OR gate
+target_OR = jnp.array( [ 0, 1 ,1, 1])
+# The AND gate
+target_AND = jnp.array( [ 0, 0 ,0, 1])
+
+n_hidden_layers = 1
+n_hidden_nodes = 2
+n_outputs = 1
+
+NN = Neural_Network(X, target_OR, n_hidden_layers, n_hidden_nodes, n_outputs, activation_function='sigmoid', cost_func=CostCrossEntropy)
+str(NN)
+NN.feed_forward()
+
+
+dw, db = NN.backward_propagation()
+
+print(dw)
+print(db)
