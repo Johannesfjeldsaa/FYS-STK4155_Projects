@@ -3,7 +3,7 @@ import numpy as np
 
 
 """
-Class for making dataframes
+For making dataframes
 """
 
 def df_analysis_method_is_index(dict, methods, headers):

@@ -1,6 +1,6 @@
 from Gridsearch import GridSearch_LinReg_epochs_batchsize
 from dataframes import df_analysis_method_is_index
-from plotting import plot_SGD_MSE_convergence_epoch_batch, plot_SGD_pred_model_MSE_epoch_batch
+from plotting import plot_SGD_MSE_convergence_epoch_batch
 from GD_class import *
 
 
@@ -34,14 +34,14 @@ np.random.seed(1342)
 
 true_beta = [2, 0.5, 3.2]
 
-n = 500
+n = 1000
 
 x = jnp.linspace(0, 1, n)
 y = jnp.sum(jnp.asarray([x ** p * b for p, b in enumerate(true_beta)]),
                 axis=0) + 0.2 * np.random.normal(size=len(x))
 
 # Making a design matrix to use for linear regression part
-degree = 1
+degree = 2
 X = make_design_matrix(x, degree)
 
 # Set parameters
@@ -94,8 +94,12 @@ grad_descentNoMomentum = GradientDescentMomentum(momentum=0, X=X, y=y,
                                             skip_convergence_check=True,
                                             record_history=True)
 
+"""
+Perform gridsearch analysis
+"""
+
 #testing diff combos of batch and n epochs
-num_batches = np.array([100, 70, 40, 20, 10, 5])
+num_batches = np.array([50, 40, 30, 20, 10, 5])
 epochs = np.array([25, 50, 100, 200, 300, 500])
 
 solution_dicts = []  # was intended if you wanted to provie other combinations, now only optimization analysis for SGD analytical
@@ -184,16 +188,8 @@ results_header = ['Num. batches MSE', 'Num. epochs MSE', 'Num. batches R2', 'Num
                   'Min MSE score', 'Max R2 score']
 
 
-
 df = df_analysis_method_is_index(batch_epoch_analysis_dict, optimization_methods, results_header)
 
 print(batch_epoch_analysis_dict)
 print(df)
 
-
-"""
-Now optimal 
-"""
-
-#plot_SGD_MSE_convergence_epoch_batch(X, y, batch_epoch_analysis_dict, 'analytical', 'OLS')
-#plot_SGD_pred_model_MSE_epoch_batch(linreg.X, x, linreg.y, batch_epoch_analysis_dict, 'analytical', 'OLS')
