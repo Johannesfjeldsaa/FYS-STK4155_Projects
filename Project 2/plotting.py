@@ -25,7 +25,10 @@ def plot_SGD_pred_model_MSE_epoch_batch(X, x, y, dict, approach, regression_meth
         plt.show()
 
 
-def plot_SGD_MSE_convergence_epoch_batch(X, y, dict, approach, regression_method):  # utvides senere til å ta inn Ridge
+def plot_SGD_MSE_convergence_epoch_batch(X, y, optimization_methods, cost_scores):  # utvides senere til å ta inn Ridge
+
+    for optimization in optimization_methods:
+
     for key, value in dict.items():
         _, MSE = SGD(X, y, value[0], value[1], 0.1, 0.3, 10**-8,
                      regression_method=regression_method, optimization=key)
