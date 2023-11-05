@@ -89,8 +89,10 @@ our try on breast cancer
 # Load the data
 cancer = load_breast_cancer()
 X = cancer.data
-target = cancer.target
-target = target.reshape(target.shape[0], 1)
+target_true = cancer.target
+target_true = target_true.reshape(target_true.shape[0], 1)
+
+
 
 """
 #splitting
@@ -103,10 +105,6 @@ X_train_scaled = scaler.transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 """
 
-# Making a data frame
-cancerpd = pd.DataFrame(cancer.data, columns=cancer.feature_names)
-print(cancerpd)
-
 # NN setup
 n_hidden_layers = 1
 n_hidden_nodes = 2
@@ -117,7 +115,7 @@ learning_rate=0.1
 #training NN with breastcancer data
 NN_output_cancer = []
 
-for X_row, target_row in zip(X, target):
+for X_row, target_row in zip(X, target_true):
 
     X = jnp.array([X_row])
     target = jnp.array([target_row])
@@ -136,7 +134,8 @@ for X_row, target_row in zip(X, target):
 
 
 print(NN_output_cancer)
-print(len(target))
+print(len(target_true))
+
 print(len(NN_output_cancer))
 
 
@@ -152,7 +151,8 @@ benign = cancer.data[cancer.target == 1]
 starting to get out what i want
 """
 
-
+# Making a data frame
+#cancerpd = pd.DataFrame(cancer.data, columns=cancer.feature_names)
 
 
 
@@ -226,5 +226,5 @@ def accuracy_test(y_true, y_pred):
 #accuracy_AND_gate = accuracy_test(target_AND, NN_output_AND)
 #print(accuracy_AND_gate)
 
-accuracy_breast_cancer = accuracy_test(target, NN_output_cancer)
+accuracy_breast_cancer = accuracy_test(target_true, NN_output_cancer)
 print(accuracy_breast_cancer)
