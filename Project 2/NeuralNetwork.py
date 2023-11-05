@@ -20,7 +20,7 @@ class Dense_Layer:
 
         if self.constructed_from_scratch:
             # initiate weights of network randomly, scale by 0.1 to keep small
-            # Initiate biases to zero
+            # Initiate biases to 0.01
             self.weights = .1 * np.random.randn(self.n_inputs, self.n_nodes)
             self.biases = np.zeros((1, self.n_nodes)) + 0.01
         else:
