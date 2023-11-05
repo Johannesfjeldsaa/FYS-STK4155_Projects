@@ -24,9 +24,14 @@ class Cost_Functions:
         if self.func_name == 'LogReg':
             return self.CostLogReg(self.target)
 
+        elif self.func_name == 'CostCrossEntropy':
+            return self.CostCrossEntropy(self.target)
+
         else:
             raise ValueError('Cost function is not available.' 
                              'Expected: LogReg, not {}' .format(self.func_name))
+
+
 
     def CostLogReg(self, target):
     
@@ -35,4 +40,10 @@ class Cost_Functions:
             return -(1.0 / target.shape[0]) * jnp.sum(
                 (target * jnp.log(pred + 10e-10)) + ((1 - target) * jnp.log(1 - pred + 10e-10)))
     
+        return func
+
+    def CostCrossEntropy(self, target):
+        def func(X):
+            return -(1.0 / target.size) * jnp.sum(target * jnp.log(X + 10e-10))
+
         return func
