@@ -11,13 +11,13 @@ import jax.numpy as jnp
 
 np.random.seed(1234)
 
-# Create design matrix
 X = jnp.array([[0, 0],
-               [0, 1],
-               [1, 0],
-               [1, 1]])
-# Since X is our input we need it to be a vector, hence we reshape it 
-#X = X.reshape((X.shape[0]*X.shape[1], 1))
+                [0, 1],
+                [1, 0],
+                [1, 1]])
+
+X = jnp.array([[1, 0]])
+
 
 # The XOR gate
 target_XOR = jnp.array( [ 0, 1 ,1, 0])
@@ -26,13 +26,16 @@ target_OR = jnp.array( [ 0, 1 ,1, 1])
 # The AND gate
 target_AND = jnp.array( [ 0, 0 ,0, 1])
 
+target = jnp.array([ 1])
+
 #%%
 n_hidden_layers = 1
 n_hidden_nodes = 2
 n_outputs = 1
-learning_rate=0.01
+learning_rate=0.1
+lmbd=0
 
-ffnn = Neural_Network(X, target_AND, n_hidden_layers, n_hidden_nodes, n_outputs, 
+ffnn = Neural_Network(X, target, n_hidden_layers, n_hidden_nodes, n_outputs, 
                       learning_rate, activation_function='sigmoid',
                       classification_problem=True)
 str(ffnn)

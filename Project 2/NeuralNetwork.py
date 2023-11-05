@@ -45,7 +45,7 @@ class Dense_Layer:
         
         return self.output
     
-    def backward_propagation(self, delta_next, weights_next, input_value, learning_rate):
+    def backward_propagation(self, delta_next, weights_next, input_value, learning_rate, lmbd):
         
         da_dz = self.activation_function.grad_activation_function(self.output_pre_activation)
         
@@ -53,6 +53,9 @@ class Dense_Layer:
         
         dC_dW = np.matmul(input_value.T, self.delta)
         dC_db = np.sum(self.delta, axis=0)
+        
+        # Adding a regularization term
+        dC_dW = dC_dW + lmbd * self.weights
         
         self.weights = self.weights - learning_rate * dC_dW
         self.biases = self.biases - learning_rate * dC_db
@@ -67,7 +70,7 @@ class Output_Layer(Dense_Layer):
         self.delta = None
         
         
-    def backward_propagation(self, input_value, learning_rate):
+    def backward_propagation(self, input_value, learning_rate, lmbd):
         
         dC_da = self.cost_function.cost_function_grad(self.output)
         da_dz = self.activation_function.grad_activation_function(self.output_pre_activation)
@@ -76,6 +79,9 @@ class Output_Layer(Dense_Layer):
         
         dC_dW = np.matmul(input_value.T, self.delta)
         dC_db = np.sum(self.delta, axis=0)
+        
+        # Adding a regularization term
+        dC_dW = dC_dW + lmbd * self.weights
         
         self.weights = self.weights - learning_rate * dC_dW
         self.biases = self.biases - learning_rate * dC_db
@@ -86,6 +92,7 @@ class Neural_Network:
 
     def __init__(self, X, target, n_hidden_layers, n_hidden_nodes, n_outputs,
                  learning_rate=0.1,
+                 lmbd=0.0,
                  activation_function='ReLU', cost_function='LogReg', 
                  weights=None, biases=None,
                  classification_problem=False):
@@ -97,6 +104,7 @@ class Neural_Network:
         self.cost_function = Cost_Functions(cost_function, self.target)
         
         self.learning_rate=learning_rate
+        self.lmbd = lmbd
         
         if weights or biases is None:
             self.construct_network_from_scratch = True
@@ -254,7 +262,8 @@ class Neural_Network:
     def feed_backward(self):
         
         self.output_layer.backward_propagation(input_value=self.hidden_layers[-1].output,
-                                               learning_rate=self.learning_rate)
+                                               learning_rate=self.learning_rate,
+                                               lmbd=self.lmbd)
         
         for i in reversed(range(self.n_hidden_layers)):
             
@@ -265,7 +274,7 @@ class Neural_Network:
                 weights = self.output_layer.weights
                 
             else:
-                delta=self.hidden_layers[i+1].delta
+                delta = self.hidden_layers[i+1].delta
                 weights = self.hidden_layers[i+1].weights
                 
             if i == 0:
@@ -277,12 +286,13 @@ class Neural_Network:
             layer.backward_propagation(delta_next=delta, 
                                        weights_next = weights,
                                        input_value = input_value,
-                                       learning_rate=self.learning_rate)
+                                       learning_rate=self.learning_rate,
+                                       lmbd=self.lmbd)
 
         
     def train(self):
         
-        for i in range(100):
+        for i in range(1000):
             
             self.feed_forward()
             self.feed_backward()
