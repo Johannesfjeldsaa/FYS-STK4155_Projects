@@ -51,7 +51,6 @@ class GradientDescent:
             self.learning_rate = (1 - alpha) * self.initial_learning_rate \
                 + alpha * self.initial_learning_rate * 0.01 
         elif method == "Exponential decay":
-            #Legg inn senere
             pass
         else:
             raise ValueError("Not a valid learning schedule!")
@@ -146,6 +145,7 @@ class GradientDescent:
                     break
 
             self.epoch += 1
+
         if self.skip_convergence_check is False:
             if self.epoch == max_epoch:
                 print(f"Did not converge in {max_epoch} epochs")
