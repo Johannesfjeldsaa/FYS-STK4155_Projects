@@ -11,13 +11,13 @@ import jax.numpy as jnp
 
 np.random.seed(1234)
 
-# Create design matrix
 X = jnp.array([[0, 0],
-               [0, 1],
-               [1, 0],
-               [1, 1]])
-# Since X is our input we need it to be a vector, hence we reshape it 
-#X = X.reshape((X.shape[0]*X.shape[1], 1))
+                [0, 1],
+                [1, 0],
+                [1, 1]])
+
+X = jnp.array([[1, 0]])
+
 
 # The XOR gate
 target_XOR = jnp.array( [ 0, 1 ,1, 0])
@@ -26,12 +26,18 @@ target_OR = jnp.array( [ 0, 1 ,1, 1])
 # The AND gate
 target_AND = jnp.array( [ 0, 0 ,0, 1])
 
+target = jnp.array([ 1])
+
 #%%
 n_hidden_layers = 1
 n_hidden_nodes = 2
 n_outputs = 1
+learning_rate=0.1
+lmbd=0
 
-ffnn = Neural_Network(X, target_OR, n_hidden_layers, n_hidden_nodes, n_outputs, activation_function='sigmoid')
+ffnn = Neural_Network(X, target, n_hidden_layers, n_hidden_nodes, n_outputs, 
+                      learning_rate, activation_function='sigmoid',
+                      classification_problem=True)
 str(ffnn)
 
 print(f'Output layer has {ffnn.output_layer.n_nodes} node and uses the {str(ffnn.output_layer.activation_function)} as activation function')
@@ -68,5 +74,35 @@ print("Final prediction:\n"
 
 #%%
 
+ffnn.feed_backward()
+
+print('Weights hidden layer 1:\n'
+      f'{ffnn.hidden_layers[0].weights}')
+print('Biases hidden layer 1:\n'
+      f'{ffnn.hidden_layers[0].biases}')
+
+print('weights output layer:\n'
+      f'{ffnn.output_layer.weights}')
+print('Biases output layer:\n'
+      f'{ffnn.output_layer.biases}')
+
+print("Final prediction:\n"
+      f"{ffnn.output_layer.output}")
 
 
+#%%
+
+ffnn.train()
+
+print('Weights hidden layer 1:\n'
+      f'{ffnn.hidden_layers[0].weights}')
+print('Biases hidden layer 1:\n'
+      f'{ffnn.hidden_layers[0].biases}')
+
+print('weights output layer:\n'
+      f'{ffnn.output_layer.weights}')
+print('Biases output layer:\n'
+      f'{ffnn.output_layer.biases}')
+
+print("Final prediction:\n"
+      f"{ffnn.output_layer.output}")
