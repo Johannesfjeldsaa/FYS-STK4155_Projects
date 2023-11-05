@@ -31,7 +31,6 @@ Can be used to compare with for task E.
 
 """
 
-"""
 # Load the data
 cancer = load_breast_cancer()
 
@@ -79,7 +78,6 @@ plt.figure(figsize=(15,8))
 sns.heatmap(data=correlation_matrix, annot=True)
 plt.show()
 
-"""
 
 
 """
@@ -91,8 +89,6 @@ cancer = load_breast_cancer()
 X = cancer.data
 target_true = cancer.target
 target_true = target_true.reshape(target_true.shape[0], 1)
-
-
 
 """
 #splitting
