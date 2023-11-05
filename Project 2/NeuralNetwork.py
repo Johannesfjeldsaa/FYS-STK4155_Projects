@@ -93,7 +93,7 @@ class Neural_Network:
     def __init__(self, X, target, n_hidden_layers, n_hidden_nodes, n_outputs,
                  learning_rate=0.1,
                  lmbd=0.0,
-                 activation_function='ReLU', cost_function='LogReg', 
+                 activation_function='ReLU', cost_function='CostCrossEntropy',
                  weights=None, biases=None,
                  classification_problem=False):
 
