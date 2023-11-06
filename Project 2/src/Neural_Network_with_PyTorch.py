@@ -2,28 +2,6 @@ import torch
 import torch.nn as nn
 
 
-class Gradient_Descent_PyTorch:
-
-    def __init__(self,
-                 neural_network,
-                 optimiziation_method='Adam',
-                 learning_rate=0.01):
-
-        self.nn = neural_network
-        self.optimiziation_method = optimiziation_method
-        self.learning_rate = learning_rate
-        self.optimizer = self.set_optimizer()
-
-    def __str__(self):
-        return (f"Gradient descent with {self.optimiziation_method} optimizer and learning rate {self.learning_rate}.")
-    def set_optimizer(self):
-        if self.optimiziation_method == 'SGD':
-            return torch.optim.SGD(self.nn.parameters(), lr=self.learning_rate)
-        elif self.optimiziation_method == 'Adam':
-            return torch.optim.Adam(self.nn.parameters(), lr=self.learning_rate)
-        else:
-            raise ValueError('method must be one of: SGD, Adam not {}'.format(self.method))
-
 class cost_function_PyTorch:
 
     def __init__(self, cost_function):
