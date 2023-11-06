@@ -14,34 +14,34 @@ from jax import grad as jax_grad
 
 class GradientDescent:
     
-    def __init__(self, X, y, learning_rate, tol, cost_function, 
+    def __init__(self, learning_rate, tol=1e-3, cost_function=None, 
                  analytic_gradient=None, iteration_method="Normal",
                  skip_convergence_check=False, record_history=False):
         
-        self.X = X
-        self.y = y
         self.learning_rate = learning_rate
         self.initial_learning_rate = learning_rate
-        self.tol = tol
-        self.cost_function = cost_function
-        self.iteration_method = iteration_method
-        self.skip_convergence_check = skip_convergence_check
-        self.record_history = record_history
-
-        if self.record_history is True:
-            self.betas = []
-            self.cost_scores = []
         
-        if analytic_gradient is not None:
-            if callable(analytic_gradient):
-                self.calc_gradient = analytic_gradient
+        if cost_function is not None:
+            self.tol = tol
+            self.cost_function = cost_function
+            self.iteration_method = iteration_method
+            self.skip_convergence_check = skip_convergence_check
+            self.record_history = record_history
+    
+            if self.record_history is True:
+                self.betas = []
+                self.cost_scores = []
+            
+            if analytic_gradient is not None:
+                if callable(analytic_gradient):
+                    self.calc_gradient = analytic_gradient
+                else:
+                    raise ValueError("Analytical gradient must be a function")
+                    
             else:
-                raise ValueError("Analytical gradient must be a function")
-                
-        else:
-            # When defining the cost function, the third parameter must be 
-            # the one to differentiate by
-            self.calc_gradient = jax_grad(self.cost_function, 2)
+                # When defining the cost function, the third parameter must be 
+                # the one to differentiate by
+                self.calc_gradient = jax_grad(self.cost_function, 2)
     
     def learning_schedule(self, method):
         if method == "Fixed learning rate":
@@ -63,8 +63,13 @@ class GradientDescent:
         else:
             return False
         
-    def calculate_change(self, gradient):
-        self.change = self.learning_rate * gradient
+    def calculate_change(self, gradient, learning_rate=None):
+        
+        if learning_rate is None:
+            learning_rate = self.learning_rate
+        
+        self.change = learning_rate * gradient
+        
         return self.change
     
     def record(self, beta, cost_score):
@@ -72,15 +77,15 @@ class GradientDescent:
         self.cost_scores.append(cost_score)
             
         
-    def iterate_full(self, max_iter, schedule_method):
+    def iterate_full(self, X, target, max_iter, schedule_method):
             
-        beta = np.random.rand(jnp.shape(self.X)[1])
+        beta = np.random.rand(jnp.shape(X)[1])
         beta = jnp.array(beta)
         self.iteration = 0
         self.max_iter = max_iter
             
         for i in range(max_iter):
-            gradient = self.calc_gradient(self.X, self.y, beta)
+            gradient = self.calc_gradient(X, target, beta)
 
             if self.skip_convergence_check is False:
                 if self.check_convergence and self.check_convergence(gradient, self.iteration):
@@ -94,7 +99,7 @@ class GradientDescent:
             beta = beta - change
             
             if self.record_history is True:
-                cost_score = self.cost_function(self.X, self.y, beta)
+                cost_score = self.cost_function(X, target, beta)
                 
                 self.record(beta, cost_score)
 
@@ -105,14 +110,15 @@ class GradientDescent:
         return beta
     
     
-    def iterate_minibatch(self, max_epoch, num_batches, schedule_method):
+    def iterate_minibatch(self, X, target, max_epoch, num_batches, 
+                          schedule_method):
 
-        beta = np.random.rand(jnp.shape(self.X)[1])
+        beta = np.random.rand(jnp.shape(X)[1])
         self.epoch = 0
         self.iteration = 0
         self.max_iter = max_epoch*num_batches
         
-        n = jnp.shape(self.X)[0]
+        n = jnp.shape(X)[0]
         indices = np.arange(n)
 
         for epoch in range(max_epoch):
@@ -124,8 +130,8 @@ class GradientDescent:
                 
                 self.iteration += 1
                 
-                X_batch = self.X[batches[i], :]
-                y_batch = self.y[batches[i]]
+                X_batch = X[batches[i], :]
+                y_batch = target[batches[i]]
 
                 gradient = self.calc_gradient(X_batch, y_batch, beta)
                 
@@ -140,7 +146,7 @@ class GradientDescent:
                 
             # Fiks riktig konvergenskriterie
             if self.skip_convergence_check is False:
-                total_gradient = self.calc_gradient(self.X, self.y, beta)
+                total_gradient = self.calc_gradient(X, target, beta)
                 if self.check_convergence(total_gradient, self.epoch):
                     break
 
@@ -153,19 +159,21 @@ class GradientDescent:
         return beta
 
     
-    def iterate(self, iteration_method, max_iter=None, max_epoch=None, num_batches=None,
+    def iterate(self, X, target, iteration_method, max_iter=None, 
+                max_epoch=None, num_batches=None,
                 schedule_method="Fixed learning rate"):
         
         if iteration_method == "Full":
             max_iter = max_iter if not None else 10000
             
-            self.beta = self.iterate_full(max_iter, schedule_method)
+            self.beta = self.iterate_full(X, target, max_iter, schedule_method)
         
         elif iteration_method == "Stochastic":
             max_epoch = max_epoch if not None else 128
             num_batches = num_batches if not None else 10
             
-            self.beta = self.iterate_minibatch(max_epoch, num_batches, schedule_method)
+            self.beta = self.iterate_minibatch(X, target, max_epoch, 
+                                               num_batches, schedule_method)
             
         return self.beta
         
@@ -179,8 +187,12 @@ class GradientDescentMomentum(GradientDescent):
         self.momentum = momentum
         self.change = 0
         
-    def calculate_change(self, gradient):
-        self.change = self.momentum*self.change + self.learning_rate*gradient
+    def calculate_change(self, gradient, learning_rate=None):
+        
+        if learning_rate is None:
+            learning_rate = self.learning_rate
+            
+        self.change = self.momentum*self.change + learning_rate*gradient
         return self.change
     
     
@@ -194,10 +206,14 @@ class GradientDescentAdagrad(GradientDescent):
         self.change = 0
         self.acc_squared_gradient = 0
         
-    def calculate_change(self, gradient):
+    def calculate_change(self, gradient, learning_rate=None):
+        
+        if learning_rate is None:
+            learning_rate = self.learning_rate
+            
         self.acc_squared_gradient = self.acc_squared_gradient + gradient*gradient
         
-        self.change = (self.learning_rate/(self.delta + jnp.sqrt(self.acc_squared_gradient)))*gradient \
+        self.change = (learning_rate/(self.delta + jnp.sqrt(self.acc_squared_gradient)))*gradient \
             + self.momentum*self.change
 
         return self.change
@@ -205,22 +221,24 @@ class GradientDescentAdagrad(GradientDescent):
     
 class GradientDescentRMSprop(GradientDescent):
     
-    def __init__(self, delta, rho, **kwargs):
+    def __init__(self, delta, rho, n_inputs, **kwargs):
         super().__init__(**kwargs)
         
         self.delta = delta
         self.rho = rho
         self.change = 0
-        p = jnp.shape(self.X)[1]
         # This does not work yet
-        self.acc_squared_gradient = jnp.zeros(p)
+        self.acc_squared_gradient = jnp.zeros(n_inputs)
         
-    def calculate_change(self, gradient):
+    def calculate_change(self, gradient, learning_rate=None):
+        
+        if learning_rate is None:
+            learning_rate = self.learning_rate
         
         self.acc_squared_gradient = (self.rho*self.acc_squared_gradient + 
                                      (1-self.rho) * gradient**2)
         # Calculate the update
-        self.change = (gradient*self.learning_rate) / (self.delta + jnp.sqrt(self.acc_squared_gradient))
+        self.change = (gradient*learning_rate) / (self.delta + jnp.sqrt(self.acc_squared_gradient))
         
         return self.change
 
@@ -236,16 +254,22 @@ class GradientDescentADAM(GradientDescent):
         self.change = 0
         self.first_moment = 0
         self.second_moment = 0
+        self.iter_adam = 0
         
-    def calculate_change(self, gradient):
+    def calculate_change(self, gradient, learning_rate=None):
+        
+        if learning_rate is None:
+            learning_rate = self.learning_rate
+        
+        self.iter_adam += 1
         
         self.first_moment = self.rho1*self.first_moment + (1 - self.rho1)*gradient
         self.second_moment = self.rho2*self.second_moment + (1-self.rho2)*(gradient*gradient)
         
-        first_term = self.first_moment/(1.0 - self.rho1**self.iteration)
-        second_term = self.second_moment/(1.0 - self.rho2**self.iteration)
+        first_term = self.first_moment/(1.0 - self.rho1**self.iter_adam)
+        second_term = self.second_moment/(1.0 - self.rho2**self.iter_adam)
 
-        self.change = self.learning_rate*first_term/(jnp.sqrt(second_term)+self.delta)
+        self.change = learning_rate*first_term/(jnp.sqrt(second_term)+self.delta)
         
         return self.change
 

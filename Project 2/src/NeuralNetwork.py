@@ -3,21 +3,25 @@ import numpy as np
 import jax.numpy as jnp
 
 from activation_functions import Activation_Functions
-from cost_functions import Cost_Functions
-
+from GD_class import *
+from copy import deepcopy
 
 class Dense_Layer:
     """
     Class for a dense layer in a neural network. Each layer consists of n_nodes with their own bias (float).
     Further each has weights vector of same length as n_inputs.
     """
-    def __init__(self, n_inputs, n_nodes, activation_function, weights=None, biases=None):
+    def __init__(self, n_inputs, n_nodes, activation_function, optimizer, 
+                 weights=None, biases=None):
 
         self.n_inputs = n_inputs
         self.n_nodes = n_nodes
         self.activation_function = Activation_Functions(activation_function)
+        self.weight_optimizer=deepcopy(optimizer)
+        self.bias_optimizer=deepcopy(optimizer)
+        
         self.constructed_from_scratch = True if weights or biases is None else False
-
+        
         if self.constructed_from_scratch:
             # initiate weights of network randomly, scale by 0.1 to keep small
             # Initiate biases to 0.01
@@ -45,20 +49,24 @@ class Dense_Layer:
         
         return self.output
     
-    def backward_propagation(self, delta_next, weights_next, input_value, learning_rate, lmbd):
+    def backward_propagation(self, delta_next, weights_next, input_value, 
+                             learning_rate, lmbd):
         
         da_dz = self.activation_function.grad_activation_function(self.output_pre_activation)
         
         self.delta = np.matmul(delta_next, weights_next.T) * da_dz
         
-        dC_dW = np.matmul(input_value.T, self.delta)
-        dC_db = np.sum(self.delta, axis=0)
-        
+        dC_dW = jnp.matmul(input_value.T, self.delta)
+        dC_db = jnp.sum(self.delta, axis=0)
+
         # Adding a regularization term
         dC_dW = dC_dW + lmbd * self.weights
         
-        self.weights = self.weights - learning_rate * dC_dW
-        self.biases = self.biases - learning_rate * dC_db
+        change_W = self.weight_optimizer.calculate_change(dC_dW, learning_rate)
+        change_b = self.bias_optimizer.calculate_change(dC_db, learning_rate)
+    
+        self.weights = self.weights - change_W
+        self.biases = self.biases - change_b
         
 class Output_Layer(Dense_Layer):
     
@@ -77,33 +85,50 @@ class Output_Layer(Dense_Layer):
         
         self.delta = dC_da * da_dz # Elementwise multiplication
         
-        dC_dW = np.matmul(input_value.T, self.delta)
-        dC_db = np.sum(self.delta, axis=0)
+        dC_dW = jnp.matmul(input_value.T, self.delta)
+        dC_db = jnp.sum(self.delta, axis=0)  # Spør om hvorfor sum (og ikke gjennomsnitt)
         
         # Adding a regularization term
         dC_dW = dC_dW + lmbd * self.weights
         
-        self.weights = self.weights - learning_rate * dC_dW
-        self.biases = self.biases - learning_rate * dC_db
+        change_W = self.weight_optimizer.calculate_change(dC_dW, learning_rate)
+        change_b = self.bias_optimizer.calculate_change(dC_db, learning_rate)
+        
+        self.weights = self.weights - change_W
+        self.biases = self.biases - change_b
     
-
 
 class Neural_Network:
 
-    def __init__(self, X, target, n_hidden_layers, n_hidden_nodes, n_outputs,
+    def __init__(self, n_inputs, n_hidden_layers, n_hidden_nodes, n_outputs,
+                 cost_function,
                  learning_rate=0.1,
                  lmbd=0.0,
-                 activation_function='ReLU', cost_function='CostCrossEntropy',
+                 activation_function_hidden='ReLU', 
+                 activation_function_output='Sigmoid',
+                 optimizer=None,
                  weights=None, biases=None,
                  classification_problem=False):
 
         # Initiate the basics of the network
-        self.X = X
-        self.target = target
-        self.activation_function = activation_function
-        self.cost_function = Cost_Functions(cost_function, self.target)
+        self.n_inputs = n_inputs
         
-        self.learning_rate=learning_rate
+        self.activation_function_hidden = activation_function_hidden
+        self.activation_function_output = activation_function_output
+        
+        self.cost_function = cost_function
+        
+        if optimizer is None:
+            self.optimizer = GradientDescentADAM(delta=1e-8, rho1=0.9, 
+                                                 rho2=0.99,
+                                                 learning_rate=0.1)
+        elif isinstance(optimizer, GradientDescent):
+            self.optimizer = optimizer
+        else:
+            raise ValueError(f"Expected an instance of GradientDescent class, not {type(optimizer)}")
+            
+        self.initial_learning_rate = learning_rate
+        self.learning_rate = learning_rate
         self.lmbd = lmbd
         
         if weights or biases is None:
@@ -135,7 +160,8 @@ class Neural_Network:
 
     def __str__(self):
         return (f"Neural Network with {self.n_hidden_layers} hidden layers and {self.n_hidden_nodes} nodes per layer. "
-                f"The activation function is {self.activation_function}.")
+                f"The activation function for hidden layers is {self.activation_function_hidden}."
+                f"The activation function for the output layer is {self.activation_function_output}.")
 
     def initiate_hidden_layers(self):
         """
@@ -152,18 +178,16 @@ class Neural_Network:
         hidden_layers = []
         for i in range(self.n_hidden_layers):
             if i == 0:
-                n_inputs = self.X.shape[1]
+                n_inputs = self.n_inputs
             else:
                 n_inputs = self.n_hidden_nodes[i - 1]
 
             if self.construct_network_from_scratch:
                 hidden_layers.append(self.construct_layer(n_inputs=n_inputs,
-                                                          n_hidden_nodes=self.n_hidden_nodes[i],
-                                                          activation_function=self.activation_function))
+                                                          n_hidden_nodes=self.n_hidden_nodes[i]))
             else:
                 hidden_layers.append(self.construct_layer(n_inputs=n_inputs,
                                                           n_hidden_nodes=self.n_hidden_nodes[i],
-                                                          activation_function=self.activation_function,
                                                           layer_indx=i))
 
         return hidden_layers
@@ -173,17 +197,21 @@ class Neural_Network:
         Initiates the output layer of the network.
         :return: Output layer of the network
         """
-        if self.construct_network_from_scratch:
-            return self.construct_output_layer(n_inputs=self.hidden_layers[-1].n_nodes,
-                                               n_hidden_nodes=self.n_outputs,
-                                               activation_function='sigmoid')
+        if self.n_hidden_layers == 0:
+            n_inputs=self.n_inputs
         else:
-            return self.construct_output_layer(n_inputs=self.hidden_layers[-1].n_nodes,
+            n_inputs=self.hidden_layers[-1].n_nodes
+                
+        if self.construct_network_from_scratch:
+
+            return self.construct_output_layer(n_inputs=n_inputs,
+                                               n_hidden_nodes=self.n_outputs)
+        else:
+            return self.construct_output_layer(n_inputs=n_inputs,
                                                n_hidden_nodes=self.n_outputs,
-                                               activation_function='sigmoid',
                                                layer_indx=-1)
         
-    def construct_output_layer_from_scratch(self, n_inputs, n_hidden_nodes, activation_function):
+    def construct_output_layer_from_scratch(self, n_inputs, n_hidden_nodes):
         """
         Constructs a layer without weights and biases.
         :param n_inputs: Number of inputs to the layer
@@ -194,9 +222,10 @@ class Neural_Network:
         return Output_Layer(cost_function=self.cost_function, 
                            n_inputs=n_inputs,
                            n_nodes=n_hidden_nodes,
-                           activation_function=activation_function)
+                           activation_function=self.activation_function_output,
+                           optimizer=self.optimizer)
 
-    def construct_output_layer_from_previous_training(self, n_inputs, n_hidden_nodes, activation_function, layer_indx):
+    def construct_output_layer_from_previous_training(self, n_inputs, n_hidden_nodes, layer_indx):
         """
         Constructs a layer with weights and biases.
         :param n_inputs: Number of inputs to the layer
@@ -208,11 +237,12 @@ class Neural_Network:
         return Output_Layer(cost_function=self.cost_function, 
                            n_inputs=n_inputs,
                            n_nodes=n_hidden_nodes,
-                           activation_function=activation_function,
+                           activation_function=self.activation_function_output,
+                           optimizer=self.optimizer,
                            weights=self.weights[layer_indx],
                            biases=self.biases[layer_indx])
 
-    def construct_layer_from_scratch(self, n_inputs, n_hidden_nodes, activation_function):
+    def construct_layer_from_scratch(self, n_inputs, n_hidden_nodes):
         """
         Constructs a layer without weights and biases.
         :param n_inputs: Number of inputs to the layer
@@ -222,9 +252,10 @@ class Neural_Network:
         """
         return Dense_Layer(n_inputs=n_inputs,
                            n_nodes=n_hidden_nodes,
-                           activation_function=activation_function)
+                           activation_function=self.activation_function_hidden,
+                           optimizer=self.optimizer)
 
-    def construct_layer_from_previous_training(self, n_inputs, n_hidden_nodes, activation_function, layer_indx):
+    def construct_layer_from_previous_training(self, n_inputs, n_hidden_nodes, layer_indx):
         """
         Constructs a layer with weights and biases.
         :param n_inputs: Number of inputs to the layer
@@ -235,18 +266,19 @@ class Neural_Network:
         """
         return Dense_Layer(n_inputs=n_inputs,
                            n_nodes=n_hidden_nodes,
-                           activation_function=activation_function,
+                           activation_function=self.activation_function_hidden,
+                           optimizer=self.optimizer,
                            weights=self.weights[layer_indx],
                            biases=self.biases[layer_indx])
     
     def classify(self):
         self.output_layer.output = jnp.where(self.output_layer.output > 0.5, 1.0, 0.0)
 
-    def feed_forward(self):
+    def feed_forward(self, X):
         for i in range(self.n_hidden_layers):
             
             if i == 0:
-                input_value = self.X
+                input_value = X
             else:
                 input_value = self.hidden_layers[i-1].output
             
@@ -259,7 +291,7 @@ class Neural_Network:
 
 
         
-    def feed_backward(self):
+    def feed_backward(self, X):
         
         self.output_layer.backward_propagation(input_value=self.hidden_layers[-1].output,
                                                learning_rate=self.learning_rate,
@@ -278,7 +310,7 @@ class Neural_Network:
                 weights = self.hidden_layers[i+1].weights
                 
             if i == 0:
-                input_value = self.X
+                input_value = X
             else:
                 input_value = self.hidden_layers[i-1].output
                 
@@ -288,14 +320,23 @@ class Neural_Network:
                                        input_value = input_value,
                                        learning_rate=self.learning_rate,
                                        lmbd=self.lmbd)
-
+    
+    def learning_schedule(self, method, iteration, num_iter):
+        if method == "Fixed learning rate":
+            pass
+        elif method == "Linear decay":
+            alpha = iteration / (num_iter)
+            self.learning_rate = (1 - alpha) * self.initial_learning_rate \
+                + alpha * self.initial_learning_rate * 0.01 
         
-    def train(self):
+    def train(self, X, num_iter=1000, method="Fixed learning rate"):
         
-        for i in range(1000):
+        for i in range(num_iter):
             
-            self.feed_forward()
-            self.feed_backward()
+            self.learning_schedule(method, iteration=i, num_iter=num_iter)
+            
+            self.feed_forward(X)
+            self.feed_backward(X)
         
         
         
