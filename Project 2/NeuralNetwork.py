@@ -1,7 +1,9 @@
+
 import numpy as np
 import jax.numpy as jnp
 
 from activation_functions import Activation_Functions
+from cost_functions import Cost_Functions
 
 
 class Dense_Layer:
@@ -18,7 +20,7 @@ class Dense_Layer:
 
         if self.constructed_from_scratch:
             # initiate weights of network randomly, scale by 0.1 to keep small
-            # Initiate biases to zero
+            # Initiate biases to 0.01
             self.weights = .1 * np.random.randn(self.n_inputs, self.n_nodes)
             self.biases = np.zeros((1, self.n_nodes)) + 0.01
         else:
@@ -29,6 +31,8 @@ class Dense_Layer:
 
         self.output = None
         self.output_pre_activation = None
+        
+        self.delta = None
 
     def forward_propagation(self, inputs):
         """
@@ -40,23 +44,76 @@ class Dense_Layer:
         self.output = self.activation_function.activation_function(self.output_pre_activation)
         
         return self.output
+    
+    def backward_propagation(self, delta_next, weights_next, input_value, learning_rate, lmbd):
+        
+        da_dz = self.activation_function.grad_activation_function(self.output_pre_activation)
+        
+        self.delta = np.matmul(delta_next, weights_next.T) * da_dz
+        
+        dC_dW = np.matmul(input_value.T, self.delta)
+        dC_db = np.sum(self.delta, axis=0)
+        
+        # Adding a regularization term
+        dC_dW = dC_dW + lmbd * self.weights
+        
+        self.weights = self.weights - learning_rate * dC_dW
+        self.biases = self.biases - learning_rate * dC_db
+        
+class Output_Layer(Dense_Layer):
+    
+    def __init__(self, cost_function, **kwargs):
+        super().__init__(**kwargs)
+        
+        self.cost_function = cost_function
+        
+        self.delta = None
+        
+        
+    def backward_propagation(self, input_value, learning_rate, lmbd):
+        
+        dC_da = self.cost_function.cost_function_grad(self.output)
+        da_dz = self.activation_function.grad_activation_function(self.output_pre_activation)
+        
+        self.delta = dC_da * da_dz # Elementwise multiplication
+        
+        dC_dW = np.matmul(input_value.T, self.delta)
+        dC_db = np.sum(self.delta, axis=0)
+        
+        # Adding a regularization term
+        dC_dW = dC_dW + lmbd * self.weights
+        
+        self.weights = self.weights - learning_rate * dC_dW
+        self.biases = self.biases - learning_rate * dC_db
+    
 
 
 class Neural_Network:
 
     def __init__(self, X, target, n_hidden_layers, n_hidden_nodes, n_outputs,
-                 activation_function='ReLU', weights=None, biases=None):
+                 learning_rate=0.1,
+                 lmbd=0.0,
+                 activation_function='ReLU', cost_function='CostCrossEntropy',
+                 weights=None, biases=None,
+                 classification_problem=False):
 
         # Initiate the basics of the network
         self.X = X
         self.target = target
         self.activation_function = activation_function
+        self.cost_function = Cost_Functions(cost_function, self.target)
+        
+        self.learning_rate=learning_rate
+        self.lmbd = lmbd
+        
         if weights or biases is None:
             self.construct_network_from_scratch = True
             self.construct_layer = self.construct_layer_from_scratch
+            self.construct_output_layer = self.construct_output_layer_from_scratch
         else:
             self.construct_network_from_scratch = False
             self.construct_layer = self.construct_layer_from_previous_training
+            self.construct_output_layer = self.construct_output_layer_from_previous_training
             self.weights = weights
             self.biases = biases
 
@@ -72,6 +129,9 @@ class Neural_Network:
 
         self.hidden_layers = self.initiate_hidden_layers()
         self.output_layer = self.initiate_output_layer()
+        
+        self.classification_problem = classification_problem
+        
 
     def __str__(self):
         return (f"Neural Network with {self.n_hidden_layers} hidden layers and {self.n_hidden_nodes} nodes per layer. "
@@ -114,14 +174,43 @@ class Neural_Network:
         :return: Output layer of the network
         """
         if self.construct_network_from_scratch:
-            return self.construct_layer(n_inputs=self.hidden_layers[-1].n_nodes,
-                                        n_hidden_nodes=self.n_outputs,
-                                        activation_function='sigmoid')
+            return self.construct_output_layer(n_inputs=self.hidden_layers[-1].n_nodes,
+                                               n_hidden_nodes=self.n_outputs,
+                                               activation_function='sigmoid')
         else:
-            return self.construct_layer(n_inputs=self.hidden_layers[-1].n_nodes,
-                                        n_hidden_nodes=self.n_outputs,
-                                        activation_function='sigmoid',
-                                        layer_indx=-1)
+            return self.construct_output_layer(n_inputs=self.hidden_layers[-1].n_nodes,
+                                               n_hidden_nodes=self.n_outputs,
+                                               activation_function='sigmoid',
+                                               layer_indx=-1)
+        
+    def construct_output_layer_from_scratch(self, n_inputs, n_hidden_nodes, activation_function):
+        """
+        Constructs a layer without weights and biases.
+        :param n_inputs: Number of inputs to the layer
+        :param n_hidden_nodes: Number of nodes in the layer
+        :param activation_function: Activation function of the layer
+        :return: Layer with random weights and biases set to 0.01
+        """
+        return Output_Layer(cost_function=self.cost_function, 
+                           n_inputs=n_inputs,
+                           n_nodes=n_hidden_nodes,
+                           activation_function=activation_function)
+
+    def construct_output_layer_from_previous_training(self, n_inputs, n_hidden_nodes, activation_function, layer_indx):
+        """
+        Constructs a layer with weights and biases.
+        :param n_inputs: Number of inputs to the layer
+        :param n_hidden_nodes: Number of nodes in the layer
+        :param activation_function: Activation function of the layer
+        :param layer_indx: Index of the layer
+        :return: Layer with weights and biases
+        """
+        return Output_Layer(cost_function=self.cost_function, 
+                           n_inputs=n_inputs,
+                           n_nodes=n_hidden_nodes,
+                           activation_function=activation_function,
+                           weights=self.weights[layer_indx],
+                           biases=self.biases[layer_indx])
 
     def construct_layer_from_scratch(self, n_inputs, n_hidden_nodes, activation_function):
         """
@@ -149,26 +238,66 @@ class Neural_Network:
                            activation_function=activation_function,
                            weights=self.weights[layer_indx],
                            biases=self.biases[layer_indx])
+    
+    def classify(self):
+        self.output_layer.output = jnp.where(self.output_layer.output > 0.5, 1.0, 0.0)
 
     def feed_forward(self):
         for i in range(self.n_hidden_layers):
             
             if i == 0:
-                self.hidden_layers[i].forward_propagation(self.X)
-                #print(self.hidden_layers[i].output)
+                input_value = self.X
             else:
-                self.hidden_layers[i].forward_propagation(self.hidden_layers[i-1].output)
+                input_value = self.hidden_layers[i-1].output
+            
+            self.hidden_layers[i].forward_propagation(input_value)
         
         self.output_layer.forward_propagation(self.hidden_layers[-1].output)
+        
+        if self.classification_problem:
+            self.classify()
 
-        #self.output = self.activation_function(jnp.dot(self.X, self.weights) + self.biases)
-        #pass
+
         
-    def backward_propagation(self):
+    def feed_backward(self):
         
-        pass
-        # dz_dW = self.hidden_layers[-1].output
-        # da_dz = self.output_layer.grad_activation_function(x=self.output_layer.output_pre_activation)
-        # dC_da = (self.output_layer.output - self.target)/(self.output_layer.output(1 - self.output_layer.output))
+        self.output_layer.backward_propagation(input_value=self.hidden_layers[-1].output,
+                                               learning_rate=self.learning_rate,
+                                               lmbd=self.lmbd)
+        
+        for i in reversed(range(self.n_hidden_layers)):
+            
+            layer = self.hidden_layers[i]
+            
+            if i == (self.n_hidden_layers - 1):
+                delta = self.output_layer.delta
+                weights = self.output_layer.weights
+                
+            else:
+                delta = self.hidden_layers[i+1].delta
+                weights = self.hidden_layers[i+1].weights
+                
+            if i == 0:
+                input_value = self.X
+            else:
+                input_value = self.hidden_layers[i-1].output
+                
+            
+            layer.backward_propagation(delta_next=delta, 
+                                       weights_next = weights,
+                                       input_value = input_value,
+                                       learning_rate=self.learning_rate,
+                                       lmbd=self.lmbd)
+
+        
+    def train(self):
+        
+        for i in range(1000):
+            
+            self.feed_forward()
+            self.feed_backward()
+        
+        
+        
         
         
