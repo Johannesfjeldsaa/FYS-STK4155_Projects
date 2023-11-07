@@ -34,8 +34,8 @@ class Neural_Network_PyTorch(nn.Module):
         self.n_hidden_nodes = n_hidden_nodes
         self.n_outputs = n_outputs
 
-        self.initiate_hidden_layers()
-        self.initiate_output_layer()
+        self.hidden_layers = self.initiate_hidden_layers()
+        self.output_layer = self.initiate_output_layer()
 
     #def __str__(self):
      #   return (f"Neural Network with {self.n_hidden_layers} hidden layers and {self.n_hidden_nodes} nodes per layer. "
@@ -68,23 +68,24 @@ class Neural_Network_PyTorch(nn.Module):
 
         :return: Hidden layers of the network
         """
+
+        hidden_layers = []
         for i in range(self.n_hidden_layers):
             if i == 0:
                 n_inputs = self.n_inputs
             else:
                 n_inputs = self.n_hidden_nodes[i - 1]
-            
-            setattr(self, f'hidden{i}', nn.Linear(n_inputs, self.n_hidden_nodes[i]))
-            setattr(self, f'activation{i}', self.activation_function_hidden_layers)
 
+            hidden_layers.append([nn.Linear(n_inputs, self.n_hidden_nodes[i]), self.activation_function_hidden_layers])
+
+        return hidden_layers
 
     def initiate_output_layer(self):
         """
         Initiates the output layer of the network.
         :return: Output layer of the network
         """
-        self.linear_output = nn.Linear(self.n_hidden_nodes[-1], self.n_outputs)
-        self.activated_output = self.activation_function_output_layer
+        return [nn.Linear(self.n_hidden_nodes[-1], self.n_outputs), self.activation_function_output_layer]
 
     def feed_forward(self, X):
         """
@@ -93,16 +94,15 @@ class Neural_Network_PyTorch(nn.Module):
         """
 
         input = X
-        for i in range(self.n_hidden_layers):
-            
-            linear_output = getattr(self, f'hidden{i}')(input)
-            non_linear_output = getattr(self, f'activation{i}')(linear_output)
-            
+        for layer in self.hidden_layers:
+            linear_output = layer[0](input)
+            non_linear_output = layer[1](linear_output)
+            # set non_linear_output as input for next layer
             input = non_linear_output
 
         # output layer
-        linear_output = self.linear_output(input)
-        output = self.activated_output(linear_output)
+        linear_output = self.output_layer[0](input)
+        output = self.output_layer[1](linear_output)
 
         return output
 
