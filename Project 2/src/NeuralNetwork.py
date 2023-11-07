@@ -25,8 +25,10 @@ class Dense_Layer:
         if self.constructed_from_scratch:
             # initiate weights of network randomly, scale by 0.1 to keep small
             # Initiate biases to 0.01
-            self.weights = .1 * np.random.randn(self.n_inputs, self.n_nodes)
-            self.biases = np.zeros((1, self.n_nodes)) + 0.01
+            #self.weights = .1 * np.random.randn(self.n_inputs, self.n_nodes)
+            self.weights = np.arange(self.n_inputs*self.n_nodes).reshape(self.n_inputs, self.n_nodes)
+            #self.weights = np.random.randn(self.n_inputs, self.n_nodes)
+            self.biases = np.zeros((1, self.n_nodes)) #+ 0.01
         else:
             # Brukes om man allerede har trent en modell.
             # Legg til kontroll av dimensjoner og type
@@ -45,7 +47,12 @@ class Dense_Layer:
         :return: Output of the layer
         """
         self.output_pre_activation = jnp.dot(inputs, self.weights) + self.biases
+        print(self.output_pre_activation)
+        #print(f"output before activation size: {self.output_pre_activation.shape}")
+        
         self.output = self.activation_function.activation_function(self.output_pre_activation)
+        print(self.output)
+        #print(f"output after activation size: {self.output.shape}")
         
         return self.output
     
@@ -56,8 +63,15 @@ class Dense_Layer:
         
         self.delta = np.matmul(delta_next, weights_next.T) * da_dz
         
+        #print(f"Size delta hidden layer: {self.delta.shape}")
+        
         dC_dW = jnp.matmul(input_value.T, self.delta)
         dC_db = jnp.sum(self.delta, axis=0)
+        
+        #print(f"Size input hidden layer: {input_value.shape}")
+        
+        #print(f"Size dC_dW hidden layer: {dC_dW.shape}")
+        #print(f"Size dC_db hidden layer: {dC_db.shape}")
 
         # Adding a regularization term
         dC_dW = dC_dW + lmbd * self.weights
@@ -83,16 +97,33 @@ class Output_Layer(Dense_Layer):
         dC_da = self.cost_function.cost_function_grad(self.output)
         da_dz = self.activation_function.grad_activation_function(self.output_pre_activation)
         
+        print(dC_da)
+        print(da_dz)
+        
         self.delta = dC_da * da_dz # Elementwise multiplication
+        print(self.delta)
+        
+        #print(f"Size delta output layer: {self.delta.shape}")
         
         dC_dW = jnp.matmul(input_value.T, self.delta)
-        dC_db = jnp.sum(self.delta, axis=0)  # Spør om hvorfor sum (og ikke gjennomsnitt)
+        dC_db = jnp.sum(self.delta, axis=0)  
+        
+        #print(f"Size input output layer: {input_value.shape}")
+        
+        #print(f"Size dC_dW output layer: {dC_dW.shape}")
+        #print(f"Size dC_db output layer: {dC_db.shape}")
         
         # Adding a regularization term
         dC_dW = dC_dW + lmbd * self.weights
         
+        print(dC_dW)
+        print(dC_db)
+        #print(learning_rate)
+        
         change_W = self.weight_optimizer.calculate_change(dC_dW, learning_rate)
         change_b = self.bias_optimizer.calculate_change(dC_db, learning_rate)
+        #print(change_W)
+        #print(change_b)
         
         self.weights = self.weights - change_W
         self.biases = self.biases - change_b
@@ -121,7 +152,7 @@ class Neural_Network:
         if optimizer is None:
             self.optimizer = GradientDescentADAM(delta=1e-8, rho1=0.9, 
                                                  rho2=0.99,
-                                                 learning_rate=0.1)
+                                                 learning_rate=learning_rate)
         elif isinstance(optimizer, GradientDescent):
             self.optimizer = optimizer
         else:
@@ -284,11 +315,8 @@ class Neural_Network:
             
             self.hidden_layers[i].forward_propagation(input_value)
         
+        print(self.hidden_layers[-1].output)
         self.output_layer.forward_propagation(self.hidden_layers[-1].output)
-        
-        if self.classification_problem:
-            self.classify()
-
 
         
     def feed_backward(self, X):
@@ -331,12 +359,21 @@ class Neural_Network:
         
     def train(self, X, num_iter=1000, method="Fixed learning rate"):
         
+        weights = []
+        
         for i in range(num_iter):
             
             self.learning_schedule(method, iteration=i, num_iter=num_iter)
             
+            weights.append(self.hidden_layers[0].weights)
+            
             self.feed_forward(X)
             self.feed_backward(X)
+            
+        if self.classification_problem:
+            self.classify()
+        
+        return weights
         
         
         

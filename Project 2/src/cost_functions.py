@@ -24,12 +24,12 @@ class Cost_Functions:
         if self.func_name == 'LogReg':
             return self.CostLogReg(self.target)
 
-        elif self.func_name == 'CostCrossEntropy':
+        elif self.func_name == 'CrossEntropy':
             return self.CostCrossEntropy(self.target)
 
         else:
             raise ValueError('Cost function is not available.' 
-                             'Expected: LogReg, not {}' .format(self.func_name))
+                             'Expected: LogReg, CrossEntropy, not {}' .format(self.func_name))
 
 
 

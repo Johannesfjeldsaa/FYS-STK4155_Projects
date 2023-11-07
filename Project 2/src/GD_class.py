@@ -67,7 +67,9 @@ class GradientDescent:
         
         if learning_rate is None:
             learning_rate = self.learning_rate
-        
+            
+        #print("GradientDescent run calculate_change")
+  
         self.change = learning_rate * gradient
         
         return self.change
@@ -192,6 +194,8 @@ class GradientDescentMomentum(GradientDescent):
         if learning_rate is None:
             learning_rate = self.learning_rate
             
+        #print("Momentum run calculate_change")
+            
         self.change = self.momentum*self.change + learning_rate*gradient
         return self.change
     
@@ -210,6 +214,8 @@ class GradientDescentAdagrad(GradientDescent):
         
         if learning_rate is None:
             learning_rate = self.learning_rate
+        
+        #print("Adagrad run calculate_change")
             
         self.acc_squared_gradient = self.acc_squared_gradient + gradient*gradient
         
@@ -234,6 +240,8 @@ class GradientDescentRMSprop(GradientDescent):
         
         if learning_rate is None:
             learning_rate = self.learning_rate
+            
+        #print("RMSprop run calculate_change")
         
         self.acc_squared_gradient = (self.rho*self.acc_squared_gradient + 
                                      (1-self.rho) * gradient**2)
@@ -260,8 +268,11 @@ class GradientDescentADAM(GradientDescent):
         
         if learning_rate is None:
             learning_rate = self.learning_rate
+            
+        #print("Adam run calculate_change")
         
         self.iter_adam += 1
+        #print(self.iter_adam)
         
         self.first_moment = self.rho1*self.first_moment + (1 - self.rho1)*gradient
         self.second_moment = self.rho2*self.second_moment + (1-self.rho2)*(gradient*gradient)
@@ -270,7 +281,7 @@ class GradientDescentADAM(GradientDescent):
         second_term = self.second_moment/(1.0 - self.rho2**self.iter_adam)
 
         self.change = learning_rate*first_term/(jnp.sqrt(second_term)+self.delta)
-        
+
         return self.change
 
 if __name__ == "__main__":
