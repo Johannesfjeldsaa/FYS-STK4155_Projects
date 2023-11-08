@@ -25,10 +25,10 @@ class Dense_Layer:
         if self.constructed_from_scratch:
             # initiate weights of network randomly, scale by 0.1 to keep small
             # Initiate biases to 0.01
-            #self.weights = .1 * np.random.randn(self.n_inputs, self.n_nodes)
-            self.weights = np.arange(self.n_inputs*self.n_nodes).reshape(self.n_inputs, self.n_nodes)
+            self.weights = .1 * np.random.randn(self.n_inputs, self.n_nodes)
+            #self.weights = np.arange(self.n_inputs*self.n_nodes).reshape(self.n_inputs, self.n_nodes)
             #self.weights = np.random.randn(self.n_inputs, self.n_nodes)
-            self.biases = np.zeros((1, self.n_nodes)) #+ 0.01
+            self.biases = np.zeros((1, self.n_nodes)) + 0.01
         else:
             # Brukes om man allerede har trent en modell.
             # Legg til kontroll av dimensjoner og type
@@ -39,6 +39,8 @@ class Dense_Layer:
         self.output_pre_activation = None
         
         self.delta = None
+        self.dC_dW = None
+        self.dC_db = None
 
     def forward_propagation(self, inputs):
         """
@@ -46,38 +48,28 @@ class Dense_Layer:
         :param inputs: Input data
         :return: Output of the layer
         """
+
         self.output_pre_activation = jnp.dot(inputs, self.weights) + self.biases
-        print(self.output_pre_activation)
-        #print(f"output before activation size: {self.output_pre_activation.shape}")
-        
         self.output = self.activation_function.activation_function(self.output_pre_activation)
-        print(self.output)
-        #print(f"output after activation size: {self.output.shape}")
-        
+
         return self.output
     
-    def backward_propagation(self, delta_next, weights_next, input_value, 
-                             learning_rate, lmbd):
+    def calculate_gradients(self, delta_next, weights_next, input_value, lmbd):
         
         da_dz = self.activation_function.grad_activation_function(self.output_pre_activation)
-        
-        self.delta = np.matmul(delta_next, weights_next.T) * da_dz
-        
-        #print(f"Size delta hidden layer: {self.delta.shape}")
-        
-        dC_dW = jnp.matmul(input_value.T, self.delta)
-        dC_db = jnp.sum(self.delta, axis=0)
-        
-        #print(f"Size input hidden layer: {input_value.shape}")
-        
-        #print(f"Size dC_dW hidden layer: {dC_dW.shape}")
-        #print(f"Size dC_db hidden layer: {dC_db.shape}")
 
-        # Adding a regularization term
-        dC_dW = dC_dW + lmbd * self.weights
+        self.delta = np.matmul(delta_next, weights_next.T) * da_dz
+ 
+        self.dC_dW = jnp.matmul(input_value.T, self.delta)
+        self.dC_db = jnp.sum(self.delta, axis=0)
         
-        change_W = self.weight_optimizer.calculate_change(dC_dW, learning_rate)
-        change_b = self.bias_optimizer.calculate_change(dC_db, learning_rate)
+        self.dC_dW = self.dC_dW + lmbd * self.weights
+
+    
+    def backward_propagation(self, learning_rate):
+
+        change_W = self.weight_optimizer.calculate_change(self.dC_dW, learning_rate)
+        change_b = self.bias_optimizer.calculate_change(self.dC_db, learning_rate)
     
         self.weights = self.weights - change_W
         self.biases = self.biases - change_b
@@ -89,46 +81,20 @@ class Output_Layer(Dense_Layer):
         
         self.cost_function = cost_function
         
-        self.delta = None
+    def calculate_gradients(self, input_value, lmbd):
         
-        
-    def backward_propagation(self, input_value, learning_rate, lmbd):
-        
-        dC_da = self.cost_function.cost_function_grad(self.output)
+        dC_da = self.cost_function(self.output)
         da_dz = self.activation_function.grad_activation_function(self.output_pre_activation)
         
-        print(dC_da)
-        print(da_dz)
-        
         self.delta = dC_da * da_dz # Elementwise multiplication
-        print(self.delta)
-        
-        #print(f"Size delta output layer: {self.delta.shape}")
-        
-        dC_dW = jnp.matmul(input_value.T, self.delta)
-        dC_db = jnp.sum(self.delta, axis=0)  
-        
-        #print(f"Size input output layer: {input_value.shape}")
-        
-        #print(f"Size dC_dW output layer: {dC_dW.shape}")
-        #print(f"Size dC_db output layer: {dC_db.shape}")
+
+        self.dC_dW = jnp.matmul(input_value.T, self.delta)
+        self.dC_db = jnp.sum(self.delta, axis=0)
         
         # Adding a regularization term
-        dC_dW = dC_dW + lmbd * self.weights
+        self.dC_dW = self.dC_dW + lmbd * self.weights
         
-        print(dC_dW)
-        print(dC_db)
-        #print(learning_rate)
-        
-        change_W = self.weight_optimizer.calculate_change(dC_dW, learning_rate)
-        change_b = self.bias_optimizer.calculate_change(dC_db, learning_rate)
-        #print(change_W)
-        #print(change_b)
-        
-        self.weights = self.weights - change_W
-        self.biases = self.biases - change_b
     
-
 class Neural_Network:
 
     def __init__(self, n_inputs, n_hidden_layers, n_hidden_nodes, n_outputs,
@@ -315,15 +281,14 @@ class Neural_Network:
             
             self.hidden_layers[i].forward_propagation(input_value)
         
-        print(self.hidden_layers[-1].output)
         self.output_layer.forward_propagation(self.hidden_layers[-1].output)
-
+        
         
     def feed_backward(self, X):
         
-        self.output_layer.backward_propagation(input_value=self.hidden_layers[-1].output,
-                                               learning_rate=self.learning_rate,
-                                               lmbd=self.lmbd)
+        # Calculate all the necessary gradients:
+        self.output_layer.calculate_gradients(input_value=self.hidden_layers[-1].output,
+                                              lmbd=self.lmbd)
         
         for i in reversed(range(self.n_hidden_layers)):
             
@@ -341,14 +306,17 @@ class Neural_Network:
                 input_value = X
             else:
                 input_value = self.hidden_layers[i-1].output
-                
+
+            layer.calculate_gradients(delta_next=delta, 
+                                      weights_next = weights,
+                                      input_value = input_value,
+                                      lmbd=self.lmbd)
             
-            layer.backward_propagation(delta_next=delta, 
-                                       weights_next = weights,
-                                       input_value = input_value,
-                                       learning_rate=self.learning_rate,
-                                       lmbd=self.lmbd)
-    
+        # Update the weights of all the layers:
+        for layer in [self.output_layer] + self.hidden_layers:
+            layer.backward_propagation(learning_rate=self.learning_rate)
+            
+            
     def learning_schedule(self, method, iteration, num_iter):
         if method == "Fixed learning rate":
             pass
@@ -356,6 +324,7 @@ class Neural_Network:
             alpha = iteration / (num_iter)
             self.learning_rate = (1 - alpha) * self.initial_learning_rate \
                 + alpha * self.initial_learning_rate * 0.01 
+        
         
     def train(self, X, num_iter=1000, method="Fixed learning rate"):
         
