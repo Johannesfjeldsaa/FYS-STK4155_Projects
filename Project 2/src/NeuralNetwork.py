@@ -318,6 +318,7 @@ class Neural_Network:
             
             
     def learning_schedule(self, method, iteration, num_iter):
+        
         if method == "Fixed learning rate":
             pass
         elif method == "Linear decay":
@@ -328,21 +329,27 @@ class Neural_Network:
         
     def train(self, X, num_iter=1000, method="Fixed learning rate"):
         
-        weights = []
+        #weights = []
         
         for i in range(num_iter):
             
             self.learning_schedule(method, iteration=i, num_iter=num_iter)
             
-            weights.append(self.hidden_layers[0].weights)
+            #weights.append(self.hidden_layers[0].weights)
             
             self.feed_forward(X)
             self.feed_backward(X)
             
+        #return weights
+    
+    def predict(self, X):
+        
+        self.feed_forward(X)
+        
         if self.classification_problem:
             self.classify()
         
-        return weights
+        return self.output_layer.output
         
         
         
