@@ -272,50 +272,65 @@ class Neural_Network:
         self.output_layer.output = jnp.where(self.output_layer.output > 0.5, 1.0, 0.0)
 
     def feed_forward(self, X):
-        for i in range(self.n_hidden_layers):
-            
-            if i == 0:
-                input_value = X
-            else:
-                input_value = self.hidden_layers[i-1].output
-            
-            self.hidden_layers[i].forward_propagation(input_value)
         
-        self.output_layer.forward_propagation(self.hidden_layers[-1].output)
+        if self.n_hidden_layers == 0:
+            
+            self.output_layer.forward_propagation(X)
         
+        else:
+            
+            for i in range(self.n_hidden_layers):
+                
+                if i == 0:
+                    input_value = X
+                else:
+                    input_value = self.hidden_layers[i-1].output
+                
+                self.hidden_layers[i].forward_propagation(input_value)
+            
+            self.output_layer.forward_propagation(self.hidden_layers[-1].output)
+            
         
     def feed_backward(self, X):
         
-        # Calculate all the necessary gradients:
-        self.output_layer.calculate_gradients(input_value=self.hidden_layers[-1].output,
-                                              lmbd=self.lmbd)
-        
-        for i in reversed(range(self.n_hidden_layers)):
+        if self.n_hidden_layers == 0:
+            self.output_layer.calculate_gradients(input_value=X,
+                                                  lmbd=self.lmbd)
             
-            layer = self.hidden_layers[i]
+            self.output_layer.backward_propagation(learning_rate=self.learning_rate)
             
-            if i == (self.n_hidden_layers - 1):
-                delta = self.output_layer.delta
-                weights = self.output_layer.weights
+            
+        else:
+            # Calculate all the necessary gradients:
+            self.output_layer.calculate_gradients(input_value=self.hidden_layers[-1].output,
+                                                  lmbd=self.lmbd)
+            
+            for i in reversed(range(self.n_hidden_layers)):
                 
-            else:
-                delta = self.hidden_layers[i+1].delta
-                weights = self.hidden_layers[i+1].weights
+                layer = self.hidden_layers[i]
                 
-            if i == 0:
-                input_value = X
-            else:
-                input_value = self.hidden_layers[i-1].output
-
-            layer.calculate_gradients(delta_next=delta, 
-                                      weights_next = weights,
-                                      input_value = input_value,
-                                      lmbd=self.lmbd)
-            
-        # Update the weights of all the layers:
-        for layer in [self.output_layer] + self.hidden_layers:
-            layer.backward_propagation(learning_rate=self.learning_rate)
-            
+                if i == (self.n_hidden_layers - 1):
+                    delta = self.output_layer.delta
+                    weights = self.output_layer.weights
+                    
+                else:
+                    delta = self.hidden_layers[i+1].delta
+                    weights = self.hidden_layers[i+1].weights
+                    
+                if i == 0:
+                    input_value = X
+                else:
+                    input_value = self.hidden_layers[i-1].output
+    
+                layer.calculate_gradients(delta_next=delta, 
+                                          weights_next = weights,
+                                          input_value = input_value,
+                                          lmbd=self.lmbd)
+                
+            # Update the weights of all the layers:
+            for layer in [self.output_layer] + self.hidden_layers:
+                layer.backward_propagation(learning_rate=self.learning_rate)
+                
             
     def learning_schedule(self, method, iteration, num_iter):
         
