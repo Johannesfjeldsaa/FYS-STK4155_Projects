@@ -4,16 +4,12 @@ Heatmap for lambda og learning rate
 Sjekk for de ulike datasettene hvilken gradientmetode som fungerer best og tune parametre for den (til bruk videre i NN)
 
 b)
-Få NN til å fungere med full designmatrise
 Legg inn mulighet for minibatches (i train)
 Få på plass pytorch versjon
-Finn ut valg av kostfunksjon og aktiveringsfunksjon for regresjonsproblem
 
 c) 
-Test ulike aktiveringsfunksjoner (sigmoid, relu, leaky relu)
 
 d)
-Legg til accuracy score
 
 e)
-Fikse slik at NN koden vår aksepterer valg av ingen hidden layers
+
