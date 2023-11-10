@@ -6,13 +6,16 @@ from activation_functions import Activation_Functions
 from GD_class import *
 from copy import deepcopy
 
+    
 class Dense_Layer:
     """
     Class for a dense layer in a neural network. Each layer consists of n_nodes with their own bias (float).
     Further each has weights vector of same length as n_inputs.
     """
+
     def __init__(self, n_inputs, n_nodes, activation_function, optimizer, 
                  weights=None, biases=None):
+        
 
         self.n_inputs = n_inputs
         self.n_nodes = n_nodes
@@ -26,8 +29,6 @@ class Dense_Layer:
             # initiate weights of network randomly, scale by 0.1 to keep small
             # Initiate biases to 0.01
             self.weights = .1 * np.random.randn(self.n_inputs, self.n_nodes)
-            #self.weights = np.arange(self.n_inputs*self.n_nodes).reshape(self.n_inputs, self.n_nodes)
-            #self.weights = np.random.randn(self.n_inputs, self.n_nodes)
             self.biases = np.zeros((1, self.n_nodes)) + 0.01
         else:
             # Brukes om man allerede har trent en modell.
@@ -269,9 +270,17 @@ class Neural_Network:
                            biases=self.biases[layer_indx])
     
     def classify(self):
+        """
+        Performs binary classification on the output of the output layer. 
+        Values higher that 0.5 are set to 1 and lower values are set to 0.
+        """
         self.output_layer.output = jnp.where(self.output_layer.output > 0.5, 1.0, 0.0)
 
     def feed_forward(self, X):
+        """
+        Performs a feed forward pass of the neural network.
+        :param X: The input data to the neural network.
+        """
         
         if self.n_hidden_layers == 0:
             
@@ -292,6 +301,14 @@ class Neural_Network:
             
         
     def feed_backward(self, X):
+        """
+        Executes a single pass of the backward propagation algorithm, first
+        calculating the gradients for all the layers, then updating all weights
+        and biases.
+        adjusting the network's internal weights and biases to minimize error
+        Performs a feed forward pass of the neural network.
+        :param X: The input data to the neural network.
+        """
         
         if self.n_hidden_layers == 0:
             self.output_layer.calculate_gradients(input_value=X,
@@ -333,6 +350,14 @@ class Neural_Network:
                 
             
     def learning_schedule(self, method, iteration, num_iter):
+        """ 
+        Adjusts the learning rate during training according to the selected 
+        learning schedule and updates the learning rate in-place. 
+        :param method: Learning rate schedule method. 
+        Options: 'Fixed learning rate' or 'Linear decay'. 
+        :param iteration: Current iteration of the training process. 
+        :param num_iter: Total number of iterations for the training process. 
+        """
         
         if method == "Fixed learning rate":
             pass
@@ -343,6 +368,15 @@ class Neural_Network:
         
         
     def train(self, X, num_iter=1000, method="Fixed learning rate"):
+        """ 
+        Trains the neural network over a given number of iterations. 
+        :param X: The input data. 
+        :param num_iter: The number of iterations for training. Default is 1000.
+        :param method: The learning schedule method to be used for updating the
+        learning rate. Options: 'Fixed learning rate' or 'Linear decay'. 
+        Default is 'Fixed learning rate'. 
+        :return: None. The weights and biases of the network are updated in-place.
+        """
         
         #weights = []
         
@@ -358,7 +392,16 @@ class Neural_Network:
         #return weights
     
     def predict(self, X):
-        
+        """
+        Predicts the output for the provided input after training the network. 
+        :param X: The input data you want to predict an output from.
+        :return: The predicted output from the network. 
+        For classification problems, the output from the output layer is made 
+        binary (either 0 or 1) before returning.
+        For regression problems, the output from the output layer is directly
+        returned.
+        """
+
         self.feed_forward(X)
         
         if self.classification_problem:

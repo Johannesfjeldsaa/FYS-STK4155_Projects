@@ -13,7 +13,23 @@ import numpy as np
 from jax import grad as jax_grad
 
 class GradientDescent:
-    
+    """
+    Class for performing gradient descent, either stochastic or normal.
+    :param learning_rate: the learning rate for the gradient descent algorithm.
+    :param tol: optional, the tolerance for the convergence check. Default: 1e-3
+    :param cost_function: cost function used in gradient descent algorithm. 
+    Should be a function. Default: None. If None, a simple version of the class
+    will be set up, for use of the calculate_change method only.
+    :param analytical_gradient: Function for the analytical gradient of the 
+    cost function. Default: None. If None, the gradient will be calculated
+    using jax.
+    :param iteration_method: ???
+    :param skip_convergence_check: False if the algorithm should check for 
+    converge, True if not. Defaul: False.
+    :param record_history: If True, the estimated beta parameters and 
+    corresponding cost scores at each iteration are recorded. 
+    """
+
     def __init__(self, learning_rate, tol=1e-3, cost_function=None, 
                  analytic_gradient=None, iteration_method="Normal",
                  skip_convergence_check=False, record_history=False):
@@ -24,7 +40,7 @@ class GradientDescent:
         if cost_function is not None:
             self.tol = tol
             self.cost_function = cost_function
-            self.iteration_method = iteration_method
+            self.iteration_method = iteration_method # Hva brukes denne til? Kan fjernes?
             self.skip_convergence_check = skip_convergence_check
             self.record_history = record_history
     
@@ -44,19 +60,33 @@ class GradientDescent:
                 self.calc_gradient = jax_grad(self.cost_function, 2)
     
     def learning_schedule(self, method):
+        """ 
+        Adjusts the learning rate during training according to the selected 
+        learning schedule and updates the learning rate in-place. 
+        :param method: Learning rate schedule method. 
+        Options: 'Fixed learning rate' or 'Linear decay'. 
+        :param iteration: Current iteration of the training process. 
+        :param num_iter: Total number of iterations for the training process. 
+        """
         if method == "Fixed learning rate":
             pass
         elif method == "Linear decay":
             alpha = self.iteration / (self.max_iter)
             self.learning_rate = (1 - alpha) * self.initial_learning_rate \
                 + alpha * self.initial_learning_rate * 0.01 
-        elif method == "Exponential decay":
-            pass
         else:
             raise ValueError("Not a valid learning schedule!")
             
         
     def check_convergence(self, gradient, iteration):
+        """
+        Checks if the gradient descent has converged by comparing the gradient 
+        norm with a tolerance.
+        :param gradient: The current gradient. 
+        :param iteration: Current iteration in gradient descent. 
+        :return: Boolean indicating if convergence is reached. 
+        If True, prints the number of iterations used before convergence.
+        """
         if jnp.linalg.norm(gradient) <= self.tol:
             print(f"Converged after {iteration} iterations")
             return True
@@ -64,22 +94,44 @@ class GradientDescent:
             return False
         
     def calculate_change(self, gradient, learning_rate=None):
+        """ 
+        Calculates the change in parameters using the current gradient and 
+        learning rate. 
+        :param gradient: Current gradient. 
+        :param learning_rate: Current learning rate. If None, uses the object's 
+        learning rate (self.learning_rate). 
+        :return: The calculated change. 
+        """
         
         if learning_rate is None:
             learning_rate = self.learning_rate
-            
-        #print("GradientDescent run calculate_change")
   
         self.change = learning_rate * gradient
         
         return self.change
     
     def record(self, beta, cost_score):
+        """ Records the current parameters (betas) and cost score at each 
+        iteration of the gradient descent. 
+        :param beta: Current parameters. 
+        :param cost_score: Current cost score. 
+        """
         self.betas.append(beta)
         self.cost_scores.append(cost_score)
             
         
     def iterate_full(self, X, target, max_iter, schedule_method):
+        """
+        Runs the gradient descent algorithm for a specified number of iterations.
+        :param X: The input data. 
+        :param target: Target values.
+        :param max_iter: Maximum number of iterations for the gradient descent.
+        :param schedule_method: Learning rate schedule method. 
+        Options: 'Fixed learning rate' or 'Linear decay'. 
+        :return: The resulting beta parameters. 
+        If record_history is True, records the parameters and corresponding 
+        cost scores at each iteration. 
+        """
             
         beta = np.random.rand(jnp.shape(X)[1])
         beta = jnp.array(beta)
@@ -146,7 +198,6 @@ class GradientDescent:
                     cost_score = self.cost_function(X_batch, y_batch, beta)
                     self.record(beta, cost_score)
                 
-            # Fiks riktig konvergenskriterie
             if self.skip_convergence_check is False:
                 total_gradient = self.calc_gradient(X, target, beta)
                 if self.check_convergence(total_gradient, self.epoch):
@@ -194,14 +245,12 @@ class GradientDescentMomentum(GradientDescent):
         if learning_rate is None:
             learning_rate = self.learning_rate
             
-        #print("Momentum run calculate_change")
-            
         self.change = self.momentum*self.change + learning_rate*gradient
         return self.change
     
     
 class GradientDescentAdagrad(GradientDescent):
-    # Sjekk hvorfor så sakte konvergering
+
     def __init__(self, delta, momentum, **kwargs):
         super().__init__(**kwargs)
         
@@ -214,9 +263,7 @@ class GradientDescentAdagrad(GradientDescent):
         
         if learning_rate is None:
             learning_rate = self.learning_rate
-        
-        #print("Adagrad run calculate_change")
-            
+         
         self.acc_squared_gradient = self.acc_squared_gradient + gradient*gradient
         
         self.change = (learning_rate/(self.delta + jnp.sqrt(self.acc_squared_gradient)))*gradient \
@@ -240,9 +287,7 @@ class GradientDescentRMSprop(GradientDescent):
         
         if learning_rate is None:
             learning_rate = self.learning_rate
-            
-        #print("RMSprop run calculate_change")
-        
+
         self.acc_squared_gradient = (self.rho*self.acc_squared_gradient + 
                                      (1-self.rho) * gradient**2)
         # Calculate the update
@@ -269,10 +314,8 @@ class GradientDescentADAM(GradientDescent):
         if learning_rate is None:
             learning_rate = self.learning_rate
             
-        #print("Adam run calculate_change")
-        
         self.iter_adam += 1
-        #print(self.iter_adam)
+
         
         self.first_moment = self.rho1*self.first_moment + (1 - self.rho1)*gradient
         self.second_moment = self.rho2*self.second_moment + (1-self.rho2)*(gradient*gradient)
@@ -286,7 +329,7 @@ class GradientDescentADAM(GradientDescent):
 
 if __name__ == "__main__":
     def make_design_matrix(x, degree):
-        "Creates the design matrix for the given polynomial degree and ijnput data"
+        "Creates the design matrix for the given polynomial degree and input data"
         
         X = np.zeros((len(x), degree+1))
         
