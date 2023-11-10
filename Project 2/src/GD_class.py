@@ -31,7 +31,7 @@ class GradientDescent:
     """
 
     def __init__(self, learning_rate, tol=1e-3, cost_function=None, 
-                 analytic_gradient=None, iteration_method="Normal",
+                 analytic_gradient=None, 
                  skip_convergence_check=False, record_history=False):
         
         self.learning_rate = learning_rate
@@ -40,7 +40,6 @@ class GradientDescent:
         if cost_function is not None:
             self.tol = tol
             self.cost_function = cost_function
-            self.iteration_method = iteration_method # Hva brukes denne til? Kan fjernes?
             self.skip_convergence_check = skip_convergence_check
             self.record_history = record_history
     
@@ -316,7 +315,6 @@ class GradientDescentADAM(GradientDescent):
             
         self.iter_adam += 1
 
-        
         self.first_moment = self.rho1*self.first_moment + (1 - self.rho1)*gradient
         self.second_moment = self.rho2*self.second_moment + (1-self.rho2)*(gradient*gradient)
         

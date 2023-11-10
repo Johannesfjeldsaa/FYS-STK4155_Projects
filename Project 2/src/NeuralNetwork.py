@@ -29,7 +29,7 @@ class Dense_Layer:
             # initiate weights of network randomly, scale by 0.1 to keep small
             # Initiate biases to 0.01
             self.weights = .1 * np.random.randn(self.n_inputs, self.n_nodes)
-            self.biases = np.zeros((1, self.n_nodes)) + 0.01
+            self.biases = np.zeros((1, self.n_nodes)) #+ 0.01
         else:
             # Brukes om man allerede har trent en modell.
             # Legg til kontroll av dimensjoner og type
