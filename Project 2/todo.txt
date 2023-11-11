@@ -1,10 +1,15 @@
+Å tilpasse:
+- Learning rate
+- Lambda
+- Number of hidden nodes
+- Antall iterasjoner trening?
+
 a)
-Lag ridge kostfunksjon
+
 Heatmap for lambda og learning rate
 Sjekk for de ulike datasettene hvilken gradientmetode som fungerer best og tune parametre for den (til bruk videre i NN)
 
 b)
-Legg inn mulighet for minibatches (i train)
 Få på plass pytorch versjon
 
 c) 
