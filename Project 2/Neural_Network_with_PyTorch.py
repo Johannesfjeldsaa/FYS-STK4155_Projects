@@ -13,7 +13,7 @@ class Neural_Network_PyTorch(nn.Module):
     - https://www.deeplearningwizard.com/deep_learning/practical_pytorch/pytorch_feedforward_neuralnetwork/
     """
     def __init__(self, n_inputs, n_hidden_layers, n_hidden_nodes, n_outputs,
-                 activation_function_hidden_layers, activation_function_output_layer):
+                 activation_function_hidden_layers='RelU', activation_function_output_layer='sigmoid'):
 
         super(Neural_Network_PyTorch, self).__init__()
 
@@ -52,8 +52,14 @@ class Neural_Network_PyTorch(nn.Module):
             return nn.ReLU()
         elif activation_function == 'Leaky ReLU':
             return nn.LeakyReLU()
+        elif activation_function is None:
+            def dummy(x):
+                return x
+            return dummy
         else:
-            raise ValueError('activation_function must be one of: sigmoid, tanh, ReLU, Leaky ReLU not {}'.format(activation_function))
+            raise ValueError('activation_function must be one of: '
+                             'sigmoid, tanh, ReLU, Leaky ReLU not {}. \n'.format(activation_function)
+                             + 'If you want to use no activation function, set activation_function to None.')
 
 
     def initiate_hidden_layers(self):
@@ -84,6 +90,7 @@ class Neural_Network_PyTorch(nn.Module):
         :return: Output layer of the network
         """
         self.linear_output = nn.Linear(self.n_hidden_nodes[-1], self.n_outputs)
+        print(self.activation_function_output_layer)
         self.activated_output = self.activation_function_output_layer
 
     def feed_forward(self, X):
@@ -106,4 +113,11 @@ class Neural_Network_PyTorch(nn.Module):
 
         return output
 
+    def classify(self, unclassified_output):
+        """
+        Classifies the output of the network.
+        :param unclassified_output: output of the network prior to the activation function of the output layer
+        :return: classified output of the network
+        """
+        return [1 if output >= 0.5 else 0 for output in unclassified_output]
 
