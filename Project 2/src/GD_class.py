@@ -23,7 +23,6 @@ class GradientDescent:
     :param analytical_gradient: Function for the analytical gradient of the 
     cost function. Default: None. If None, the gradient will be calculated
     using jax.
-    :param iteration_method: ???
     :param skip_convergence_check: False if the algorithm should check for 
     converge, True if not. Defaul: False.
     :param record_history: If True, the estimated beta parameters and 
@@ -165,6 +164,19 @@ class GradientDescent:
     
     def iterate_minibatch(self, X, target, max_epoch, num_batches, 
                           schedule_method):
+        """
+        Runs stochastic gradient descent algorithm for a specified number of 
+        epochs.
+        :param X: The input data. 
+        :param target: Target values.
+        :param max_epoch: Maximum number of epochs.
+        :param num_batches: The number of batches to split data in.
+        :param schedule_method: Learning rate schedule method. 
+        Options: 'Fixed learning rate' or 'Linear decay'. 
+        :return: The resulting beta parameters. 
+        If record_history is True, records the parameters and corresponding 
+        cost scores at each iteration. 
+        """
 
         beta = np.random.rand(jnp.shape(X)[1])
         self.epoch = 0
@@ -214,7 +226,26 @@ class GradientDescent:
     def iterate(self, X, target, iteration_method, max_iter=None, 
                 max_epoch=None, num_batches=None,
                 schedule_method="Fixed learning rate"):
-        
+        """
+        Performs model training iterations based on specified method, either 
+        stochastic of normal.
+        :param X: Input data.
+        :param target: Target values.
+        :param iteration_method: Method of iterations: 'Full' for normal 
+        gradient descent or 'Stochastic' for stochastic gradient descent.
+        :param max_iter: Maximum number of iterations for normal gradient 
+        descent. Defaults to 10000 if not provided.
+        :param max_epoch: Maximum number of epochs for stochastic gradient 
+        descent. Defaults to 128 if not provided.
+        :param num_batches: Number of minibatches for stochastic gradient descent. 
+        Defaults to 10 if not provided.
+        :param schedule_method: Learning rate adjustment method. Can be either
+        'Fixed learning rate' or 'Linear decay'. Default is 'Fixed learning rate'.
+        :return: Final beta parameters after training. 
+        If record_history is True, records the parameters and corresponding 
+        cost scores at each iteration. 
+        """
+                
         if iteration_method == "Full":
             max_iter = max_iter if not None else 10000
             
@@ -232,6 +263,14 @@ class GradientDescent:
 
 
 class GradientDescentMomentum(GradientDescent):
+    """
+    Class implementing gradient descent optimization algorithm with momentum.
+    Inherits from the 'GradientDescent' parent class.
+
+    :param momentum: fraction of the change from the previous time step to add
+    to the current change. Value should lie between 0 and 1. Higher value means 
+    more momentum.
+    """
     
     def __init__(self, momentum, **kwargs):
         super().__init__(**kwargs)
@@ -240,6 +279,13 @@ class GradientDescentMomentum(GradientDescent):
         self.change = 0
         
     def calculate_change(self, gradient, learning_rate=None):
+        """ 
+        Calculates the change in parameters using the momentum algorithm. 
+        :param gradient: Current gradient. 
+        :param learning_rate: Current learning rate. If None, uses the object's 
+        learning rate (self.learning_rate). 
+        :return: The calculated change. 
+        """
         
         if learning_rate is None:
             learning_rate = self.learning_rate
@@ -249,6 +295,16 @@ class GradientDescentMomentum(GradientDescent):
     
     
 class GradientDescentAdagrad(GradientDescent):
+    """
+    Class implementing gradient descent optimimizing using the Adagrad algorithm.
+    Inherits from the 'GradientDescent' parent class.
+
+    :param momentum: fraction of the change from the previous time step to add
+    to the current change. Value should lie between 0 and 1. Higher value means 
+    more momentum.
+    :param delta: Small constant for numerical stability.
+
+    """
 
     def __init__(self, delta, momentum, **kwargs):
         super().__init__(**kwargs)
@@ -259,6 +315,13 @@ class GradientDescentAdagrad(GradientDescent):
         self.acc_squared_gradient = 0
         
     def calculate_change(self, gradient, learning_rate=None):
+        """ 
+        Calculates the change in parameters using the Adagrad algorithm. 
+        :param gradient: Current gradient. 
+        :param learning_rate: Current learning rate. If None, uses the object's 
+        learning rate (self.learning_rate). 
+        :return: The calculated change. 
+        """
         
         if learning_rate is None:
             learning_rate = self.learning_rate
@@ -272,6 +335,14 @@ class GradientDescentAdagrad(GradientDescent):
     
     
 class GradientDescentRMSprop(GradientDescent):
+    """
+    Class implementing gradient descent optimimizing using the RMSProp algorithm.
+    Inherits from the 'GradientDescent' parent class.
+
+    :param delta: Small constant added for numerical stability.
+    :param rho: Decay rate used to determine the extent of the moving average.
+    :param n_inputs: The number of inputs in the model.
+    """
     
     def __init__(self, delta, rho, n_inputs, **kwargs):
         super().__init__(**kwargs)
@@ -279,10 +350,16 @@ class GradientDescentRMSprop(GradientDescent):
         self.delta = delta
         self.rho = rho
         self.change = 0
-        # This does not work yet
         self.acc_squared_gradient = jnp.zeros(n_inputs)
         
     def calculate_change(self, gradient, learning_rate=None):
+        """ 
+        Calculates the change in parameters using the RMSProp algorithm. 
+        :param gradient: Current gradient. 
+        :param learning_rate: Current learning rate. If None, uses the object's 
+        learning rate (self.learning_rate). 
+        :return: The calculated change. 
+        """
         
         if learning_rate is None:
             learning_rate = self.learning_rate
@@ -296,7 +373,15 @@ class GradientDescentRMSprop(GradientDescent):
 
         
 class GradientDescentADAM(GradientDescent):
-    # Fiks for stokastisk
+    """
+    Class implementing gradient descent optimimizing using the Adam algorithm.
+    Inherits from the 'GradientDescent' parent class.
+
+    :param delta: Small constant added for numerical stability.
+    :param rho1: Exponential decay rate for the first moment estimates.
+    :param rho2: Exponential decay rate for the second-moment estimates.
+    """
+
     def __init__(self, delta, rho1, rho2, **kwargs):
         super().__init__(**kwargs)
         
@@ -309,6 +394,13 @@ class GradientDescentADAM(GradientDescent):
         self.iter_adam = 0
         
     def calculate_change(self, gradient, learning_rate=None):
+        """ 
+        Calculates the change in parameters using the RMSProp algorithm. 
+        :param gradient: Current gradient. 
+        :param learning_rate: Current learning rate. If None, uses the object's 
+        learning rate (self.learning_rate). 
+        :return: The calculated change. 
+        """
         
         if learning_rate is None:
             learning_rate = self.learning_rate

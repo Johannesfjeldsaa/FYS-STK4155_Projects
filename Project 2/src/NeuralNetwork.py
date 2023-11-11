@@ -77,14 +77,14 @@ class Dense_Layer:
         
 class Output_Layer(Dense_Layer):
     
-    def __init__(self, cost_function, **kwargs):
+    def __init__(self, grad_cost_function, **kwargs):
         super().__init__(**kwargs)
         
-        self.cost_function = cost_function
+        self.grad_cost_function = grad_cost_function
         
-    def calculate_gradients(self, input_value, lmbd):
+    def calculate_gradients(self, input_value, target, lmbd):
         
-        dC_da = self.cost_function(self.output)
+        dC_da = self.grad_cost_function(target, self.output)
         da_dz = self.activation_function.grad_activation_function(self.output_pre_activation)
         
         self.delta = dC_da * da_dz # Elementwise multiplication
@@ -99,7 +99,7 @@ class Output_Layer(Dense_Layer):
 class Neural_Network:
 
     def __init__(self, n_inputs, n_hidden_layers, n_hidden_nodes, n_outputs,
-                 cost_function,
+                 grad_cost_function,
                  learning_rate=0.1,
                  lmbd=0.0,
                  activation_function_hidden='ReLU', 
@@ -114,7 +114,7 @@ class Neural_Network:
         self.activation_function_hidden = activation_function_hidden
         self.activation_function_output = activation_function_output
         
-        self.cost_function = cost_function
+        self.grad_cost_function = grad_cost_function
         
         if optimizer is None:
             self.optimizer = GradientDescentADAM(delta=1e-8, rho1=0.9, 
@@ -217,7 +217,7 @@ class Neural_Network:
         :param activation_function: Activation function of the layer
         :return: Layer with random weights and biases set to 0.01
         """
-        return Output_Layer(cost_function=self.cost_function, 
+        return Output_Layer(grad_cost_function=self.grad_cost_function, 
                            n_inputs=n_inputs,
                            n_nodes=n_hidden_nodes,
                            activation_function=self.activation_function_output,
@@ -232,7 +232,7 @@ class Neural_Network:
         :param layer_indx: Index of the layer
         :return: Layer with weights and biases
         """
-        return Output_Layer(cost_function=self.cost_function, 
+        return Output_Layer(grad_cost_function=self.grad_cost_function, 
                            n_inputs=n_inputs,
                            n_nodes=n_hidden_nodes,
                            activation_function=self.activation_function_output,
@@ -300,7 +300,7 @@ class Neural_Network:
             self.output_layer.forward_propagation(self.hidden_layers[-1].output)
             
         
-    def feed_backward(self, X):
+    def feed_backward(self, X, target):
         """
         Executes a single pass of the backward propagation algorithm, first
         calculating the gradients for all the layers, then updating all weights
@@ -312,6 +312,7 @@ class Neural_Network:
         
         if self.n_hidden_layers == 0:
             self.output_layer.calculate_gradients(input_value=X,
+                                                  target=target,
                                                   lmbd=self.lmbd)
             
             self.output_layer.backward_propagation(learning_rate=self.learning_rate)
@@ -320,6 +321,7 @@ class Neural_Network:
         else:
             # Calculate all the necessary gradients:
             self.output_layer.calculate_gradients(input_value=self.hidden_layers[-1].output,
+                                                  target=target,
                                                   lmbd=self.lmbd)
             
             for i in reversed(range(self.n_hidden_layers)):
@@ -367,29 +369,51 @@ class Neural_Network:
                 + alpha * self.initial_learning_rate * 0.01 
         
         
-    def train(self, X, num_iter=1000, method="Fixed learning rate"):
+    def train(self, X, target, num_iter=1000, 
+              method="Fixed learning rate", n_minibatches=None):
         """ 
         Trains the neural network over a given number of iterations. 
         :param X: The input data. 
         :param num_iter: The number of iterations for training. Default is 1000.
+        If using stochastic method, num_iter becomes the number of epochs.
         :param method: The learning schedule method to be used for updating the
         learning rate. Options: 'Fixed learning rate' or 'Linear decay'. 
         Default is 'Fixed learning rate'. 
+        :param n_minimatches: Number of minibatches to use if stochastic.
+        Default is None, in which case the full dataset is used.
         :return: None. The weights and biases of the network are updated in-place.
         """
         
-        #weights = []
+        if n_minibatches is None:
+            
+            for i in range(num_iter):
+                
+                self.learning_schedule(method, iteration=i, num_iter=num_iter)
+    
+                self.feed_forward(X)
+                self.feed_backward(X, target)
         
-        for i in range(num_iter):
+        else:
+            # Using stochastic method
             
-            self.learning_schedule(method, iteration=i, num_iter=num_iter)
+            indices = np.arange(X.shape[0])
             
-            #weights.append(self.hidden_layers[0].weights)
-            
-            self.feed_forward(X)
-            self.feed_backward(X)
-            
-        #return weights
+            for epoch in range(num_iter):
+                
+                np.random.shuffle(indices)
+                
+                batches = jnp.array_split(indices, n_minibatches)
+                
+                for i in range(n_minibatches):
+                    
+                    X_batch = X[batches[i], :]
+                    target_batch = target[batches[i]]
+                    
+                    self.learning_schedule(method, iteration=i, num_iter=num_iter)
+                    
+                    self.feed_forward(X_batch)
+                    self.feed_backward(X_batch, target_batch)
+
     
     def predict(self, X):
         """
