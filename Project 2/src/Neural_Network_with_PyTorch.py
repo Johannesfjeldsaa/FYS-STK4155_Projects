@@ -2,24 +2,6 @@ import torch
 import torch.nn as nn
 
 
-class cost_function_PyTorch:
-
-    def __init__(self, cost_function):
-        self.cost_function_name = cost_function
-        self.cost_function = self.set_cost_function(self.cost_function_name)
-
-    def __str__(self):
-        return (f"Cost function with {self.cost_function_name} configured.")
-
-    def set_cost_function(self, cost_function):
-        if cost_function == 'CrossEntropyLoss':
-            return nn.CrossEntropyLoss()
-        elif cost_function == 'MSELoss':
-            return nn.MSELoss()
-        elif cost_function == 'BCEWithLogitsLoss':
-            return nn.BCEWithLogitsLoss()
-        else:
-            raise ValueError('cost_function must be one of: CrossEntropyLoss, MSELoss not {}'.format(cost_function))
 
 class Neural_Network_PyTorch(nn.Module):
     """
@@ -31,7 +13,7 @@ class Neural_Network_PyTorch(nn.Module):
     - https://www.deeplearningwizard.com/deep_learning/practical_pytorch/pytorch_feedforward_neuralnetwork/
     """
     def __init__(self, n_inputs, n_hidden_layers, n_hidden_nodes, n_outputs,
-                 activation_function_hidden_layers, activation_function_output_layer):
+                 activation_function_hidden_layers='RelU', activation_function_output_layer='sigmoid'):
 
         super(Neural_Network_PyTorch, self).__init__()
 
@@ -52,8 +34,8 @@ class Neural_Network_PyTorch(nn.Module):
         self.n_hidden_nodes = n_hidden_nodes
         self.n_outputs = n_outputs
 
-        self.hidden_layers = self.initiate_hidden_layers()
-        self.output_layer = self.initiate_output_layer()
+        self.initiate_hidden_layers()
+        self.initiate_output_layer()
 
     #def __str__(self):
      #   return (f"Neural Network with {self.n_hidden_layers} hidden layers and {self.n_hidden_nodes} nodes per layer. "
@@ -70,8 +52,14 @@ class Neural_Network_PyTorch(nn.Module):
             return nn.ReLU()
         elif activation_function == 'Leaky ReLU':
             return nn.LeakyReLU()
+        elif activation_function is None:
+            def dummy(x):
+                return x
+            return dummy
         else:
-            raise ValueError('activation_function must be one of: sigmoid, tanh, ReLU, Leaky ReLU not {}'.format(activation_function))
+            raise ValueError('activation_function must be one of: '
+                             'sigmoid, tanh, ReLU, Leaky ReLU not {}. \n'.format(activation_function)
+                             + 'If you want to use no activation function, set activation_function to None.')
 
 
     def initiate_hidden_layers(self):
@@ -86,24 +74,24 @@ class Neural_Network_PyTorch(nn.Module):
 
         :return: Hidden layers of the network
         """
-
-        hidden_layers = []
         for i in range(self.n_hidden_layers):
             if i == 0:
                 n_inputs = self.n_inputs
             else:
                 n_inputs = self.n_hidden_nodes[i - 1]
+            
+            setattr(self, f'hidden{i}', nn.Linear(n_inputs, self.n_hidden_nodes[i]))
+            setattr(self, f'activation{i}', self.activation_function_hidden_layers)
 
-            hidden_layers.append([nn.Linear(n_inputs, self.n_hidden_nodes[i]), self.activation_function_hidden_layers])
-
-        return hidden_layers
 
     def initiate_output_layer(self):
         """
         Initiates the output layer of the network.
         :return: Output layer of the network
         """
-        return nn.Linear(self.n_hidden_nodes[-1], self.n_outputs)
+        self.linear_output = nn.Linear(self.n_hidden_nodes[-1], self.n_outputs)
+        print(self.activation_function_output_layer)
+        self.activated_output = self.activation_function_output_layer
 
     def feed_forward(self, X):
         """
@@ -112,15 +100,24 @@ class Neural_Network_PyTorch(nn.Module):
         """
 
         input = X
-        for layer in self.hidden_layers:
-            linear_output = layer[0](input)
-            non_linear_output = layer[1](linear_output)
-            # set non_linear_output as input for next layer
+        for i in range(self.n_hidden_layers):
+            
+            linear_output = getattr(self, f'hidden{i}')(input)
+            non_linear_output = getattr(self, f'activation{i}')(linear_output)
+            
             input = non_linear_output
 
-
-        output = self.output_layer(input)
+        # output layer
+        linear_output = self.linear_output(input)
+        output = self.activated_output(linear_output)
 
         return output
 
+    def classify(self, unclassified_output):
+        """
+        Classifies the output of the network.
+        :param unclassified_output: output of the network prior to the activation function of the output layer
+        :return: classified output of the network
+        """
+        return [1 if output >= 0.5 else 0 for output in unclassified_output]
 
