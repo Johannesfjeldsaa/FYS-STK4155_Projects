@@ -125,7 +125,7 @@ class Neural_Network_PyTorch(nn.Module):
         :param N_minibatches: number of minibatches
         :return: trained network
         """
-
+        torch.manual_seed(1234)
         if n_minibatches is None:
 
             for i in range(num_iter):
