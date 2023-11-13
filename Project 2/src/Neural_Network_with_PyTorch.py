@@ -113,6 +113,62 @@ class Neural_Network_PyTorch(nn.Module):
 
         return output
 
+    def train_network(self, X, target, optimizer, criterion,
+                      num_iter=1000, n_minibatches=None):
+        """
+        Trains the network.
+        :param X: input data
+        :param y: target data
+        :param optimizer: optimizer (adam, sgd, etc)
+        :param criterion: loss function
+        :param num_iter: number of iterations or epochs
+        :param N_minibatches: number of minibatches
+        :return: trained network
+        """
+
+        if n_minibatches is None:
+
+            for i in range(num_iter):
+                self.train()
+                optimizer.zero_grad()
+                # Zero the gradients
+                optimizer.zero_grad()
+
+                # Forward pass to get output/logits
+                target_pred = self.feed_forward(X)
+
+                # Calculate loss and do backpropagation
+                loss = criterion(target_pred, target)
+                loss.backward()
+
+                # Updating neural network parameters: w = w - learning_rate * gradient
+                optimizer.step()
+
+        else:
+            # Minibatch training
+            for epoch in range(num_iter):
+                self.train()
+                batches = torch.randperm(X.shape[0])
+
+                for i in range(n_minibatches):
+                    X_batch = X[batches[i], :]
+                    target_batch = target[batches[i]]
+
+                    # Zero the gradients
+                    optimizer.zero_grad()
+
+                    # Forward pass to get output/logits
+                    target_pred = self.feed_forward(X_batch)
+
+                    # Calculate loss and do backpropagation
+                    loss = criterion(target_pred, target_batch)
+                    loss.backward()
+
+                    # Updating neural network parameters: w = w - learning_rate * gradient
+                    optimizer.step()
+        return self
+
+
     def classify(self, unclassified_output):
         """
         Classifies the output of the network.
