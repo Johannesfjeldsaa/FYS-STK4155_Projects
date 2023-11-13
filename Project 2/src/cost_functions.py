@@ -9,6 +9,17 @@ import jax.numpy as jnp
 
 from jax import grad as jax_grad
 
+def grad_mse(target, pred):
+        
+    n = len(target) # Number of inputs
+        
+    return 2/n * (pred - target)
+
+def grad_cost_logreg(target, pred):
+    
+    return (pred - target)/(pred * (1 - pred))
+
+
 class Cost_Functions:
     def __init__(self, cost_function, target):
         self.target = target

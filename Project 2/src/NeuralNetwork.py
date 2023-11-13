@@ -370,7 +370,8 @@ class Neural_Network:
         
         
     def train(self, X, target, num_iter=1000, 
-              method="Fixed learning rate", n_minibatches=None):
+              n_minibatches=None,
+              method="Fixed learning rate"):
         """ 
         Trains the neural network over a given number of iterations. 
         :param X: The input data. 
@@ -398,6 +399,8 @@ class Neural_Network:
             
             indices = np.arange(X.shape[0])
             
+            iteration = 0
+            
             for epoch in range(num_iter):
                 
                 np.random.shuffle(indices)
@@ -406,10 +409,13 @@ class Neural_Network:
                 
                 for i in range(n_minibatches):
                     
+                    iteration += 1
+                    
                     X_batch = X[batches[i], :]
                     target_batch = target[batches[i]]
                     
-                    self.learning_schedule(method, iteration=i, num_iter=num_iter)
+                    self.learning_schedule(method, iteration=iteration, 
+                                           num_iter=num_iter)
                     
                     self.feed_forward(X_batch)
                     self.feed_backward(X_batch, target_batch)
