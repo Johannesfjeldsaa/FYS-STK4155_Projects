@@ -16,9 +16,11 @@ class Activation_Functions:
             return self.ReLU, self.grad_ReLU
         elif self.func_name == 'Leaky ReLU':
             return self.Leaky_ReLU, self.grad_Leaky_ReLU
+        elif self.func_name == "Linear":
+            return self.linear, self.grad_linear
         else:
             raise ValueError('Activation function is not available.' 
-                             'Expected: sigmoid, relu, leaky_relu, not {}' .format(self.func_name))
+                             'Expected: sigmoid, relu, leaky_relu, Linear, not {}' .format(self.func_name))
 
     def sigmoid(self, x):
         """
@@ -86,7 +88,8 @@ class Activation_Functions:
         :param x: x-axis coordinate
         :return: function value [0, inf]
         """
-        return max(0.0, x)
+        #return max(0.0, x)
+        return np.maximum(0.0, x)
 
     def grad_ReLU(self, x):
         """
@@ -98,7 +101,8 @@ class Activation_Functions:
         :param x: x-axis value
         :return: gradient of the ReLU function
         """
-        return 1.0 if x >= 0.0 else 0.0
+        #return 1.0 if x >= 0.0 else 0.0
+        return np.where(x >= 0.0, 1.0, 0.0)
 
     def Leaky_ReLU(self, x):
         """
@@ -110,7 +114,8 @@ class Activation_Functions:
         :param x: x-axis coordinate
         :return: function value
         """
-        return max(0.01 * x, x)
+        #return max(0.01 * x, x)
+        return np.maximum(0.01 * x, x)
 
     def grad_Leaky_ReLU(self, x):
         """
@@ -122,7 +127,16 @@ class Activation_Functions:
         :param x: x-axis value
         :return: gradient of the Leaky ReLU function
         """
-        return 1.0 if x >= 0.0 else 0.01
+        #return 1.0 if x >= 0.0 else 0.01
+        return np.where(x >= 0.0, 1.0, 0.01)
+    
+    def linear(self, x):
+        
+        return x
+    
+    def grad_linear(self, x):
+        
+        return 1.0
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
