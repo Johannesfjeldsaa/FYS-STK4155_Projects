@@ -9,6 +9,17 @@ import jax.numpy as jnp
 
 from jax import grad as jax_grad
 
+def grad_mse(target, pred):
+        
+    n = len(target) # Number of inputs
+        
+    return 2/n * (pred - target)
+
+def grad_cost_logreg(target, pred):
+    
+    return (pred - target)/(pred * (1 - pred))
+
+
 class Cost_Functions:
     def __init__(self, cost_function, target):
         self.target = target
@@ -24,12 +35,12 @@ class Cost_Functions:
         if self.func_name == 'LogReg':
             return self.CostLogReg(self.target)
 
-        elif self.func_name == 'CostCrossEntropy':
+        elif self.func_name == 'CrossEntropy':
             return self.CostCrossEntropy(self.target)
 
         else:
             raise ValueError('Cost function is not available.' 
-                             'Expected: LogReg, not {}' .format(self.func_name))
+                             'Expected: LogReg, CrossEntropy, not {}' .format(self.func_name))
 
 
 
