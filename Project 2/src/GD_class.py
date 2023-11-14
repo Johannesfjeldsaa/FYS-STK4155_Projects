@@ -344,13 +344,13 @@ class GradientDescentRMSprop(GradientDescent):
     :param n_inputs: The number of inputs in the model.
     """
     
-    def __init__(self, delta, rho, n_inputs, **kwargs):
+    def __init__(self, delta, rho, **kwargs):
         super().__init__(**kwargs)
         
         self.delta = delta
         self.rho = rho
         self.change = 0
-        self.acc_squared_gradient = jnp.zeros(n_inputs)
+        self.acc_squared_gradient = 0
         
     def calculate_change(self, gradient, learning_rate=None):
         """ 
