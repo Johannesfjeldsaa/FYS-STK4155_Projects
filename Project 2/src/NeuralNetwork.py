@@ -32,7 +32,6 @@ class Dense_Layer:
             self.biases = np.zeros((1, self.n_nodes)) #+ 0.01
         else:
             # Brukes om man allerede har trent en modell.
-            # Legg til kontroll av dimensjoner og type
             self.weights = weights
             self.biases = biases
 
